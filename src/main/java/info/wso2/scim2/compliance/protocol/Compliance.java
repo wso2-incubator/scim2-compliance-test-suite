@@ -186,11 +186,11 @@ public class Compliance extends HttpServlet {
         }
         Result finalResults = new Result(statistics, results);
         //generate pdf results sheet
-        try {
-            PDFGenerator.GeneratePDFResults(finalResults);
-        } catch (IOException e) {
-            return (new Result(e.getMessage()));
-        }
+       // try {
+         //   PDFGenerator.GeneratePDFResults(finalResults);
+       // } catch (IOException e) {
+           // return (new Result(e.getMessage()));
+       // }
         return finalResults;
     }
 }
