@@ -35,8 +35,8 @@ public class Result {
     @XmlElement(name = "statistics")
     Statistics       statistics;
 
-    @XmlElement(name = "error_message")
-    String           errorMessage;
+    @XmlElement(name = "errorMessage")
+    String           errorMessage = "";
 
     public Result() {
 

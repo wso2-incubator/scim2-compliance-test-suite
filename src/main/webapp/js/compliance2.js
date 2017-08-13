@@ -44,15 +44,12 @@ $(document).ready(
 
             $("#spinner-container2").empty();
 
-            if (data.authRequired === "true") {
-                var template = $('#authMethodTemplate2').html();
-                var html = Mustache.to_html(template, data);
-                $("#authMethod2").html = html;
-
-                $("#authenticationAlert2").show();
-                $("#settingsArrow2").removeClass("icon-chevron-right");
-                $("#settingsArrow2").addClass("icon-chevron-down");
-                $("#settings2").slideDown();
+            if (data.errorMessage != "") {
+                $("#spinner-container2").empty();
+                var x = document.getElementById('compliance-error2');
+                x.style.display = 'block';
+                x.innerHTML = "An error occurred. " + data.errorMessage;
+                $("#compliance-error-container2").show();
             } else {
                 data.index = getIndex();
                 data.color = getColor();
