@@ -26,4 +26,9 @@ public class SCIMServiceProviderConfig extends AbstractSCIMObject {
        Attribute patchAttribute  = getAttribute("patch");
        return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
    }
+
+    public boolean getSortSupported() throws CharonException {
+        Attribute patchAttribute  = getAttribute("sort");
+        return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
 }

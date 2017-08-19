@@ -159,6 +159,18 @@ public class Compliance extends HttpServlet {
             results.add(testResult);
         }
 
+        // Pagination Test
+        PaginationTest paginationTest = new PaginationTest(complianceTestMetaDataHolder);
+        ArrayList<TestResult> paginationTestResults = new ArrayList<>();
+        try {
+            paginationTestResults = paginationTest.performTest();
+        } catch (ComplianceException e) {
+            return (new Result(e.getDetail()));
+        }
+        for (TestResult testResult : paginationTestResults) {
+            results.add(testResult);
+        }
+
         Statistics statistics = new Statistics();
         for (TestResult result : results) {
 

@@ -50,6 +50,8 @@ public class ComplianceConstants {
         public static final String ATTRIBUTE_MUTABILITY_TEST = "Attribute Mutability Test";
         public static final String ALL_GROUPS_IN_TEST = "All Groups In Test";
         public static final String ALL_USERS_IN_TEST = "All Users In Test";
+        public static final String PAGINATION_USER_TEST = "Pagination User Test";
+        public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
         public static final String FILTER_CONTENT_TEST = "Filter Content Test";
     }
 

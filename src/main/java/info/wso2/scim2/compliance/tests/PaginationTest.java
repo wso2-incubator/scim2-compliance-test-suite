@@ -47,7 +47,7 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
-public class ListTest {
+public class PaginationTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String usersURL  = null;
@@ -55,7 +55,7 @@ public class ListTest {
     private ArrayList<String> groupIDs = new ArrayList<>();
     private ArrayList<String> userIDs = new ArrayList<>();
 
-    public ListTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
+    public PaginationTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
@@ -75,18 +75,18 @@ public class ListTest {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
             CreateTestsUsers();
-            testResults.add(ListUsers());
+            testResults.add(PaginateUsers());
             CreateTestsGroups();
-            testResults.add(ListGroups());
+            testResults.add(PaginateGroups());
         } catch (GeneralComplianceException e){
                 testResults.add(e.getResult());
         }
         return testResults;
     }
 
-    private TestResult ListUsers() throws ComplianceException, GeneralComplianceException {
+    private TestResult PaginateUsers() throws ComplianceException, GeneralComplianceException {
 
-        HttpGet method = new HttpGet(usersURL);
+        HttpGet method = new HttpGet(usersURL + "?startIndex=1&count=2");
 
         HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
 
@@ -123,7 +123,7 @@ public class ListTest {
             for (String id : userIDs) {
                 CleanUpUser(id);
             }
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                     "Could not list the users at url " + usersURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -151,7 +151,7 @@ public class ListTest {
                         for (String id : userIDs) {
                             CleanUpUser(id);
                         }
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
                                         responseStatus, subTests)));
@@ -169,7 +169,7 @@ public class ListTest {
                 for (String id : userIDs) {
                     CleanUpUser(id);
                 }
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -189,12 +189,12 @@ public class ListTest {
                 CleanUpUser(id);
             }
             return new TestResult
-                    (TestResult.SUCCESS, "List Users",
+                    (TestResult.SUCCESS, "Pagination Users",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "List Users",
+                    (TestResult.ERROR, "Pagination Users",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         }
@@ -239,13 +239,13 @@ public class ListTest {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
 
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                     "Could not delete the default user at url " + deleteUserURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() != 204) {
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                     "Could not delete the default user at url " + deleteUserURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -257,19 +257,12 @@ public class ListTest {
                                              ArrayList<String> subTests) throws CharonException,
             ComplianceException, GeneralComplianceException {
 
-        subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
-        ArrayList<String> returnedUserIDs = new ArrayList<>();
-        for (User user : userList) {
-            returnedUserIDs.add(user.getId());
+        subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
+        if (userList.size() != 2){
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
+                    "Response does not contain right number of pagination.",
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
-        for (String id : userIDs){
-            if (!returnedUserIDs.contains(id)){
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
-                        "Response does not contain all the created users",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-            }
-        }
-
     }
 
     private ArrayList<String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
@@ -310,7 +303,7 @@ public class ListTest {
                     try {
                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     }
@@ -325,7 +318,7 @@ public class ListTest {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                         "Could not create default users at url " + usersURL,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -395,10 +388,10 @@ public class ListTest {
         return groupIDs;
     }
 
-    private TestResult ListGroups()
+    private TestResult PaginateGroups()
             throws ComplianceException, GeneralComplianceException {
 
-        HttpGet method = new HttpGet(groupURL);
+        HttpGet method = new HttpGet(groupURL + "?startIndex=1&count=2");
 
         HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
 
@@ -435,7 +428,7 @@ public class ListTest {
             for (String id : groupIDs) {
                 CleanUpGroup(id);
             }
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                     "Could not list the groups at url " + groupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -463,7 +456,7 @@ public class ListTest {
                         for (String id : groupIDs) {
                             CleanUpGroup(id);
                         }
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
                                         responseStatus, subTests)));
@@ -481,7 +474,7 @@ public class ListTest {
                 for (String id : groupIDs) {
                     CleanUpGroup(id);
                 }
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -500,12 +493,12 @@ public class ListTest {
                 CleanUpGroup(id);
             }
             return new TestResult
-                    (TestResult.SUCCESS, "List Groups",
+                    (TestResult.SUCCESS, "Paginate Groups",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "List Groups",
+                    (TestResult.ERROR, "Paginate Groups",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         }
@@ -516,19 +509,13 @@ public class ListTest {
                                               String headerString, String responseStatus,
                                               ArrayList<String> subTests)
             throws CharonException, ComplianceException, GeneralComplianceException {
-        subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
-
-        ArrayList<String> returnedGroupIDs = new ArrayList<>();
-        for (Group group : returnedGroups) {
-            returnedGroupIDs.add(group.getId());
-        }
-        for (String id : groupIDs){
-            if (!returnedGroupIDs.contains(id)){
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
-                        "Response does not contain all the created groups",
+        subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
+        if(returnedGroups.size() != 2) {
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
+                        "Response does not contain right number of paginated groups",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-            }
         }
+
     }
 
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
@@ -570,13 +557,13 @@ public class ListTest {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
 
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                     "Could not delete the default group at url " + deleteGroupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() != 204) {
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                     "Could not delete the default group at url " + deleteGroupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
