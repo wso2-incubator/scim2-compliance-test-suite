@@ -67,11 +67,11 @@ public class PaginationTest {
     }
 
     public ArrayList<TestResult> performTest() throws ComplianceException {
-        //perform list tests
-        return GetListTest();
+        //perform pagination tests
+        return GetPaginationTest();
     }
 
-    private ArrayList<TestResult> GetListTest() throws ComplianceException {
+    private ArrayList<TestResult> GetPaginationTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
             CreateTestsUsers();
@@ -124,7 +124,7 @@ public class PaginationTest {
                 CleanUpUser(id);
             }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
-                    "Could not list the users at url " + usersURL,
+                    "Could not paginate the users at url " + usersURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
@@ -162,7 +162,7 @@ public class PaginationTest {
                 for (String id : userIDs) {
                     CleanUpUser(id);
                 }
-                throw new ComplianceException(500, "Error in decoding the returned list resource.");
+                throw new ComplianceException(500, "Error in decoding the returned paginated resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 //clean up task
@@ -259,6 +259,10 @@ public class PaginationTest {
 
         subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
         if (userList.size() != 2){
+            //clean up task
+            for (String id : userIDs) {
+                CleanUpUser(id);
+            }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                     "Response does not contain right number of pagination.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -365,7 +369,7 @@ public class PaginationTest {
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     }
@@ -380,7 +384,7 @@ public class PaginationTest {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                         "Could not create default groups at url " + groupURL,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -429,7 +433,7 @@ public class PaginationTest {
                 CleanUpGroup(id);
             }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
-                    "Could not list the groups at url " + groupURL,
+                    "Could not paginate the groups at url " + groupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
@@ -467,7 +471,7 @@ public class PaginationTest {
                 for (String id : groupIDs) {
                     CleanUpGroup(id);
                 }
-                throw new ComplianceException(500, "Error in decoding the returned list resource.");
+                throw new ComplianceException(500, "Error in decoding the returned paginated resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 //clean up task
@@ -511,9 +515,13 @@ public class PaginationTest {
             throws CharonException, ComplianceException, GeneralComplianceException {
         subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
         if(returnedGroups.size() != 2) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
-                        "Response does not contain right number of paginated groups",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            //clean up task
+            for (String id : groupIDs) {
+                CleanUpUser(id);
+            }
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
+                    "Response does not contain right number of paginated groups",
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
     }

@@ -23,6 +23,7 @@ import info.wso2.scim2.compliance.exception.CriticalComplianceException;
 import info.wso2.scim2.compliance.tests.*;
 import info.wso2.scim2.compliance.utils.ComplianceConstants;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.wso2.charon3.core.exceptions.CharonException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -170,6 +171,27 @@ public class Compliance extends HttpServlet {
         for (TestResult testResult : paginationTestResults) {
             results.add(testResult);
         }
+
+        // Sort Test
+        SortTest sortTest = new SortTest(complianceTestMetaDataHolder);
+        ArrayList<TestResult> sortTestResults = new ArrayList<>();
+        try {
+            if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getSortSupported()){
+                try {
+                    sortTestResults = sortTest.performTest();
+                } catch (ComplianceException e) {
+                    return (new Result(e.getDetail()));
+                }
+                for (TestResult testResult : sortTestResults) {
+                    results.add(testResult);
+                }
+            } else {
+                results.add(new TestResult(TestResult.SKIPPED, "Sort Test", "Skipped",null));
+            }
+        } catch (CharonException e) {
+            return (new Result(e.getDetail()));
+        }
+
 
         Statistics statistics = new Statistics();
         for (TestResult result : results) {

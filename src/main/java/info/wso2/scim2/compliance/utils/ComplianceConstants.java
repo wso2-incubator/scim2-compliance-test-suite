@@ -53,6 +53,8 @@ public class ComplianceConstants {
         public static final String PAGINATION_USER_TEST = "Pagination User Test";
         public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
         public static final String FILTER_CONTENT_TEST = "Filter Content Test";
+        public static final String SORT_USERS_TEST = "Sort Users Test";
+        public static final String SORT_GROUPS_TEST = "Sort Groups Test";
     }
 
     public static class DefinedInstances {

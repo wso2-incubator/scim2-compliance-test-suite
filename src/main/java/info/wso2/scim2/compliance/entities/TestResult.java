@@ -51,9 +51,8 @@ public class TestResult {
 
     private int status;
 
-    public TestResult() {
+    public TestResult() {}
 
-    }
 
     public TestResult(int status, String name, String message, Wire wire) {
         this.name = name;
@@ -78,6 +77,7 @@ public class TestResult {
     public int getStatus() {
         return this.status;
     }
+
 
     public String getMessage() {
         return message;

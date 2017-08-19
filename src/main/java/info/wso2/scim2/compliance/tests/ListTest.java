@@ -264,6 +264,10 @@ public class ListTest {
         }
         for (String id : userIDs){
             if (!returnedUserIDs.contains(id)){
+                //clean up task
+                for (String userId : userIDs) {
+                    CleanUpUser(userId);
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                         "Response does not contain all the created users",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -524,6 +528,10 @@ public class ListTest {
         }
         for (String id : groupIDs){
             if (!returnedGroupIDs.contains(id)){
+                //clean up task
+                for (String groupId : groupIDs) {
+                    CleanUpGroup(groupId);
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Response does not contain all the created groups",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));

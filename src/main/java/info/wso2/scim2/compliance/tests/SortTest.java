@@ -48,7 +48,7 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FilterTest {
+public class SortTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String usersURL  = null;
@@ -56,7 +56,7 @@ public class FilterTest {
     private HashMap<String,String> groupIDs = new HashMap<>();
     private HashMap<String,String> userIDs = new HashMap<>();
 
-    public FilterTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
+    public SortTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
@@ -68,27 +68,27 @@ public class FilterTest {
     }
 
     public ArrayList<TestResult> performTest() throws ComplianceException {
-        //perform filter tests
-        return GetFilterTest();
+        //perform list tests
+        return GetSortTest();
     }
 
-    private ArrayList<TestResult> GetFilterTest() throws ComplianceException {
+    private ArrayList<TestResult> GetSortTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
             CreateTestsUsers();
-            testResults.add(FilterUsers());
+            testResults.add(SortUsers());
             CreateTestsGroups();
-            testResults.add(FilterGroups());
+            testResults.add(SortGroups());
         } catch (GeneralComplianceException e){
             testResults.add(e.getResult());
         }
         return testResults;
     }
 
-    private TestResult FilterUsers()
+    private TestResult SortUsers()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(userIDs.values())).get(0);
-        HttpGet method = new HttpGet(usersURL +"?filter=userName+eq+" + value);
+        HttpGet method = new HttpGet(usersURL +"?sortBy=id&sortOrder=ascending");
 
         HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
 
@@ -125,8 +125,8 @@ public class FilterTest {
             for (String id : userIDs.keySet()) {
                 CleanUpUser(id);
             }
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
-                    "Could not filter the users at url " + usersURL,
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
+                    "Could not sort the users at url " + usersURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
@@ -153,7 +153,7 @@ public class FilterTest {
                         for (String id : userIDs.keySet()) {
                             CleanUpUser(id);
                         }
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
                                         responseStatus, subTests)));
@@ -164,14 +164,14 @@ public class FilterTest {
                 for (String id : userIDs.keySet()) {
                     CleanUpUser(id);
                 }
-                throw new ComplianceException(500, "Error in decoding the returned filter resource.");
+                throw new ComplianceException(500, "Error in decoding the returned sort resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 //clean up task
                 for (String id : userIDs.keySet()) {
                     CleanUpUser(id);
                 }
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -187,12 +187,12 @@ public class FilterTest {
                 CleanUpUser(id);
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Filter Users",
+                    (TestResult.SUCCESS, "Sort Users",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Filter Users",
+                    (TestResult.ERROR, "Sort Users",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         }
@@ -237,13 +237,13 @@ public class FilterTest {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
 
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                     "Could not delete the default user at url " + deleteUserURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() != 204) {
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                     "Could not delete the default user at url " + deleteUserURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -255,20 +255,27 @@ public class FilterTest {
                                              ArrayList<String> subTests) throws CharonException,
             ComplianceException, GeneralComplianceException {
 
-        subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
-        String value = (new ArrayList<>(userIDs.values())).get(0);
-        for (User user : userList) {
-            if (!value.equals(user.getUserName())){
-                //clean up task
-                for (String id : userIDs.keySet()) {
-                    CleanUpUser(id);
-                }
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
-                        "Response does not contain the expected users",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
+        if(isUserListSorted(userList)) {
+            //clean up task
+            for (String id : userIDs.keySet()) {
+                CleanUpUser(id);
             }
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
+                    "Response does not contain the sorted list of users",
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
     }
+
+    private boolean isUserListSorted(ArrayList<User> userList) throws CharonException {
+        boolean sorted = true;
+        for (int i = 1; i < userList.size(); i++) {
+            if (userList.get(i-1).getId().compareTo(userList.get(i).getId()) > 0) sorted = false;
+        }
+        return sorted;
+    }
+
+
 
     private HashMap<String, String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
@@ -308,7 +315,7 @@ public class FilterTest {
                     try {
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     }
@@ -323,7 +330,7 @@ public class FilterTest {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Users",
                         "Could not create default users at url " + usersURL,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -370,7 +377,7 @@ public class FilterTest {
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     }
@@ -385,7 +392,7 @@ public class FilterTest {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                         "Could not create default groups at url " + groupURL,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -393,10 +400,10 @@ public class FilterTest {
         return groupIDs;
     }
 
-    private TestResult FilterGroups()
+    private TestResult SortGroups()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(groupIDs.values())).get(0);
-        HttpGet method = new HttpGet(groupURL +"?filter=displayName+eq+" + value);
+        HttpGet method = new HttpGet(groupURL +"?sortBy=id&sortOrder=ascending");
 
         HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
 
@@ -433,8 +440,8 @@ public class FilterTest {
             for (String id : groupIDs.keySet()) {
                 CleanUpGroup(id);
             }
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
-                    "Could not filter the groups at url " + groupURL,
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
+                    "Could not sort the groups at url " + groupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
@@ -461,7 +468,7 @@ public class FilterTest {
                         for (String id : groupIDs.keySet()) {
                             CleanUpGroup(id);
                         }
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
                                         responseStatus, subTests)));
@@ -472,14 +479,14 @@ public class FilterTest {
                 for (String id : groupIDs.keySet()) {
                     CleanUpGroup(id);
                 }
-                throw new ComplianceException(500, "Error in decoding the returned filter resource.");
+                throw new ComplianceException(500, "Error in decoding the returned sort resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 //clean up task
                 for (String id : groupIDs.keySet()) {
                     CleanUpGroup(id);
                 }
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -498,7 +505,7 @@ public class FilterTest {
                 CleanUpGroup(id);
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Filter Groups",
+                    (TestResult.SUCCESS, "Sort Groups",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         } else {
@@ -507,7 +514,7 @@ public class FilterTest {
                 CleanUpGroup(id);
             }
             return new TestResult
-                    (TestResult.ERROR, "Filter Groups",
+                    (TestResult.ERROR, "Sort Groups",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         }
@@ -520,20 +527,24 @@ public class FilterTest {
                                               String headerString, String responseStatus,
                                               ArrayList<String> subTests)
             throws CharonException, ComplianceException, GeneralComplianceException {
-        subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
-
-        String value = (new ArrayList<>(groupIDs.values())).get(0);
-        for (Group group : returnedGroups) {
-           if (!value.equals(group.getDisplayName())){
-               //clean up task
-               for (String id : groupIDs.keySet()) {
-                   CleanUpGroup(id);
-               }
-               throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
-                       "Response does not contain the expected groups",
-                       ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-           }
+        subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
+        if(isGroupListSorted(returnedGroups)) {
+            //clean up task
+            for (String id : groupIDs.keySet()) {
+                CleanUpGroup(id);
+            }
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
+                    "Response does not contain the sorted list of groups",
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
+    }
+
+    private boolean isGroupListSorted(ArrayList<Group> returnedGroups) throws CharonException {
+        boolean sorted = true;
+        for (int i = 1; i < returnedGroups.size(); i++) {
+            if (returnedGroups.get(i-1).getId().compareTo(returnedGroups.get(i).getId()) > 0) sorted = false;
+        }
+        return sorted;
     }
 
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
@@ -575,13 +586,13 @@ public class FilterTest {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
 
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                     "Could not delete the default group at url " + deleteGroupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() != 204) {
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Sort Groups",
                     "Could not delete the default group at url " + deleteGroupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
