@@ -59,8 +59,7 @@ public class UserTest{
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
-        url = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        url =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
     }
 

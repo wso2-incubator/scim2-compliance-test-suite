@@ -22,7 +22,6 @@ import info.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 public class ComplianceTestMetaDataHolder {
 
     private String url;
-    private String version;
     private String username;
     private String password;
     private String client_id;
@@ -39,14 +38,6 @@ public class ComplianceTestMetaDataHolder {
 
     public void setScimServiceProviderConfig(SCIMServiceProviderConfig scimServiceProviderConfig) {
         this.scimServiceProviderConfig = scimServiceProviderConfig;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public String getUrl() {

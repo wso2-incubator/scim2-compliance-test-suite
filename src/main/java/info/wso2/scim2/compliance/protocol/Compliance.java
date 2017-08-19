@@ -20,7 +20,6 @@ import info.wso2.scim2.compliance.entities.Statistics;
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
-import info.wso2.scim2.compliance.pdf.PDFGenerator;
 import info.wso2.scim2.compliance.tests.*;
 import info.wso2.scim2.compliance.utils.ComplianceConstants;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -32,7 +31,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.util.ArrayList;
 
 @Path("/test2")
@@ -54,9 +52,11 @@ public class Compliance extends HttpServlet {
                            @FormParam(ComplianceConstants.RequestCodeConstants.AUTHORIZATION_METHOD)
                                    String authMethod)
             throws InterruptedException, ServletException {
-        // TODO: remove when done coding!
+
         if (url == null || url.isEmpty()) {
-            url = "https://localhost:9443/";
+            ComplianceException BadRequestException = new ComplianceException();
+            BadRequestException.setDetail("URL can not be empty.");
+            return (new Result(BadRequestException.getDetail()));
         }
 
         // This is to keep the test results
@@ -69,23 +69,15 @@ public class Compliance extends HttpServlet {
         UrlValidator urlValidator = new UrlValidator(schemes);
         /*
         if (!urlValidator.isValid(url)) {
-
             ComplianceException BadRequestException = new ComplianceException();
-            BadRequestException.setDetail("Invalid Service Provider URL.");
-            BadRequestException.setStatus(ComplianceConstants.ResponseCodeConstants.CODE_BAD_REQUEST);
-            results.add(new TestResult(TestResult.ERROR, BadRequestException));
-
-            Statistics statistics = new Statistics();
-            statistics.incFailed();
-
-            return new Result(statistics, results);
+            BadRequestException.setDetail("Invalid URL had been entered.");
+            return (new Result(BadRequestException.getDetail()));
         }
         */
 
         // create a complianceTestMetaDataHolder to use to hold the test suite configurations
         ComplianceTestMetaDataHolder complianceTestMetaDataHolder = new ComplianceTestMetaDataHolder();
         complianceTestMetaDataHolder.setUrl(url);
-        complianceTestMetaDataHolder.setVersion("/scim2");
         complianceTestMetaDataHolder.setUsername(username);
         complianceTestMetaDataHolder.setPassword(password);
         complianceTestMetaDataHolder.setAuthorization_server(authorizationServer);
@@ -107,7 +99,6 @@ public class Compliance extends HttpServlet {
             // failing critical test
             results.add(e.getResult());
         } catch (ComplianceException e) {
-            //TODO :This need to be displyed in UI
             return (new Result(e.getDetail()));
         }
 
@@ -142,7 +133,6 @@ public class Compliance extends HttpServlet {
         } catch (CriticalComplianceException e) {
             results.add(e.getResult());
         } catch (ComplianceException e) {
-            //TODO :This need to be displyed in UI
             return (new Result(e.getMessage()));
         }
         //List Test
@@ -185,6 +175,7 @@ public class Compliance extends HttpServlet {
             }
         }
         Result finalResults = new Result(statistics, results);
+       // finalResults.setReportLink(null);
         //generate pdf results sheet
        // try {
          //   PDFGenerator.GeneratePDFResults(finalResults);

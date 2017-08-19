@@ -60,12 +60,10 @@ public class FilterTest {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
-        usersURL = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        usersURL =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
 
-        groupURL = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        groupURL =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
@@ -123,6 +121,10 @@ public class FilterTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            //clean up task
+            for (String id : userIDs.keySet()) {
+                CleanUpUser(id);
+            }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
                     "Could not filter the users at url " + usersURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -147,6 +149,10 @@ public class FilterTest {
                                 responseString, headerString, responseStatus, subTests);
 
                     } catch (BadRequestException | CharonException e) {
+                        //clean up task
+                        for (String id : userIDs.keySet()) {
+                            CleanUpUser(id);
+                        }
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
@@ -154,9 +160,17 @@ public class FilterTest {
                     }
                 }
             } catch (JSONException e) {
+                //clean up task
+                for (String id : userIDs.keySet()) {
+                    CleanUpUser(id);
+                }
                 throw new ComplianceException(500, "Error in decoding the returned filter resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                //clean up task
+                for (String id : userIDs.keySet()) {
+                    CleanUpUser(id);
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Users",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -411,6 +425,10 @@ public class FilterTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            //clean up task
+            for (String id : groupIDs.keySet()) {
+                CleanUpGroup(id);
+            }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
                     "Could not filter the groups at url " + groupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -435,6 +453,10 @@ public class FilterTest {
                                 responseString, headerString, responseStatus, subTests);
 
                     } catch (BadRequestException | CharonException e) {
+                        //clean up task
+                        for (String id : groupIDs.keySet()) {
+                            CleanUpGroup(id);
+                        }
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
@@ -442,9 +464,17 @@ public class FilterTest {
                     }
                 }
             } catch (JSONException e) {
+                //clean up task
+                for (String id : groupIDs.keySet()) {
+                    CleanUpGroup(id);
+                }
                 throw new ComplianceException(500, "Error in decoding the returned filter resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                //clean up task
+                for (String id : groupIDs.keySet()) {
+                    CleanUpGroup(id);
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -453,6 +483,10 @@ public class FilterTest {
             try {
                 CheckForListOfGroupsReturned(groupList, method, responseString, headerString, responseStatus, subTests);
             } catch (CharonException e) {
+                //clean up task
+                for (String id : groupIDs.keySet()) {
+                    CleanUpGroup(id);
+                }
                 throw new ComplianceException(500, "Could not get the created group id");
             }
             //clean up task
@@ -474,6 +508,8 @@ public class FilterTest {
                             headerString, responseStatus, subTests));
         }
     }
+
+
 
     private void CheckForListOfGroupsReturned(ArrayList<Group> returnedGroups,
                                               HttpGet method, String responseString,

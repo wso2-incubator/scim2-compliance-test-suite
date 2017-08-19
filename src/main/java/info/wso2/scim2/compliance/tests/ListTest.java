@@ -59,12 +59,10 @@ public class ListTest {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
-        usersURL = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        usersURL =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
 
-        groupURL = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        groupURL =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
@@ -413,6 +411,10 @@ public class ListTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            //clean up task
+            for (String id : groupIDs) {
+                CleanUpGroup(id);
+            }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                     "Could not list the groups at url " + groupURL,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -437,6 +439,10 @@ public class ListTest {
                                 responseString, headerString, responseStatus, subTests);
 
                     } catch (BadRequestException | CharonException e) {
+                        //clean up task
+                        for (String id : groupIDs) {
+                            CleanUpGroup(id);
+                        }
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                                 "Response Validation Error",
                                 ComplianceUtils.getWire(method, responseString, headerString,
@@ -444,9 +450,17 @@ public class ListTest {
                     }
                 }
             } catch (JSONException e) {
+                //clean up task
+                for (String id : groupIDs) {
+                    CleanUpGroup(id);
+                }
                 throw new ComplianceException(500, "Error in decoding the returned list resource.");
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                //clean up task
+                for (String id : groupIDs) {
+                    CleanUpGroup(id);
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -455,6 +469,10 @@ public class ListTest {
             try {
                 CheckForListOfGroupsReturned(groupList, method, responseString, headerString, responseStatus, subTests);
             } catch (CharonException e) {
+                //clean up task
+                for (String id : groupIDs) {
+                    CleanUpGroup(id);
+                }
                 throw new ComplianceException(500, "Could not get the created group id");
             }
             //clean up task

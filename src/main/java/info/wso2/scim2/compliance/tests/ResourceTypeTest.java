@@ -56,8 +56,7 @@ public class ResourceTypeTest {
 
     private TestResult getResourceTypeTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
-        String url = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        String url =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.RESOURCE_TYPE_ENDPOINT;
 
         // specify the get request

@@ -59,7 +59,6 @@ public class ConfigTest {
     private TestResult getServiceProviderConfigTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
         String url = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
                 ComplianceConstants.TestConstants.SERVICE_PROVIDER_ENDPOINT;
 
         // specify the get request

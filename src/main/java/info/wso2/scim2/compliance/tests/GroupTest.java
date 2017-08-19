@@ -52,8 +52,7 @@ public class GroupTest {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
-        url = complianceTestMetaDataHolder.getUrl() +
-                complianceTestMetaDataHolder.getVersion() +
+        url =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 

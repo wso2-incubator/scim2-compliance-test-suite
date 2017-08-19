@@ -23,12 +23,6 @@ import java.util.List;
 @XmlRootElement
 public class Result {
 
-    @XmlElement(name = "authRequired")
-    boolean          authRequired = false;
-
-    @XmlElement(name = "authMethods")
-    List<AuthMetod>  authMethods  = new ArrayList<AuthMetod>();
-
     @XmlElement(name = "results")
     List<TestResult> results      = new ArrayList<TestResult>();
 
@@ -37,6 +31,9 @@ public class Result {
 
     @XmlElement(name = "errorMessage")
     String           errorMessage = "";
+
+    //@XmlElement(name = "reportLink")
+   // String           reportLink = "";
 
     public Result() {
 
@@ -62,4 +59,12 @@ public class Result {
     public String getErrorMessage() {
         return errorMessage;
     }
+
+   // public String getReportLink() {
+       // return reportLink;
+    //}
+
+   // public void setReportLink(String reportLink) {
+     //   this.reportLink = reportLink;
+   // }
 }
