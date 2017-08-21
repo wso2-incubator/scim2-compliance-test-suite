@@ -22,11 +22,11 @@ import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
 import info.wso2.scim2.compliance.pdf.PDFGenerator;
 import info.wso2.scim2.compliance.tests.*;
+import info.wso2.scim2.compliance.tests.BulkTest;
 import info.wso2.scim2.compliance.utils.ComplianceConstants;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.wso2.charon3.core.exceptions.CharonException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -219,6 +219,25 @@ public class Compliance extends HttpServlet {
             return (new Result(e.getDetail()));
         }
 
+        // Bulk Test
+        BulkTest bulkTest = new BulkTest(complianceTestMetaDataHolder);
+        ArrayList<TestResult> bulkTestResults = new ArrayList<>();
+        try {
+            if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getBulkSupported()){
+                try {
+                    bulkTestResults = bulkTest.performTest();
+                } catch (ComplianceException e) {
+                    return (new Result(e.getDetail()));
+                }
+                for (TestResult testResult : bulkTestResults) {
+                    results.add(testResult);
+                }
+            } else {
+                results.add(new TestResult(TestResult.SKIPPED, "Bulk Test", "Skipped",null));
+            }
+        } catch (CharonException e) {
+            return (new Result(e.getDetail()));
+        }
 
         Statistics statistics = new Statistics();
         for (TestResult result : results) {

@@ -220,7 +220,6 @@ public class PDFGenerator {
             if (WinAnsiEncoding.INSTANCE.contains(test.charAt(i)) ) {
                 b.append(test.charAt(i));
             } else {
-                //textToBeShown.add("new_line");
                 textToBeShown.add(b.toString());
                 b = new StringBuilder();
             }

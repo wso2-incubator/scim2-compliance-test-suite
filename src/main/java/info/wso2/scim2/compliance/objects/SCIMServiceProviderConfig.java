@@ -31,4 +31,9 @@ public class SCIMServiceProviderConfig extends AbstractSCIMObject {
         Attribute patchAttribute  = getAttribute("sort");
         return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
     }
+
+    public boolean getBulkSupported() throws CharonException {
+        Attribute patchAttribute  = getAttribute("bulk");
+        return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
 }

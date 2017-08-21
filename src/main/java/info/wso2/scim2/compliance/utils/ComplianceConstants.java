@@ -45,6 +45,7 @@ public class ComplianceConstants {
         public static final String USERS_ENDPOINT = "/Users";
         public static final String GROUPS_ENDPOINT = "/Groups";
         public static final String ME_ENDPOINT = "/Me";
+        public static final String BULK_ENDPOINT = "/Bulk";
 
         public static final String SCHEMA_LIST_TEST = "Schema List Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
@@ -77,6 +78,15 @@ public class ComplianceConstants {
         public static String DEFINED_PATCH_USER_PAYLOAD =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
                         "\"Operations\":[{\"op\":\"add\",\"value\":{\"nickName\":\"shaggy\"}}]}";
+
+        public static String DEFINED_BULK_REQUEST = "{\"failOnErrors\":1,\"schemas\":" +
+                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
+                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"Alice\",\"password\":\"sachini\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"bulkId\":\"ytrewq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"Bob\"," +
+                "\"password\":\"vindula\"}}]}";
     }
 
 }
