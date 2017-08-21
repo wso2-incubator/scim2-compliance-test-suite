@@ -40,7 +40,6 @@ public class Wire {
         this.tests = tests;
     }
 
-
     public String getToServer() {
         return toServer;
     }

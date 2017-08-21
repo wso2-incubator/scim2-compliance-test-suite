@@ -67,11 +67,8 @@ public class BulkTest {
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
-            //perform create group test
+            //perform bulk test
             testResults.add(BulkPostTest());
-            //run clean up task
-            RunCleanUpTask();
-
         } catch (GeneralComplianceException e) {
             testResults.add(e.getResult());
         }
@@ -144,7 +141,8 @@ public class BulkTest {
         }
 
         if (response.getStatusLine().getStatusCode() == 200) {
-
+            //run clean up task
+            RunCleanUpTask();
             return new TestResult
                     (TestResult.SUCCESS, "Bulk Test",
                             "", ComplianceUtils.getWire(method, responseString,
@@ -203,7 +201,7 @@ public class BulkTest {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Bulk Test",
-                    "Could not delete the created user at url reponse location : " + url,
+                    "Could not delete the created user at url response location : " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
