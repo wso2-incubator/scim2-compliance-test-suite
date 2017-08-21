@@ -62,7 +62,7 @@ public class ResourceTypeTest {
         // specify the get request
         HttpGet method = new HttpGet(url);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");

@@ -142,6 +142,18 @@ public class Compliance extends HttpServlet {
             results.add(testResult);
         }
 
+        //Me Test
+        MeTest meTest = new MeTest(complianceTestMetaDataHolder);
+        ArrayList<TestResult> meTestResults = null;
+        try {
+            meTestResults = meTest.performTest();
+        } catch (ComplianceException e) {
+            return (new Result(e.getDetail()));
+        }
+        for (TestResult testResult : meTestResults) {
+            results.add(testResult);
+        }
+
         // /ResourceType Test
         ResourceTypeTest resourceTypeTest = new ResourceTypeTest(complianceTestMetaDataHolder);
         try {

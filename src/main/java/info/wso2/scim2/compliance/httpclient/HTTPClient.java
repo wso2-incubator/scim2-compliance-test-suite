@@ -29,7 +29,7 @@ public class HTTPClient {
 
     private static HttpClient httpClient = null;
 
-    public static HttpClient getHttpClientWithBasicAuth() {
+    public static HttpClient getHttpClient() {
         if(httpClient == null) {
             HttpClient httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
             return httpClient;
@@ -41,6 +41,18 @@ public class HTTPClient {
                                                           HttpRequestBase method) {
 
         String auth = complianceTestMetaDataHolder.getUsername() + ":" + complianceTestMetaDataHolder.getPassword();
+        if (!auth.equals(":")) {
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+            String authHeader = "Basic " + new String(encodedAuth);
+            method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        }
+        return method;
+    }
+
+    public static HttpRequestBase setAuthorizationHeader (String userName, String password,
+                                                          HttpRequestBase method) {
+
+        String auth = userName + ":" + password;
         if (!auth.equals(":")) {
             byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
             String authHeader = "Basic " + new String(encodedAuth);

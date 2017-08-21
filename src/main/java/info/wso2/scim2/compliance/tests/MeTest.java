@@ -40,12 +40,11 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
-public class UserTest{
+public class MeTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String url;
     private User user = null;
-
 
     public User getUser() {
         return user;
@@ -55,12 +54,12 @@ public class UserTest{
         this.user = user;
     }
 
-    public UserTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
+    public MeTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
 
         url =  complianceTestMetaDataHolder.getUrl() +
-                ComplianceConstants.TestConstants.USERS_ENDPOINT;
+                ComplianceConstants.TestConstants.ME_ENDPOINT;
     }
 
     public ArrayList<TestResult> performTest() throws ComplianceException {
@@ -96,7 +95,6 @@ public class UserTest{
         //create user test
         HttpClient client = HTTPClient.getHttpClient();
 
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
 
@@ -129,7 +127,7 @@ public class UserTest{
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create User",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create Me",
                     "Could not create default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -143,7 +141,7 @@ public class UserTest{
             try {
                 user = (User)jsonDecoder.decodeResource(responseString, schema, new User());
             } catch (BadRequestException | CharonException | InternalErrorException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create Me",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -152,17 +150,17 @@ public class UserTest{
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create Me",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Create User",
+                    (TestResult.SUCCESS, "Create Me",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Create User",
+                    (TestResult.ERROR, "Create Me",
                             "", ComplianceUtils.getWire(method, responseString,
                             headerString, responseStatus, subTests));
         }
@@ -170,17 +168,15 @@ public class UserTest{
 
     public TestResult GetUserTest () throws GeneralComplianceException, ComplianceException {
 
-        String getUserURL = null;
-        try {
-            getUserURL = url + "/" + user.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created user.");
-        }
-        HttpGet method = new HttpGet(getUserURL);
+        HttpGet method = new HttpGet(url);
 
         HttpClient client = HTTPClient.getHttpClient();
 
-        method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method = (HttpGet) HTTPClient.setAuthorizationHeader(
+                ComplianceConstants.DefinedInstances.DEFINED_USER_USERNAME,
+                ComplianceConstants.DefinedInstances.DEFINED_USER_PASSWORD,
+                method);
+
         method.setHeader("Accept", "application/json");
 
         HttpResponse response = null;
@@ -209,7 +205,7 @@ public class UserTest{
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get User",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Me",
                     "Could not get the default user from url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -224,7 +220,7 @@ public class UserTest{
                 user = (User)jsonDecoder.decodeResource(responseString, schema, new User());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Me",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -233,17 +229,17 @@ public class UserTest{
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Me",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Get User",
+                    (TestResult.SUCCESS, "Get Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Get User",
+                    (TestResult.ERROR, "Get Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         }
@@ -251,17 +247,14 @@ public class UserTest{
 
     public TestResult UpdateUserTest () throws GeneralComplianceException, ComplianceException {
 
-        String updateUserURL = null;
-        try {
-            updateUserURL = url + "/" + user.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created user.");
-        }
-        HttpPut method = new HttpPut(updateUserURL);
+        HttpPut method = new HttpPut(url);
 
         HttpClient client = HTTPClient.getHttpClient();
 
-        method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method = (HttpPut) HTTPClient.setAuthorizationHeader(
+                ComplianceConstants.DefinedInstances.DEFINED_USER_USERNAME,
+                ComplianceConstants.DefinedInstances.DEFINED_USER_PASSWORD,
+                method);
 
         HttpResponse response = null;
         String responseString = "";
@@ -297,7 +290,7 @@ public class UserTest{
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update User",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Me",
                     "Could not update the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -312,7 +305,7 @@ public class UserTest{
                 user = (User)jsonDecoder.decodeResource(responseString, schema, new User());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Me",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -322,17 +315,17 @@ public class UserTest{
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Me",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Update User",
+                    (TestResult.SUCCESS, "Update Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Update User",
+                    (TestResult.ERROR, "Update Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         }
@@ -340,17 +333,14 @@ public class UserTest{
 
     public TestResult PatchUserTest () throws GeneralComplianceException, ComplianceException {
 
-        String patchUserURL = null;
-        try {
-            patchUserURL = url + "/" + user.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created user.");
-        }
-        HttpPatch method = new HttpPatch(patchUserURL);
+        HttpPatch method = new HttpPatch(url);
         //create user test
         HttpClient client = HTTPClient.getHttpClient();
 
-        method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method = (HttpPatch) HTTPClient.setAuthorizationHeader(
+                ComplianceConstants.DefinedInstances.DEFINED_USER_USERNAME,
+                ComplianceConstants.DefinedInstances.DEFINED_USER_PASSWORD,
+                method);
 
         HttpResponse response = null;
         String responseString = "";
@@ -386,7 +376,7 @@ public class UserTest{
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch User",
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Me",
                     "Could not patch the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -401,7 +391,7 @@ public class UserTest{
                 user = (User)jsonDecoder.decodeResource(responseString, schema, new User());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Me",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -411,17 +401,17 @@ public class UserTest{
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch User",
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Me",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
             return new TestResult
-                    (TestResult.SUCCESS, "Patch User",
+                    (TestResult.SUCCESS, "Patch Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Patch User",
+                    (TestResult.ERROR, "Patch Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         }
@@ -429,9 +419,71 @@ public class UserTest{
 
     public TestResult DeleteUserTest () throws GeneralComplianceException, ComplianceException {
 
+        HttpDelete method = new HttpDelete(url);
+
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpDelete) HTTPClient.setAuthorizationHeader(
+                ComplianceConstants.DefinedInstances.DEFINED_USER_USERNAME,
+                ComplianceConstants.DefinedInstances.DEFINED_USER_PASSWORD,
+                method);
+
+        method.setHeader("Accept", "application/json");
+
+        HttpResponse response = null;
+        String responseString = "";
+        String headerString = "";
+        String responseStatus = "";
+        ArrayList<String> subTests =  new ArrayList<>();
+        try {
+
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+
+        } catch (Exception e) {
+            // Read the response body.
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+            CleanUpDelete();
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Delete Me",
+                    "Could not delete the default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        }
+
+        if (response.getStatusLine().getStatusCode() == 204) {
+            return new TestResult
+                    (TestResult.SUCCESS, "Delete Me",
+                            "", ComplianceUtils.getWire(method, responseString, headerString,
+                            responseStatus, subTests));
+        } else {
+            CleanUpDelete();
+            return new TestResult
+                    (TestResult.ERROR, "Delete Me",
+                            "", ComplianceUtils.getWire(method, responseString, headerString,
+                            responseStatus, subTests));
+        }
+    }
+
+
+    public TestResult CleanUpDelete () throws GeneralComplianceException, ComplianceException {
+
         String deleteUserURL = null;
         try {
-            deleteUserURL = url + "/" + user.getId();
+            deleteUserURL = complianceTestMetaDataHolder.getUrl() +
+                    ComplianceConstants.TestConstants.USERS_ENDPOINT + "/" + user.getId();
         } catch (CharonException | NullPointerException e) {
             throw new ComplianceException("Error in reading the id of the created user.");
         }
@@ -469,19 +521,19 @@ public class UserTest{
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Delete User",
-                    "Could not delete the default user at url " + url,
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Delete Me",
+                    "Could not clean up the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() == 204) {
             return new TestResult
-                    (TestResult.SUCCESS, "Delete User",
+                    (TestResult.SUCCESS, "Delete Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
             return new TestResult
-                    (TestResult.ERROR, "Delete User",
+                    (TestResult.ERROR, "Delete Me",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         }

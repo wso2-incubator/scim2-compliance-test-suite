@@ -88,7 +88,7 @@ public class PaginationTest {
 
         HttpGet method = new HttpGet(usersURL + "?startIndex=1&count=2");
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -206,7 +206,7 @@ public class PaginationTest {
 
         HttpDelete method = new HttpDelete(deleteUserURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -278,7 +278,7 @@ public class PaginationTest {
 
         HttpPost method = new HttpPost(usersURL);
         //create users
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -340,7 +340,7 @@ public class PaginationTest {
 
         HttpPost method = new HttpPost(groupURL);
         //create groups
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -397,7 +397,7 @@ public class PaginationTest {
 
         HttpGet method = new HttpGet(groupURL + "?startIndex=1&count=2");
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -532,7 +532,7 @@ public class PaginationTest {
 
         HttpDelete method = new HttpDelete(deleteGroupURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");

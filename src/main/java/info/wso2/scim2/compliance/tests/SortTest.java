@@ -90,7 +90,7 @@ public class SortTest {
         String value = (new ArrayList<>(userIDs.values())).get(0);
         HttpGet method = new HttpGet(usersURL +"?sortBy=id&sortOrder=ascending");
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -204,7 +204,7 @@ public class SortTest {
 
         HttpDelete method = new HttpDelete(deleteUserURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -286,7 +286,7 @@ public class SortTest {
 
         HttpPost method = new HttpPost(usersURL);
         //create users
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -348,7 +348,7 @@ public class SortTest {
 
         HttpPost method = new HttpPost(groupURL);
         //create groups
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -405,7 +405,7 @@ public class SortTest {
         String value = (new ArrayList<>(groupIDs.values())).get(0);
         HttpGet method = new HttpGet(groupURL +"?sortBy=id&sortOrder=ascending");
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -553,7 +553,7 @@ public class SortTest {
 
         HttpDelete method = new HttpDelete(deleteGroupURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");

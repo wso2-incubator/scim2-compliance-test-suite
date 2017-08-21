@@ -44,6 +44,7 @@ public class ComplianceConstants {
         public static final String RESOURCE_TYPE_ENDPOINT = "/ResourceType";
         public static final String USERS_ENDPOINT = "/Users";
         public static final String GROUPS_ENDPOINT = "/Groups";
+        public static final String ME_ENDPOINT = "/Me";
 
         public static final String SCHEMA_LIST_TEST = "Schema List Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
@@ -58,6 +59,10 @@ public class ComplianceConstants {
     }
 
     public static class DefinedInstances {
+        public static String DEFINED_USER_PASSWORD = "7019asd84";
+        public static String DEFINED_USER_USERNAME = "bjensenexamplecom";
+
+
         public static String DEFINED_USER =
                         "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\":[{" +
                                 "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +

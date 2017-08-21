@@ -88,9 +88,7 @@ public class GroupTest {
     }
 
     public void RunCleanUpTask() throws ComplianceException {
-        if(userTest.getUser() == null) {
-            throw new ComplianceException("Initializing the service provider failed.");
-        }
+
         try {
 
             userTest.DeleteUserTest();
@@ -114,7 +112,7 @@ public class GroupTest {
         }
         HttpPost method = new HttpPost(url);
         //create group test
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -196,7 +194,7 @@ public class GroupTest {
         }
         HttpGet method = new HttpGet(getGroupURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -286,7 +284,7 @@ public class GroupTest {
         }
         HttpPut method = new HttpPut(updateUserURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
 
@@ -380,7 +378,7 @@ public class GroupTest {
         }
         HttpPatch method = new HttpPatch(patchGroupURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
 
@@ -467,7 +465,7 @@ public class GroupTest {
         }
         HttpDelete method = new HttpDelete(deleteGroupURL);
 
-        HttpClient client = HTTPClient.getHttpClientWithBasicAuth();
+        HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
