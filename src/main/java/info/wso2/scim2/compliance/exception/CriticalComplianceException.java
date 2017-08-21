@@ -17,6 +17,9 @@ package info.wso2.scim2.compliance.exception;
 
 import info.wso2.scim2.compliance.entities.TestResult;
 
+/**
+ * Critical compliance exception definition.
+ */
 public class CriticalComplianceException extends Exception {
 
 	private TestResult result = null;

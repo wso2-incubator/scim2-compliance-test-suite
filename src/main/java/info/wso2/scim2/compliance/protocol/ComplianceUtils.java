@@ -26,8 +26,21 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * This class contains utils used in the test suite.
+ */
 public class ComplianceUtils {
 
+    /**
+     * method to get the wire.
+     * @param method
+     * @param responseBody
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @return
+     * @throws ComplianceException
+     */
     public static Wire getWire(HttpRequestBase method, String responseBody,
                                String headerString, String responseStatus,
                                ArrayList<String> subTests) throws ComplianceException {

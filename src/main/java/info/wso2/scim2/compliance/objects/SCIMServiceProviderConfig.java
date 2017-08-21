@@ -20,6 +20,9 @@ import org.wso2.charon3.core.attributes.SimpleAttribute;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
 
+/**
+ * This class prototypes the ServiceProviderConfig scim object.
+ */
 public class SCIMServiceProviderConfig extends AbstractSCIMObject {
 
    public boolean getPatchSupported() throws CharonException {

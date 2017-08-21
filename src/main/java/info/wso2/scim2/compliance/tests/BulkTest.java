@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package info.wso2.scim2.compliance.tests;
 
 
@@ -22,13 +38,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ *  This class performs the tests related to /Bulk endpoint.
+ */
 public class BulkTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String url;
     private ArrayList<String> createdUserLocations = new ArrayList<>();
 
-
+    /**
+     * Initializer.
+     * @param complianceTestMetaDataHolder
+     */
     public BulkTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -37,6 +59,11 @@ public class BulkTest {
                 ComplianceConstants.TestConstants.BULK_ENDPOINT;
     }
 
+    /**
+     * Main method which handles the sub tests.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -51,14 +78,24 @@ public class BulkTest {
         return testResults;
     }
 
+    /**
+     * Service Provider clean up method.
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     public void RunCleanUpTask() throws ComplianceException, GeneralComplianceException {
         for(String location : createdUserLocations) {
             DeleteUser(location);
         }
     }
 
+    /**
+     * Post test on /Bulk endpoint.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult BulkPostTest() throws GeneralComplianceException, ComplianceException {
-
 
         String definedRequest = ComplianceConstants.DefinedInstances.DEFINED_BULK_REQUEST;
 
@@ -86,7 +123,8 @@ public class BulkTest {
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
             }
-            responseStatus = response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase();
+            responseStatus = response.getStatusLine().getStatusCode() + " " +
+                    response.getStatusLine().getReasonPhrase();
 
             //get the created user locations
             createdUserLocations = getLocations(responseString);
@@ -119,6 +157,13 @@ public class BulkTest {
         }
     }
 
+    /**
+     * Delete the users created by the bulk request.
+     * @param url
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult DeleteUser (String url) throws GeneralComplianceException, ComplianceException {
 
         String deleteUserURL = url;
@@ -175,7 +220,12 @@ public class BulkTest {
         }
     }
 
-
+    /**
+     * Extract created user locations from the bulk response.
+     * @param response
+     * @return
+     * @throws JSONException
+     */
     public ArrayList<String> getLocations (String response) throws JSONException {
 
         ArrayList<String> UserLocations = new ArrayList<>();

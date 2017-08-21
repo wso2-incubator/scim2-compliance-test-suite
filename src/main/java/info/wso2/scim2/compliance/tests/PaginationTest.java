@@ -47,6 +47,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class is for pagination related test cases.
+ */
 public class PaginationTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -55,6 +58,10 @@ public class PaginationTest {
     private ArrayList<String> groupIDs = new ArrayList<>();
     private ArrayList<String> userIDs = new ArrayList<>();
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public PaginationTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -66,11 +73,21 @@ public class PaginationTest {
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
+    /**
+     * Method to handle test cases.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         //perform pagination tests
         return GetPaginationTest();
     }
 
+    /**
+     * Pagination test main method.
+     * @return
+     * @throws ComplianceException
+     */
     private ArrayList<TestResult> GetPaginationTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -84,6 +101,12 @@ public class PaginationTest {
         return testResults;
     }
 
+    /**
+     * Pagination users test case.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult PaginateUsers() throws ComplianceException, GeneralComplianceException {
 
         HttpGet method = new HttpGet(usersURL + "?startIndex=1&count=2");
@@ -200,6 +223,12 @@ public class PaginationTest {
         }
     }
 
+    /**
+     * Clean up task for users.
+     * @param id
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CleanUpUser(String id) throws ComplianceException, GeneralComplianceException {
 
         String deleteUserURL = usersURL + "/" + id;
@@ -269,6 +298,12 @@ public class PaginationTest {
         }
     }
 
+    /**
+     * Create users for testing purpose.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private ArrayList<String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
@@ -330,7 +365,12 @@ public class PaginationTest {
         return userIDs;
     }
 
-
+    /**
+     * Create groups fro testing purpose.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private ArrayList<String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
@@ -392,6 +432,12 @@ public class PaginationTest {
         return groupIDs;
     }
 
+    /**
+     * Pagination test for groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult PaginateGroups()
             throws ComplianceException, GeneralComplianceException {
 
@@ -508,6 +554,18 @@ public class PaginationTest {
         }
     }
 
+    /**
+     * Validation test for groups returned in response.
+     * @param returnedGroups
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfGroupsReturned(ArrayList<Group> returnedGroups,
                                               HttpGet method, String responseString,
                                               String headerString, String responseStatus,
@@ -526,6 +584,12 @@ public class PaginationTest {
 
     }
 
+    /**
+     * Clean up task for groups.
+     * @param id
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
 
         String deleteGroupURL = groupURL + "/" + id;

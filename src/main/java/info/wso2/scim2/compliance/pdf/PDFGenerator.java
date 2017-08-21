@@ -32,10 +32,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
+/**
+ * This class handle the PDF report generation for the test suite.
+ */
 public class PDFGenerator {
 
     private static PDDocument document = null;
 
+    /**
+     * Init report generation.
+     * @param finalResults
+     */
     private static void init(Result finalResults){
         document = new PDDocument();
         if (finalResults.getErrorMessage() != ""){
@@ -54,6 +61,13 @@ public class PDFGenerator {
         }
     }
 
+    /**
+     * Method to generate the report in PDF format.
+     * @param finalResults
+     * @param fullPath
+     * @return
+     * @throws IOException
+     */
     public static String GeneratePDFResults(Result finalResults, String fullPath) throws IOException {
         init(finalResults);
         int pageNo = 0;
@@ -165,6 +179,17 @@ public class PDFGenerator {
 
     }
 
+    /**
+     * Print the results to PDF.
+     * @param contentStream
+     * @param fontSize
+     * @param pdfFont
+     * @param leading
+     * @param startX
+     * @param startY
+     * @param lines
+     * @throws IOException
+     */
     public static void printResult(PDPageContentStream contentStream, float fontSize,
                                    PDFont pdfFont, float leading, float startX, float startY, List<String> lines)
             throws IOException {
@@ -174,6 +199,15 @@ public class PDFGenerator {
         }
     }
 
+    /**
+     * Method to separate lines of the PDF.
+     * @param text
+     * @param fontSize
+     * @param pdfFont
+     * @param width
+     * @return
+     * @throws IOException
+     */
     private static List<String> getLines(String text, float fontSize, PDFont pdfFont, float width)
             throws IOException {
         width = width - 150 ;
@@ -204,6 +238,14 @@ public class PDFGenerator {
         return lines;
     }
 
+    /**
+     * This return the character count of a given text.
+     * @param requiredSize
+     * @param subString
+     * @param pdfFont
+     * @return
+     * @throws IOException
+     */
     private static int getCharacterCount(float requiredSize, String subString, PDFont pdfFont) throws IOException {
         double factor = 0.95;
         String string  = subString;
@@ -213,6 +255,12 @@ public class PDFGenerator {
         return string.length();
     }
 
+    /**
+     * This removes the unsupported characters from the text.
+     * @param test
+     * @return
+     * @throws IOException
+     */
     private static ArrayList<String> removeUnsupportedCharacters(String test) throws IOException {
         ArrayList<String> textToBeShown= new ArrayList<>();
         StringBuilder b = new StringBuilder();
@@ -227,6 +275,5 @@ public class PDFGenerator {
         textToBeShown.add(b.toString());
         return textToBeShown;
     }
-
 
 }

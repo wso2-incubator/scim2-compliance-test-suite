@@ -48,6 +48,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class consists of sorting test cases.
+ */
 public class SortTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -56,6 +59,10 @@ public class SortTest {
     private HashMap<String,String> groupIDs = new HashMap<>();
     private HashMap<String,String> userIDs = new HashMap<>();
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public SortTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -72,6 +79,11 @@ public class SortTest {
         return GetSortTest();
     }
 
+    /**
+     * Method to handle sorting test cases.
+     * @return
+     * @throws ComplianceException
+     */
     private ArrayList<TestResult> GetSortTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -85,6 +97,12 @@ public class SortTest {
         return testResults;
     }
 
+    /**
+     * Sort test case.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult SortUsers()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(userIDs.values())).get(0);
@@ -198,6 +216,12 @@ public class SortTest {
         }
     }
 
+    /**
+     * Clean up task for users.
+     * @param id
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CleanUpUser(String id) throws ComplianceException, GeneralComplianceException {
 
         String deleteUserURL = usersURL + "/" + id;
@@ -249,6 +273,18 @@ public class SortTest {
         }
     }
 
+    /**
+     * Validate returned list of users.
+     * @param userList
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfUsersReturned(ArrayList<User> userList,
                                              HttpGet method, String responseString,
                                              String headerString, String responseStatus,
@@ -267,6 +303,12 @@ public class SortTest {
         }
     }
 
+    /**
+     * Method to check given array list os users is sorted according to user id.
+     * @param userList
+     * @return
+     * @throws CharonException
+     */
     private boolean isUserListSorted(ArrayList<User> userList) throws CharonException {
         boolean sorted = true;
         for (int i = 1; i < userList.size(); i++) {
@@ -275,8 +317,12 @@ public class SortTest {
         return sorted;
     }
 
-
-
+    /**
+     * Create users for testing purpose.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private HashMap<String, String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
@@ -338,7 +384,12 @@ public class SortTest {
         return userIDs;
     }
 
-
+    /**
+     * Create groups for testing purpose.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private HashMap<String, String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
@@ -400,6 +451,12 @@ public class SortTest {
         return groupIDs;
     }
 
+    /**
+     * Sorr test fro groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult SortGroups()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(groupIDs.values())).get(0);
@@ -520,8 +577,18 @@ public class SortTest {
         }
     }
 
-
-
+    /**
+     * Validation test for returned groups.
+     * @param returnedGroups
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfGroupsReturned(ArrayList<Group> returnedGroups,
                                               HttpGet method, String responseString,
                                               String headerString, String responseStatus,
@@ -539,6 +606,12 @@ public class SortTest {
         }
     }
 
+    /**
+     * This checks whether the given array list of groups are in sorted order with respect to group id.
+     * @param returnedGroups
+     * @return
+     * @throws CharonException
+     */
     private boolean isGroupListSorted(ArrayList<Group> returnedGroups) throws CharonException {
         boolean sorted = true;
         for (int i = 1; i < returnedGroups.size(); i++) {
@@ -547,6 +620,12 @@ public class SortTest {
         return sorted;
     }
 
+    /**
+     * Clean up task for groups.
+     * @param id
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
 
         String deleteGroupURL = groupURL + "/" + id;

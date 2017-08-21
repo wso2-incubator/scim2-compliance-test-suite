@@ -41,6 +41,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of test cases related to /Groups endpoint.
+ */
 public class GroupTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -48,6 +51,10 @@ public class GroupTest {
     private Group group = null;
     private UserTest userTest = null;
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public GroupTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -56,6 +63,11 @@ public class GroupTest {
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
+    /**
+     * Method to handle test cases.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -87,8 +99,11 @@ public class GroupTest {
         return testResults;
     }
 
+    /**
+     * Clean up task.
+     * @throws ComplianceException
+     */
     public void RunCleanUpTask() throws ComplianceException {
-
         try {
 
             userTest.DeleteUserTest();
@@ -97,6 +112,12 @@ public class GroupTest {
         }
     }
 
+    /**
+     * Group Create Test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult CreateGroupTest () throws GeneralComplianceException, ComplianceException {
         String definedGroup = null;
         userTest = new UserTest(complianceTestMetaDataHolder);
@@ -184,6 +205,12 @@ public class GroupTest {
         }
     }
 
+    /**
+     * Group get test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult GetGroupTest () throws GeneralComplianceException, ComplianceException {
 
         String getGroupURL = null;
@@ -264,6 +291,12 @@ public class GroupTest {
         }
     }
 
+    /**
+     * Group update test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult UpdateGroupTest () throws GeneralComplianceException, ComplianceException {
 
         String updateUserURL = null;
@@ -361,6 +394,12 @@ public class GroupTest {
         }
     }
 
+    /**
+     * Group patch test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult PatchGroupTest () throws GeneralComplianceException, ComplianceException {
 
         String patchGroupURL = null;
@@ -455,6 +494,12 @@ public class GroupTest {
         }
     }
 
+    /**
+     * Group delete test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult DeleteGroupTest () throws GeneralComplianceException, ComplianceException {
 
         String deleteGroupURL = null;
@@ -514,6 +559,5 @@ public class GroupTest {
                             responseStatus, subTests));
         }
     }
-
 
 }

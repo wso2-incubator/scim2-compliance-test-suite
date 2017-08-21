@@ -39,8 +39,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This contains the validation tests common to all the other main test cases.
+ */
 public class ResponseValidateTests {
 
+    /**
+     * Main method to handle validation tests.
+     * @param scimObject
+     * @param schema
+     * @param requestedAttributes
+     * @param requestedExcludingAttributes
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws BadRequestException
+     * @throws CharonException
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public static void runValidateTests(SCIMObject scimObject,
                                         SCIMResourceTypeSchema schema,
                                         String requestedAttributes,

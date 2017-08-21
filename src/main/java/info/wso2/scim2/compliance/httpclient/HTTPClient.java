@@ -15,7 +15,6 @@
  */
 package info.wso2.scim2.compliance.httpclient;
 
-
 import info.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
@@ -25,6 +24,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.nio.charset.Charset;
 
+/**
+ * This class is to depicts the HTTP client.
+ */
 public class HTTPClient {
 
     private static HttpClient httpClient = null;

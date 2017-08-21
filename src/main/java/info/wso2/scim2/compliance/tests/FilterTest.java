@@ -48,6 +48,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class consists of Filtering test cases for both users and groups.
+ */
 public class FilterTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -56,6 +59,10 @@ public class FilterTest {
     private HashMap<String,String> groupIDs = new HashMap<>();
     private HashMap<String,String> userIDs = new HashMap<>();
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public FilterTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -67,11 +74,21 @@ public class FilterTest {
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
+    /**
+     * Method to handle test case.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         //perform filter tests
         return GetFilterTest();
     }
 
+    /**
+     * Perform user and group filter tests.
+     * @return
+     * @throws ComplianceException
+     */
     private ArrayList<TestResult> GetFilterTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -85,6 +102,12 @@ public class FilterTest {
         return testResults;
     }
 
+    /**
+     * Filter Users.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult FilterUsers()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(userIDs.values())).get(0);
@@ -198,6 +221,12 @@ public class FilterTest {
         }
     }
 
+    /**
+     * Clean up task to delete the created users.
+     * @param id
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CleanUpUser(String id) throws ComplianceException, GeneralComplianceException {
 
         String deleteUserURL = usersURL + "/" + id;
@@ -249,6 +278,18 @@ public class FilterTest {
         }
     }
 
+    /**
+     * Validation test to check whether the response contains all the expected users.
+     * @param userList
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfUsersReturned(ArrayList<User> userList,
                                              HttpGet method, String responseString,
                                              String headerString, String responseStatus,
@@ -270,6 +311,12 @@ public class FilterTest {
         }
     }
 
+    /**
+     * Create test users.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private HashMap<String, String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
@@ -331,7 +378,12 @@ public class FilterTest {
         return userIDs;
     }
 
-
+    /**
+     * Create test groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private HashMap<String, String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
@@ -393,6 +445,12 @@ public class FilterTest {
         return groupIDs;
     }
 
+    /**
+     * Method to filter groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult FilterGroups()
             throws ComplianceException, GeneralComplianceException {
         String value = (new ArrayList<>(groupIDs.values())).get(0);
@@ -514,7 +572,18 @@ public class FilterTest {
     }
 
 
-
+    /**
+     * Validation test to check whether the response contains all the expected groups.
+     * @param returnedGroups
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfGroupsReturned(ArrayList<Group> returnedGroups,
                                               HttpGet method, String responseString,
                                               String headerString, String responseStatus,
@@ -524,18 +593,24 @@ public class FilterTest {
 
         String value = (new ArrayList<>(groupIDs.values())).get(0);
         for (Group group : returnedGroups) {
-           if (!value.equals(group.getDisplayName())){
-               //clean up task
-               for (String id : groupIDs.keySet()) {
-                   CleanUpGroup(id);
-               }
-               throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
-                       "Response does not contain the expected groups",
-                       ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-           }
+            if (!value.equals(group.getDisplayName())){
+                //clean up task
+                for (String id : groupIDs.keySet()) {
+                    CleanUpGroup(id);
+                }
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Filter Groups",
+                        "Response does not contain the expected groups",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
         }
     }
 
+    /**
+     * Clean up the created groups after the test.
+     * @param id
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
 
         String deleteGroupURL = groupURL + "/" + id;

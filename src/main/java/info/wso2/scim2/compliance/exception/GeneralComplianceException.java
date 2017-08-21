@@ -17,6 +17,9 @@ package info.wso2.scim2.compliance.exception;
 
 import info.wso2.scim2.compliance.entities.TestResult;
 
+/**
+ * General compliance exception definition.
+ */
 public class GeneralComplianceException extends Exception {
 
 	private TestResult result = null;

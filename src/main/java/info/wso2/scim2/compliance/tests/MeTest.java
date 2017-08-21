@@ -40,6 +40,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of test cases related to /Me endpoint.
+ */
 public class MeTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -54,6 +57,10 @@ public class MeTest {
         this.user = user;
     }
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public MeTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -62,6 +69,11 @@ public class MeTest {
                 ComplianceConstants.TestConstants.ME_ENDPOINT;
     }
 
+    /**
+     * Method to handle test cases.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -89,6 +101,12 @@ public class MeTest {
         return testResults;
     }
 
+    /**
+     * Create Me test case.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult CreateUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpPost method = new HttpPost(url);
@@ -166,6 +184,12 @@ public class MeTest {
         }
     }
 
+    /**
+     * Get me test case.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult GetUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpGet method = new HttpGet(url);
@@ -245,6 +269,12 @@ public class MeTest {
         }
     }
 
+    /**
+     * Update me test case.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult UpdateUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpPut method = new HttpPut(url);
@@ -331,6 +361,12 @@ public class MeTest {
         }
     }
 
+    /**
+     * Patch me test case.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult PatchUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpPatch method = new HttpPatch(url);
@@ -417,6 +453,12 @@ public class MeTest {
         }
     }
 
+    /**
+     * Delete me test case.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult DeleteUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpDelete method = new HttpDelete(url);
@@ -477,7 +519,12 @@ public class MeTest {
         }
     }
 
-
+    /**
+     * Clean up task.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult CleanUpDelete () throws GeneralComplianceException, ComplianceException {
 
         String deleteUserURL = null;

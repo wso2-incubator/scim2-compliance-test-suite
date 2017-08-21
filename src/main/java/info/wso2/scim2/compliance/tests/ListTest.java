@@ -47,6 +47,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of test cases on List operation.
+ */
 public class ListTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -55,6 +58,10 @@ public class ListTest {
     private ArrayList<String> groupIDs = new ArrayList<>();
     private ArrayList<String> userIDs = new ArrayList<>();
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public ListTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -66,11 +73,21 @@ public class ListTest {
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
 
+    /**
+     * Method to handle test cases.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         //perform list tests
         return GetListTest();
     }
 
+    /**
+     * Handle the List test case.
+     * @return
+     * @throws ComplianceException
+     */
     private ArrayList<TestResult> GetListTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -79,11 +96,17 @@ public class ListTest {
             CreateTestsGroups();
             testResults.add(ListGroups());
         } catch (GeneralComplianceException e){
-                testResults.add(e.getResult());
+            testResults.add(e.getResult());
         }
         return testResults;
     }
 
+    /**
+     * List test case.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult ListUsers() throws ComplianceException, GeneralComplianceException {
 
         HttpGet method = new HttpGet(usersURL);
@@ -200,6 +223,12 @@ public class ListTest {
         }
     }
 
+    /**
+     * Clean up task for user.
+     * @param id
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CleanUpUser(String id) throws ComplianceException, GeneralComplianceException {
 
         String deleteUserURL = usersURL + "/" + id;
@@ -251,6 +280,18 @@ public class ListTest {
         }
     }
 
+    /**
+     * Validation test for list of users in the response.
+     * @param userList
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfUsersReturned(ArrayList<User> userList,
                                              HttpGet method, String responseString,
                                              String headerString, String responseStatus,
@@ -276,6 +317,12 @@ public class ListTest {
 
     }
 
+    /**
+     * Create test users.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private ArrayList<String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
@@ -312,7 +359,7 @@ public class ListTest {
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     User user = null;
                     try {
-                       user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                                 "Could not decode the server response of users create.",
@@ -337,7 +384,12 @@ public class ListTest {
         return userIDs;
     }
 
-
+    /**
+     * Create test groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private ArrayList<String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
@@ -399,6 +451,12 @@ public class ListTest {
         return groupIDs;
     }
 
+    /**
+     * List test groups.
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private TestResult ListGroups()
             throws ComplianceException, GeneralComplianceException {
 
@@ -515,6 +573,18 @@ public class ListTest {
         }
     }
 
+    /**
+     * Validation test for list of groups in the response.
+     * @param returnedGroups
+     * @param method
+     * @param responseString
+     * @param headerString
+     * @param responseStatus
+     * @param subTests
+     * @throws CharonException
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private void CheckForListOfGroupsReturned(ArrayList<Group> returnedGroups,
                                               HttpGet method, String responseString,
                                               String headerString, String responseStatus,
@@ -539,6 +609,12 @@ public class ListTest {
         }
     }
 
+    /**
+     * Clean up task for groups.
+     * @param id
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     private void CleanUpGroup (String id) throws GeneralComplianceException, ComplianceException {
 
         String deleteGroupURL = groupURL + "/" + id;

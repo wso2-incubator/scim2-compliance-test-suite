@@ -15,6 +15,9 @@
  */
 package info.wso2.scim2.compliance.utils;
 
+/**
+ * This class contains the constances used in.
+ */
 public class ComplianceConstants {
 
     public static class RequestCodeConstants {

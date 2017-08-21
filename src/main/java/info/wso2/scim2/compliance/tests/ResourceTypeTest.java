@@ -40,6 +40,9 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of /ResourceTypeTest endpoint related tests.
+ */
 public class ResourceTypeTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
@@ -49,11 +52,23 @@ public class ResourceTypeTest {
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
     }
 
-    // Test is to get the resource types from service provider
+    /**
+     * Test is to get the resource types from service provider
+     * @return
+     * @throws CriticalComplianceException
+     * @throws ComplianceException
+     */
+
     public TestResult performTest() throws CriticalComplianceException, ComplianceException {
         return getResourceTypeTest();
     }
 
+    /**
+     * Test case for get ResourceType.
+     * @return
+     * @throws CriticalComplianceException
+     * @throws ComplianceException
+     */
     private TestResult getResourceTypeTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
         String url =  complianceTestMetaDataHolder.getUrl() +

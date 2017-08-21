@@ -39,23 +39,35 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
-/*
-This Class is to test the /ServiceProviderConfig Endpoint.
- */
+/**
+* This Class is to test the /ServiceProviderConfig Endpoint.
+ **/
 public class ConfigTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private SCIMServiceProviderConfig scimServiceProviderConfig = null;
 
+    /**
+     * Initializer.
+     * @param complianceTestMetaDataHolder
+     */
     public ConfigTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
-            this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
+        this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
     }
 
-    // Test is to get the service provider configurations from service provider
+    /**
+     * Test is to get the service provider configurations from service provider.
+     **/
     public TestResult performTest() throws CriticalComplianceException, ComplianceException{
         return getServiceProviderConfigTest();
     }
 
+    /**
+     * Method to get the service provider configs.
+     * @return
+     * @throws CriticalComplianceException
+     * @throws ComplianceException
+     */
     private TestResult getServiceProviderConfigTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
         String url = complianceTestMetaDataHolder.getUrl() +
@@ -90,18 +102,18 @@ public class ConfigTest {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-                Header[] headers = response.getAllHeaders();
-                for (Header header : headers) {
-                    headerString += header.getName() + " : " + header.getValue() + "\n";
-                }
-                responseStatus = response.getStatusLine().getStatusCode() + " "
-                        + response.getStatusLine().getReasonPhrase();
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
 
-                throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get ServiceProviderConfig",
-                                "Could not get ServiceProviderConfig at url " + url,
-                                ComplianceUtils.getWire(method, responseString,
-                                        headerString, responseStatus, subTests)));
+            throw new CriticalComplianceException(new TestResult
+                    (TestResult.ERROR, "Get ServiceProviderConfig",
+                            "Could not get ServiceProviderConfig at url " + url,
+                            ComplianceUtils.getWire(method, responseString,
+                                    headerString, responseStatus, subTests)));
         }
         if (response.getStatusLine().getStatusCode() == 200) {
             //obtain the schema corresponding to serviceProviderConfig

@@ -15,7 +15,9 @@
  */
 package info.wso2.scim2.compliance.exception;
 
-
+/**
+ * Compliance exception definition.
+ */
 public class ComplianceException extends Exception {
 
     //A detailed human-readable message.

@@ -40,12 +40,14 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of test cases related to /Users endpoint.
+ */
 public class UserTest{
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String url;
     private User user = null;
-
 
     public User getUser() {
         return user;
@@ -55,6 +57,10 @@ public class UserTest{
         this.user = user;
     }
 
+    /**
+     * Initialize.
+     * @param complianceTestMetaDataHolder
+     */
     public UserTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -63,6 +69,11 @@ public class UserTest{
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
     }
 
+    /**
+     * Method to handle test cases.
+     * @return
+     * @throws ComplianceException
+     */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
@@ -90,6 +101,12 @@ public class UserTest{
         return testResults;
     }
 
+    /**
+     * Create user test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult CreateUserTest () throws GeneralComplianceException, ComplianceException {
 
         HttpPost method = new HttpPost(url);
@@ -168,6 +185,12 @@ public class UserTest{
         }
     }
 
+    /**
+     * Get user test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult GetUserTest () throws GeneralComplianceException, ComplianceException {
 
         String getUserURL = null;
@@ -249,6 +272,12 @@ public class UserTest{
         }
     }
 
+    /**
+     * Update user test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult UpdateUserTest () throws GeneralComplianceException, ComplianceException {
 
         String updateUserURL = null;
@@ -338,6 +367,12 @@ public class UserTest{
         }
     }
 
+    /**
+     * Patch user test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult PatchUserTest () throws GeneralComplianceException, ComplianceException {
 
         String patchUserURL = null;
@@ -427,6 +462,12 @@ public class UserTest{
         }
     }
 
+    /**
+     * Delete user test.
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     public TestResult DeleteUserTest () throws GeneralComplianceException, ComplianceException {
 
         String deleteUserURL = null;

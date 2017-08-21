@@ -19,6 +19,9 @@ package info.wso2.scim2.compliance.protocol;
 import info.wso2.scim2.compliance.objects.SCIMResourceType;
 import info.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 
+/**
+ * This contains the meta data that need to configure the test suite.
+ */
 public class ComplianceTestMetaDataHolder {
 
     private String url;
