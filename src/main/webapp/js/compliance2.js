@@ -87,6 +87,11 @@ $(document).ready(
                 new google.visualization.PieChart(document
                     .getElementById('compliance-chart2')).draw(chartData, options);
 
+                var y = document.getElementById('report');
+                y.style.display = 'block';
+                y.href = data.linkToReport;
+                $("#report-link-container").show();
+
                 prettyPrint();
                 $("#result-container2").show();
             }

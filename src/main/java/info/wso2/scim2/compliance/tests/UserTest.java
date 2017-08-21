@@ -76,6 +76,8 @@ public class UserTest{
             if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported()){
                 //perform patch user test if and only if it is supported by the SCIM service provider
                 testResults.add(PatchUserTest());
+            } else {
+                testResults.add(new TestResult(TestResult.SKIPPED, "Patch User Test", "Skipped",null));
             }
             //perform delete user test
             testResults.add(DeleteUserTest());
@@ -430,8 +432,8 @@ public class UserTest{
         String deleteUserURL = null;
         try {
             deleteUserURL = url + "/" + user.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created user.");
+        } catch (CharonException | NullPointerException e) {
+            throw new ComplianceException("Error in reading the id of the created user.");
         }
         HttpDelete method = new HttpDelete(deleteUserURL);
 

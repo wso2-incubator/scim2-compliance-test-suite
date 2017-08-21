@@ -32,8 +32,8 @@ public class Result {
     @XmlElement(name = "errorMessage")
     String           errorMessage = "";
 
-    //@XmlElement(name = "reportLink")
-   // String           reportLink = "";
+    @XmlElement(name = "linkToReport")
+    String           link = "";
 
     public Result() {
 
@@ -60,11 +60,7 @@ public class Result {
         return errorMessage;
     }
 
-   // public String getReportLink() {
-       // return reportLink;
-    //}
-
-   // public void setReportLink(String reportLink) {
-     //   this.reportLink = reportLink;
-   // }
+    public void setReportLink(String reportLink) {
+        link = reportLink;
+    }
 }

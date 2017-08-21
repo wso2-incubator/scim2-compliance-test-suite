@@ -20,22 +20,30 @@ import info.wso2.scim2.compliance.entities.Statistics;
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
+import info.wso2.scim2.compliance.pdf.PDFGenerator;
 import info.wso2.scim2.compliance.tests.*;
 import info.wso2.scim2.compliance.utils.ComplianceConstants;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.wso2.charon3.core.exceptions.CharonException;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Path("/test2")
 public class Compliance extends HttpServlet {
+
+    @Context ServletContext context;
+
     private static final long serialVersionUID = 1L;
 
     @POST
@@ -57,6 +65,13 @@ public class Compliance extends HttpServlet {
         if (url == null || url.isEmpty()) {
             ComplianceException BadRequestException = new ComplianceException();
             BadRequestException.setDetail("URL can not be empty.");
+            return (new Result(BadRequestException.getDetail()));
+        }
+
+        //TODO : Add other authentication logging checks as well.
+        if ((username.isEmpty() || password.isEmpty())) {
+            ComplianceException BadRequestException = new ComplianceException();
+            BadRequestException.setDetail("Authorization with service provider failed.");
             return (new Result(BadRequestException.getDetail()));
         }
 
@@ -209,13 +224,15 @@ public class Compliance extends HttpServlet {
             }
         }
         Result finalResults = new Result(statistics, results);
-       // finalResults.setReportLink(null);
+
         //generate pdf results sheet
-       // try {
-         //   PDFGenerator.GeneratePDFResults(finalResults);
-       // } catch (IOException e) {
-           // return (new Result(e.getMessage()));
-       // }
+        try {
+            String fullPath = context.getRealPath("/WEB-INF");
+            String reportURL = PDFGenerator.GeneratePDFResults(finalResults, fullPath);
+            finalResults.setReportLink("file://" + reportURL);
+        } catch (IOException e) {
+           return (new Result(e.getMessage()));
+        }
         return finalResults;
     }
 }

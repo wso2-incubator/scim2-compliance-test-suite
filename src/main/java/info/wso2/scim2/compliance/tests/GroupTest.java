@@ -69,6 +69,9 @@ public class GroupTest {
             if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported()){
                 //perform patch group test if and only if it is supported by the SCIM service provider
                 testResults.add(PatchGroupTest());
+            } else {
+                testResults.add(new TestResult(TestResult.SKIPPED, "Patch Group Test", "Skipped",null));
+
             }
             //perform delete group test
             testResults.add(DeleteGroupTest());
@@ -85,10 +88,14 @@ public class GroupTest {
     }
 
     public void RunCleanUpTask() throws ComplianceException {
+        if(userTest.getUser() == null) {
+            throw new ComplianceException("Initializing the service provider failed.");
+        }
         try {
+
             userTest.DeleteUserTest();
         } catch (GeneralComplianceException | ComplianceException e) {
-           throw new ComplianceException(500, "Group Clean up task failed");
+           throw new ComplianceException("Group Clean up task failed");
         }
     }
 

@@ -86,4 +86,16 @@ public class TestResult {
     public Wire getWire() {
         return wire;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getStatusText() {
+        return statusText;
+    }
+
+    public String getStatusLabel() {
+        return statusLabel;
+    }
 }

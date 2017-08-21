@@ -28,6 +28,10 @@ public class ComplianceException extends Exception {
         this.status = status;
         this.detail = detail;
     }
+    public ComplianceException(String detail) {
+        this.detail = detail;
+    }
+
 
     /**
      * Constructs a new exception with the specified detail message and
