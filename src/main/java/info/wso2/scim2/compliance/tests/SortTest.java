@@ -89,6 +89,10 @@ public class SortTest {
         try {
             CreateTestsUsers();
             testResults.add(SortUsers());
+        } catch (GeneralComplianceException e){
+            testResults.add(e.getResult());
+        }
+        try {
             CreateTestsGroups();
             testResults.add(SortGroups());
         } catch (GeneralComplianceException e){
@@ -326,9 +330,9 @@ public class SortTest {
     private HashMap<String, String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
-        definedUsers.add("{\"password\": \"7019asd81\",\"userName\": \"AbrTkAA\"}");
-        definedUsers.add("{\"password\": \"7019asd82\",\"userName\": \"UttEdHt\"}");
-        definedUsers.add("{\"password\": \"7019asd83\",\"userName\": \"KKTQwhr\"}");
+        definedUsers.add("{\"password\": \"7019asd81\",\"userName\": \"AbrTkAA41\"}");
+        definedUsers.add("{\"password\": \"7019asd82\",\"userName\": \"UttEdHt42\"}");
+        definedUsers.add("{\"password\": \"7019asd83\",\"userName\": \"KKTQwhr43\"}");
 
         HttpPost method = new HttpPost(usersURL);
         //create users
@@ -393,9 +397,9 @@ public class SortTest {
     private HashMap<String, String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
-        definedGroups.add("{\"displayName\": \"EYtXcD\"}");
-        definedGroups.add("{\"displayName\": \"BktqER\"}");
-        definedGroups.add("{\"displayName\": \"ZwLtOP\"}");
+        definedGroups.add("{\"displayName\": \"EYtXcD41\"}");
+        definedGroups.add("{\"displayName\": \"BktqER42\"}");
+        definedGroups.add("{\"displayName\": \"ZwLtOP43\"}");
 
         HttpPost method = new HttpPost(groupURL);
         //create groups

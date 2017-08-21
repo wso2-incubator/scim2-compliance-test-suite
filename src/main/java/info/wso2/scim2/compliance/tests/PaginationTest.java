@@ -93,10 +93,14 @@ public class PaginationTest {
         try {
             CreateTestsUsers();
             testResults.add(PaginateUsers());
+        } catch (GeneralComplianceException e){
+            testResults.add(e.getResult());
+        }
+        try {
             CreateTestsGroups();
             testResults.add(PaginateGroups());
         } catch (GeneralComplianceException e){
-                testResults.add(e.getResult());
+            testResults.add(e.getResult());
         }
         return testResults;
     }
@@ -307,9 +311,9 @@ public class PaginationTest {
     private ArrayList<String> CreateTestsUsers() throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
-        definedUsers.add("{\"password\": \"7019asd81\",\"userName\": \"AbrTkAA\"}");
-        definedUsers.add("{\"password\": \"7019asd82\",\"userName\": \"UttEdHt\"}");
-        definedUsers.add("{\"password\": \"7019asd83\",\"userName\": \"KKTQwhr\"}");
+        definedUsers.add("{\"password\": \"7019asd81\",\"userName\": \"AbrTkAA11\"}");
+        definedUsers.add("{\"password\": \"7019asd82\",\"userName\": \"UttEdHt12\"}");
+        definedUsers.add("{\"password\": \"7019asd83\",\"userName\": \"KKTQwhr13\"}");
 
         HttpPost method = new HttpPost(usersURL);
         //create users
@@ -374,9 +378,9 @@ public class PaginationTest {
     private ArrayList<String> CreateTestsGroups () throws ComplianceException, GeneralComplianceException {
 
         ArrayList<String> definedGroups = new ArrayList<>();
-        definedGroups.add("{\"displayName\": \"EYtXcD\"}");
-        definedGroups.add("{\"displayName\": \"BktqER\"}");
-        definedGroups.add("{\"displayName\": \"ZwLtOP\"}");
+        definedGroups.add("{\"displayName\": \"EYtXcD11\"}");
+        definedGroups.add("{\"displayName\": \"BktqER12\"}");
+        definedGroups.add("{\"displayName\": \"ZwLtOP13\"}");
 
         HttpPost method = new HttpPost(groupURL);
         //create groups
@@ -575,7 +579,7 @@ public class PaginationTest {
         if(returnedGroups.size() != 2) {
             //clean up task
             for (String id : groupIDs) {
-                CleanUpUser(id);
+                CleanUpGroup(id);
             }
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Paginate Groups",
                     "Response does not contain right number of paginated groups",
