@@ -103,16 +103,21 @@ public class Compliance extends HttpServlet {
         complianceTestMetaDataHolder.setClient_secret(clientSecret);
 
         try {
-            // Start with the critical tests. This will throw exception and test will stop if fails.
+            // Schema Test
+            SchemaTest schemaTest = new SchemaTest(complianceTestMetaDataHolder);
+            results.add(schemaTest.performTest());
 
+        } catch (CriticalComplianceException e) {
+            results.add(e.getResult());
+        } catch (ComplianceException e) {
+            return (new Result(e.getDetail()));
+        }
+        try {
             // ServiceProviderConfig Test
             ConfigTest configTest = new ConfigTest(complianceTestMetaDataHolder);
             results.add(configTest.performTest());
-
-            //TODO : All the other test should come here
-
         } catch (CriticalComplianceException e) {
-            // failing critical test
+            //TODO : Stop at here
             results.add(e.getResult());
         } catch (ComplianceException e) {
             return (new Result(e.getDetail()));

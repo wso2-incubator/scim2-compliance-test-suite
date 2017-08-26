@@ -17,6 +17,7 @@ package info.wso2.scim2.compliance.protocol;
 
 
 import info.wso2.scim2.compliance.objects.SCIMResourceType;
+import info.wso2.scim2.compliance.objects.SCIMSchema;
 import info.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 
 /**
@@ -34,6 +35,7 @@ public class ComplianceTestMetaDataHolder {
     private String authorization_method;
     private SCIMServiceProviderConfig scimServiceProviderConfig;
     private SCIMResourceType scimResourceType;
+    private SCIMSchema scimSchema;
 
     public SCIMServiceProviderConfig getScimServiceProviderConfig() {
         return scimServiceProviderConfig;
@@ -113,6 +115,14 @@ public class ComplianceTestMetaDataHolder {
 
     public SCIMResourceType getScimResourceType() {
         return scimResourceType;
+    }
+
+    public SCIMSchema getScimSchema() {
+        return scimSchema;
+    }
+
+    public void setScimSchema(SCIMSchema scimSchema) {
+        this.scimSchema = scimSchema;
     }
 }
 

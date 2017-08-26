@@ -17,6 +17,8 @@ package info.wso2.scim2.compliance.tests;
 
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.GeneralComplianceException;
+import info.wso2.scim2.compliance.objects.SCIMSchema;
+import info.wso2.scim2.compliance.protocol.Compliance;
 import info.wso2.scim2.compliance.protocol.ComplianceUtils;
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
@@ -37,6 +39,8 @@ import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -59,7 +63,8 @@ public class ConfigTest {
      * Test is to get the service provider configurations from service provider.
      **/
     public TestResult performTest() throws CriticalComplianceException, ComplianceException{
-        return getServiceProviderConfigTest();
+
+       return getServiceProviderConfigTest();
     }
 
     /**
@@ -68,7 +73,8 @@ public class ConfigTest {
      * @throws CriticalComplianceException
      * @throws ComplianceException
      */
-    private TestResult getServiceProviderConfigTest () throws CriticalComplianceException, ComplianceException {
+    @TestCase
+    public TestResult getServiceProviderConfigTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
         String url = complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.SERVICE_PROVIDER_ENDPOINT;
@@ -117,8 +123,8 @@ public class ConfigTest {
         }
         if (response.getStatusLine().getStatusCode() == 200) {
             //obtain the schema corresponding to serviceProviderConfig
-            SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.
-                    getInstance().getServiceProviderConfigResourceSchema();
+            SCIMResourceTypeSchema schema = complianceTestMetaDataHolder.getScimSchema().
+                    getServiceProviderConfigSchema();
 
             JSONDecoder jsonDecoder = new JSONDecoder();
             try {

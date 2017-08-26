@@ -49,6 +49,7 @@ public class ComplianceConstants {
         public static final String GROUPS_ENDPOINT = "/Groups";
         public static final String ME_ENDPOINT = "/Me";
         public static final String BULK_ENDPOINT = "/Bulk";
+        public static final String SCHEMAS_ENDPOINT = "/Schemas";
 
         public static final String SCHEMA_LIST_TEST = "Schema List Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
@@ -60,6 +61,8 @@ public class ComplianceConstants {
         public static final String FILTER_CONTENT_TEST = "Filter Content Test";
         public static final String SORT_USERS_TEST = "Sort Users Test";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
+
+        public static final String EXTENSION_SCHEMA_URI = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
     }
 
     public static class DefinedInstances {
