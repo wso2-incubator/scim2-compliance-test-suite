@@ -15,6 +15,10 @@
  */
 package info.wso2.scim2.compliance.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Random;
+
 /**
  * This class contains the constances used in.
  */
@@ -62,23 +66,25 @@ public class ComplianceConstants {
         public static final String SORT_USERS_TEST = "Sort Users Test";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
 
-        public static final String EXTENSION_SCHEMA_URI = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
+        public static final String EXTENSION_SCHEMA_URI =
+                "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
     }
 
     public static class DefinedInstances {
+
         public static String DEFINED_USER_PASSWORD = "7019asd84";
         public static String DEFINED_USER_USERNAME = "bjensenexamplecom";
 
 
         public static String DEFINED_USER =
-                        "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\":[{" +
-                                "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                                "\"value\": \"babs@jensen.org\",\"type\": \"home\"}]}";
+                "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}]}";
 
         public static String DEFINED_UPDATED_USER =
-                        "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\": [{" +
-                                "\"value\": \"bjensen@wso2.com\",\"type\": \"work\",\"primary\": true}," +
-                                "{\"value\": \"babs@wso2.org\",\"type\": \"home\"}]}";
+                "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\": [{" +
+                        "\"value\": \"bjensen@wso2.com\",\"type\": \"work\",\"primary\": true}," +
+                        "{\"value\": \"babs@wso2.org\",\"type\": \"home\"}]}";
 
 
         public static String DEFINED_PATCH_USER_PAYLOAD =
@@ -94,5 +100,4 @@ public class ComplianceConstants {
                 "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"Bob\"," +
                 "\"password\":\"vindula\"}}]}";
     }
-
 }

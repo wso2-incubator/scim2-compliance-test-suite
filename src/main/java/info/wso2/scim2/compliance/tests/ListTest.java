@@ -18,6 +18,7 @@ package info.wso2.scim2.compliance.tests;
 
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
+import info.wso2.scim2.compliance.exception.CriticalComplianceException;
 import info.wso2.scim2.compliance.exception.GeneralComplianceException;
 import info.wso2.scim2.compliance.httpclient.HTTPClient;
 import info.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
@@ -45,6 +46,8 @@ import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -80,7 +83,30 @@ public class ListTest {
      */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         //perform list tests
-        return GetListTest();
+        ArrayList<TestResult> testResults = new ArrayList<>();
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults = (ArrayList<TestResult>) method.invoke(this);
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (GeneralComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in List Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in List Test.");
+                }
+
+            }
+        }
+        return testResults;
     }
 
     /**
@@ -88,7 +114,8 @@ public class ListTest {
      * @return
      * @throws ComplianceException
      */
-    private ArrayList<TestResult> GetListTest() throws ComplianceException {
+    @TestCase
+    public ArrayList<TestResult> GetListTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
             CreateTestsUsers();

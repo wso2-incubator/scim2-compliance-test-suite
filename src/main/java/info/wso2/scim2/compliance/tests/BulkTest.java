@@ -19,6 +19,7 @@ package info.wso2.scim2.compliance.tests;
 
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
+import info.wso2.scim2.compliance.exception.CriticalComplianceException;
 import info.wso2.scim2.compliance.exception.GeneralComplianceException;
 import info.wso2.scim2.compliance.httpclient.HTTPClient;
 import info.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
@@ -36,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -66,11 +69,27 @@ public class BulkTest {
      */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
-        try {
-            //perform bulk test
-            testResults.add(BulkPostTest());
-        } catch (GeneralComplianceException e) {
-            testResults.add(e.getResult());
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults.add((TestResult) method.invoke(this));
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (GeneralComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in Bulk Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in Bulk Test.");
+                }
+
+            }
         }
         return testResults;
     }
@@ -92,6 +111,7 @@ public class BulkTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult BulkPostTest() throws GeneralComplianceException, ComplianceException {
 
         String definedRequest = ComplianceConstants.DefinedInstances.DEFINED_BULK_REQUEST;
@@ -238,5 +258,4 @@ public class BulkTest {
 
         return UserLocations;
     }
-
 }

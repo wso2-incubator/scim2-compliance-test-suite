@@ -15,6 +15,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -35,8 +37,31 @@ public class SchemaTest {
     /**
      * Test is to get the service provider configurations from service provider.
      **/
-    public TestResult performTest() throws CriticalComplianceException, ComplianceException {
-       return getSchemasTest();
+    public ArrayList<TestResult> performTest() throws CriticalComplianceException, ComplianceException {
+        ArrayList<TestResult> testResults = new ArrayList<>();
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults.add((TestResult) method.invoke(this));
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (CriticalComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in Schema Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in Schema Test.");
+                }
+
+            }
+        }
+        return testResults;
     }
 
     /**
@@ -112,6 +137,4 @@ public class SchemaTest {
                             responseStatus, subTests));
         }
     }
-
-
 }

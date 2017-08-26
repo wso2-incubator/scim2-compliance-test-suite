@@ -45,6 +45,8 @@ import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -80,7 +82,30 @@ public class PaginationTest {
      */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         //perform pagination tests
-        return GetPaginationTest();
+        ArrayList<TestResult> testResults = new ArrayList<>();
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults = (ArrayList<TestResult>) method.invoke(this);
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (GeneralComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in Pagination Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in Pagination Test.");
+                }
+
+            }
+        }
+        return testResults;
     }
 
     /**
@@ -88,7 +113,8 @@ public class PaginationTest {
      * @return
      * @throws ComplianceException
      */
-    private ArrayList<TestResult> GetPaginationTest() throws ComplianceException {
+    @TestCase
+    public ArrayList<TestResult> GetPaginationTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         try {
             CreateTestsUsers();
@@ -344,7 +370,7 @@ public class PaginationTest {
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     User user = null;
                     try {
-                       user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Pagination Users",
                                 "Could not decode the server response of users create.",

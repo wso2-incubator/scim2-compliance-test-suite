@@ -38,6 +38,8 @@ import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -59,8 +61,33 @@ public class ResourceTypeTest {
      * @throws ComplianceException
      */
 
-    public TestResult performTest() throws CriticalComplianceException, ComplianceException {
-        return getResourceTypeTest();
+    public ArrayList<TestResult> performTest() throws CriticalComplianceException, ComplianceException {
+        ArrayList<TestResult> testResults = new ArrayList<>();
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults.add((TestResult) method.invoke(this));
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (GeneralComplianceException e1) {
+                        testResults.add(e1.getResult());
+                    } catch (CriticalComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in ResourceType Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in ResourceType Test.");
+                }
+
+            }
+        }
+        return testResults;
     }
 
     /**
@@ -69,7 +96,8 @@ public class ResourceTypeTest {
      * @throws CriticalComplianceException
      * @throws ComplianceException
      */
-    private TestResult getResourceTypeTest () throws CriticalComplianceException, ComplianceException {
+    @TestCase
+    public TestResult getResourceTypeTest () throws CriticalComplianceException, ComplianceException {
         // Construct the endpoint url
         String url =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.RESOURCE_TYPE_ENDPOINT;
@@ -124,7 +152,7 @@ public class ResourceTypeTest {
             try {
                 scimResourceType =
                         (SCIMResourceType) jsonDecoder.decodeResource(responseString, schema,
-                                        new SCIMResourceType());
+                                new SCIMResourceType());
                 complianceTestMetaDataHolder.setScimResourceType(scimResourceType);
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
@@ -160,6 +188,4 @@ public class ResourceTypeTest {
                             responseStatus, subTests));
         }
     }
-
-
 }

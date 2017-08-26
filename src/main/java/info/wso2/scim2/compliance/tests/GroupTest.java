@@ -36,10 +36,14 @@ import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.objects.Group;
+import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * This class consists of test cases related to /Groups endpoint.
@@ -48,17 +52,13 @@ public class GroupTest {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String url;
-    private Group group = null;
-    private UserTest userTest = null;
 
     /**
      * Initialize.
      * @param complianceTestMetaDataHolder
      */
     public GroupTest(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
-
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
-
         url =  complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
     }
@@ -70,46 +70,40 @@ public class GroupTest {
      */
     public ArrayList<TestResult> performTest() throws ComplianceException {
         ArrayList<TestResult> testResults = new ArrayList<>();
-        try {
-            //perform create group test
-            testResults.add(CreateGroupTest());
-            //perform get group test
-            testResults.add(GetGroupTest());
-            //perform update group test
-            testResults.add(UpdateGroupTest());
-
-            if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported()){
-                //perform patch group test if and only if it is supported by the SCIM service provider
-                testResults.add(PatchGroupTest());
-            } else {
-                testResults.add(new TestResult(TestResult.SKIPPED, "Patch Group Test", "Skipped",null));
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    if(method.getName().equals("PatchGroupTest")){
+                        if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported()){
+                            testResults.add((TestResult) method.invoke(this));
+                        } else {
+                            testResults.add(new TestResult(TestResult.SKIPPED,
+                                    "Patch Group Test", "Skipped",null));
+                        }
+                    } else{
+                        testResults.add((TestResult) method.invoke(this));
+                    }
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (GeneralComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in Group Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in Group Test.");
+                } catch (CharonException e) {
+                    throw new ComplianceException("Error occurred in Group Test.");
+                }
 
             }
-            //perform delete group test
-            testResults.add(DeleteGroupTest());
-
-        } catch (GeneralComplianceException e) {
-            testResults.add(e.getResult());
-        } catch (CharonException e) {
-            throw  new ComplianceException(500, "Error in getting the Patch attribute");
-        } finally {
-            //run clean up task
-            RunCleanUpTask();
         }
         return testResults;
-    }
-
-    /**
-     * Clean up task.
-     * @throws ComplianceException
-     */
-    public void RunCleanUpTask() throws ComplianceException {
-        try {
-
-            userTest.DeleteUserTest();
-        } catch (GeneralComplianceException | ComplianceException e) {
-           throw new ComplianceException("Group Clean up task failed");
-        }
     }
 
     /**
@@ -118,19 +112,13 @@ public class GroupTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult CreateGroupTest () throws GeneralComplianceException, ComplianceException {
+
+        Group group = null;
         String definedGroup = null;
-        userTest = new UserTest(complianceTestMetaDataHolder);
-        try {
-            userTest.CreateUserTest();
-            definedGroup = "{\"displayName\": \"engineer\", " +
-                            "\"members\": " +
-                                "[{\"value\":\""+ userTest.getUser().getId() +"\"," +
-                                "\"display\": \""+ userTest.getUser().getUserName() +"\"}" +
-                            "]}";
-        } catch (Exception e) {
-            throw new ComplianceException(500, "Error while creating the user to add to group");
-        }
+
+        definedGroup = "{\"displayName\": \"engineer\"}";
         HttpPost method = new HttpPost(url);
         //create group test
         HttpClient client = HTTPClient.getHttpClient();
@@ -156,7 +144,8 @@ public class GroupTest {
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
             }
-            responseStatus = response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase();
+            responseStatus = response.getStatusLine().getStatusCode() + " " +
+                    response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
             // Read the response body.
@@ -180,6 +169,13 @@ public class GroupTest {
             try {
                 group = (Group)jsonDecoder.decodeResource(responseString, schema, new Group());
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                try {
+                    CleanUpGroup(group.getId(), "Group Create");
+                } catch (CharonException e1) {
+                    throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Group Create",
+                            "Could not retrieve the group id",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create Group",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -189,8 +185,22 @@ public class GroupTest {
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
+                try {
+                    CleanUpGroup(group.getId(), "Group Create");
+                } catch (CharonException e1) {
+                    throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Group Create",
+                            "Could not retrieve the group id",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Create Group",
                         "Response Validation Error",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            try {
+                CleanUpGroup(group.getId(), "Group Create");
+            } catch (CharonException e1) {
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Group Create",
+                        "Could not retrieve the group id",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
             return new TestResult
@@ -211,14 +221,15 @@ public class GroupTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult GetGroupTest () throws GeneralComplianceException, ComplianceException {
 
+        String id = InitiateGroup("Get Group");
+        Group group = null;
         String getGroupURL = null;
-        try {
-            getGroupURL = url + "/" + group.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created group.");
-        }
+
+        getGroupURL = url + "/" + id;
+
         HttpGet method = new HttpGet(getGroupURL);
 
         HttpClient client = HTTPClient.getHttpClient();
@@ -244,13 +255,14 @@ public class GroupTest {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-           // get all headers
+            // get all headers
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            CleanUpGroup(id,"Get Group");
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Group",
                     "Could not get the default group from url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -265,6 +277,7 @@ public class GroupTest {
                 group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                CleanUpGroup(id,"Get Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Group",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -275,15 +288,19 @@ public class GroupTest {
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
+                CleanUpGroup(id,"Get Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Get Group",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
+
+            CleanUpGroup(id,"Get Group");
             return new TestResult
                     (TestResult.SUCCESS, "Get Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
+            CleanUpGroup(id,"Get Group");
             return new TestResult
                     (TestResult.ERROR, "Get Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
@@ -297,24 +314,21 @@ public class GroupTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult UpdateGroupTest () throws GeneralComplianceException, ComplianceException {
 
+        Group group = null;
+        String id = InitiateGroup("Update Group");
         String updateUserURL = null;
         String definedUpdatedGroup = null;
         try {
-            definedUpdatedGroup = "{\"displayName\": \"Doctors\", " +
-                    "\"members\": " +
-                    "[{\"value\":\""+ userTest.getUser().getId() +"\"," +
-                    "\"display\": \""+ userTest.getUser().getUserName() +"\"}" +
-                    "]}";
+            definedUpdatedGroup = "{\"displayName\": \"Doctors\"}";
         } catch (Exception e) {
-            throw new ComplianceException(500, "Error while getting the user to add to group");
+            throw new ComplianceException("Error while getting the user to add to group");
         }
-        try {
-            updateUserURL = url + "/" + group.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created group.");
-        }
+
+        updateUserURL = url + "/" + id;
+
         HttpPut method = new HttpPut(updateUserURL);
 
         HttpClient client = HTTPClient.getHttpClient();
@@ -353,6 +367,7 @@ public class GroupTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            CleanUpGroup(id, "Update Group");
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Group",
                     "Could not update the default group at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -368,6 +383,7 @@ public class GroupTest {
                 group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                CleanUpGroup(id, "Update Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Group",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -378,15 +394,20 @@ public class GroupTest {
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
+
+                CleanUpGroup(id,"Update Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Update Group",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
+
+            CleanUpGroup(id, "Update Group");
             return new TestResult
                     (TestResult.SUCCESS, "Update Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
+            CleanUpGroup(id, "Update Group");
             return new TestResult
                     (TestResult.ERROR, "Update Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
@@ -400,21 +421,18 @@ public class GroupTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult PatchGroupTest () throws GeneralComplianceException, ComplianceException {
 
+        Group group = null;
+        String id = InitiateGroup("Patch Group");
         String patchGroupURL = null;
         String definedPatchedGroup = null;
-        try {
-            definedPatchedGroup = "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
-                    "\"Operations\":[{\"op\":\"add\",\"value\":{\"displayName\": \"Actors\"}}]}";
-        } catch (Exception e) {
-            throw new ComplianceException(500, "Error while getting the user to add to group");
-        }
-        try {
-            patchGroupURL = url + "/" + group.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created group.");
-        }
+        definedPatchedGroup = "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
+                "\"Operations\":[{\"op\":\"add\",\"value\":{\"displayName\": \"Actors\"}}]}";
+
+        patchGroupURL = url + "/" + id;
+
         HttpPatch method = new HttpPatch(patchGroupURL);
 
         HttpClient client = HTTPClient.getHttpClient();
@@ -453,6 +471,7 @@ public class GroupTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            CleanUpGroup(id, "Patch Group");
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Group",
                     "Could not patch the default group at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -468,6 +487,7 @@ public class GroupTest {
                 group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                CleanUpGroup(id, "Patch Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Group",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -478,15 +498,18 @@ public class GroupTest {
                         responseString, headerString, responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
+                CleanUpGroup(id, "Patch Group");
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Patch Group",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
+            CleanUpGroup(id,"Patch Group");
             return new TestResult
                     (TestResult.SUCCESS, "Patch Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
+            CleanUpGroup(id, "Patch Group");
             return new TestResult
                     (TestResult.ERROR, "Patch Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
@@ -500,14 +523,15 @@ public class GroupTest {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
+    @TestCase
     public TestResult DeleteGroupTest () throws GeneralComplianceException, ComplianceException {
 
+        Group group = null;
+        String id = InitiateGroup("Delete Group");
         String deleteGroupURL = null;
-        try {
-            deleteGroupURL = url + "/" + group.getId();
-        } catch (CharonException e) {
-            throw new ComplianceException(e.getStatus(),"Error in reading the id of the created group.");
-        }
+
+        deleteGroupURL = url + "/" + id;
+
         HttpDelete method = new HttpDelete(deleteGroupURL);
 
         HttpClient client = HTTPClient.getHttpClient();
@@ -542,6 +566,7 @@ public class GroupTest {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            CleanUpGroup(id, "Delete Group");
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Delete Group",
                     "Could not delete the default group at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -553,6 +578,7 @@ public class GroupTest {
                             "", ComplianceUtils.getWire(method, responseString, headerString,
                             responseStatus, subTests));
         } else {
+            CleanUpGroup(id, "Delete Group");
             return new TestResult
                     (TestResult.ERROR, "Delete Group",
                             "", ComplianceUtils.getWire(method, responseString, headerString,
@@ -560,4 +586,159 @@ public class GroupTest {
         }
     }
 
+    /**
+     * This method cleans the group with the given groupId and the user with the given id.
+     * @param groupId
+     * @param testName
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
+    public boolean CleanUpGroup (String groupId, String testName)
+            throws GeneralComplianceException, ComplianceException {
+
+        String deleteGroupURL = null;
+        deleteGroupURL = url + "/" + groupId;
+
+        HttpDelete method = new HttpDelete(deleteGroupURL);
+
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+
+        HttpResponse response = null;
+        String responseString = "";
+        String headerString = "";
+        String responseStatus = "";
+        ArrayList<String> subTests =  new ArrayList<>();
+        try {
+
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+
+        } catch (Exception e) {
+            // Read the response body.
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not delete the default group at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        }
+
+        if (response.getStatusLine().getStatusCode() == 204) {
+            return true;
+        } else {
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not delete the default group at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        }
+    }
+
+    /**
+     * This method created a group and return the id.
+     * @param testName
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
+    public String InitiateGroup(String testName)
+            throws GeneralComplianceException, ComplianceException {
+
+        Group group = null;
+        String definedGroup = null;
+
+        definedGroup = "{\"displayName\": \"YERFTERI\"}";
+        HttpPost method = new HttpPost(url);
+        //create group test
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+        method.setHeader("Content-Type", "application/json");
+
+        HttpResponse response = null;
+        String responseString = "";
+        String headerString = "";
+        String responseStatus = "";
+        ArrayList<String> subTests =  new ArrayList<>();
+        try {
+            //create the group
+            HttpEntity entity = new ByteArrayEntity(definedGroup.getBytes("UTF-8"));
+            method.setEntity(entity);
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " " +
+                    response.getStatusLine().getReasonPhrase();
+
+        } catch (Exception e) {
+            // Read the response body.
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not create default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        }
+
+        if (response.getStatusLine().getStatusCode() == 201) {
+            //obtain the schema corresponding to group
+            SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
+
+            JSONDecoder jsonDecoder = new JSONDecoder();
+            try {
+                group = (Group)jsonDecoder.decodeResource(responseString, schema, new Group());
+            } catch (BadRequestException | CharonException | InternalErrorException e) {
+
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                        "Could not decode the server response",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            try {
+                ResponseValidateTests.runValidateTests(group, schema,null,
+                        null, method,
+                        responseString, headerString, responseStatus, subTests);
+
+            } catch (BadRequestException | CharonException e) {
+
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                        "Response Validation Error",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            try {
+                return group.getId();
+            } catch (CharonException e) {
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                        "Could not retrieve the group id",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+        } else {
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not create default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+        }
+    }
 }

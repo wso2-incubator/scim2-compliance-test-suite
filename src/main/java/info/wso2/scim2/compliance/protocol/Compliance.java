@@ -83,6 +83,8 @@ public class Compliance extends HttpServlet {
                 ComplianceConstants.RequestCodeConstants.HTTPS};
 
         UrlValidator urlValidator = new UrlValidator(schemes);
+
+        //TODO : Remove the comment when deployed
         /*
         if (!urlValidator.isValid(url)) {
             ComplianceException BadRequestException = new ComplianceException();
@@ -105,19 +107,25 @@ public class Compliance extends HttpServlet {
         try {
             // Schema Test
             SchemaTest schemaTest = new SchemaTest(complianceTestMetaDataHolder);
-            results.add(schemaTest.performTest());
-
+            ArrayList<TestResult> schemaResults = schemaTest.performTest();
+            for(TestResult result : schemaResults){
+                results.add(result);
+            }
         } catch (CriticalComplianceException e) {
             results.add(e.getResult());
         } catch (ComplianceException e) {
             return (new Result(e.getDetail()));
         }
+
+
         try {
-            // ServiceProviderConfig Test
+            // Schema Test
             ConfigTest configTest = new ConfigTest(complianceTestMetaDataHolder);
-            results.add(configTest.performTest());
+            ArrayList<TestResult> configResults = configTest.performTest();
+            for(TestResult result : configResults){
+                results.add(result);
+            }
         } catch (CriticalComplianceException e) {
-            //TODO : Stop at here
             results.add(e.getResult());
         } catch (ComplianceException e) {
             return (new Result(e.getDetail()));
@@ -162,11 +170,14 @@ public class Compliance extends HttpServlet {
         // /ResourceType Test
         ResourceTypeTest resourceTypeTest = new ResourceTypeTest(complianceTestMetaDataHolder);
         try {
-            results.add(resourceTypeTest.performTest());
+            ArrayList<TestResult> resourceTypeResults = resourceTypeTest.performTest();
+            for(TestResult result : resourceTypeResults){
+                results.add(result);
+            }
         } catch (CriticalComplianceException e) {
             results.add(e.getResult());
         } catch (ComplianceException e) {
-            return (new Result(e.getMessage()));
+            return (new Result(e.getDetail()));
         }
         //List Test
         ListTest listTest = new ListTest(complianceTestMetaDataHolder);
@@ -265,6 +276,7 @@ public class Compliance extends HttpServlet {
         try {
             String fullPath = context.getRealPath("/WEB-INF");
             String reportURL = PDFGenerator.GeneratePDFResults(finalResults, fullPath);
+            //TODO : Change this on server
             finalResults.setReportLink("file://" + reportURL);
         } catch (IOException e) {
            return (new Result(e.getMessage()));

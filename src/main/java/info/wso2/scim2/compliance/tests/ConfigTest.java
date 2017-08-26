@@ -17,8 +17,6 @@ package info.wso2.scim2.compliance.tests;
 
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.GeneralComplianceException;
-import info.wso2.scim2.compliance.objects.SCIMSchema;
-import info.wso2.scim2.compliance.protocol.Compliance;
 import info.wso2.scim2.compliance.protocol.ComplianceUtils;
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
@@ -36,7 +34,6 @@ import org.wso2.charon3.core.encoder.JSONDecoder;
 import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
-import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,9 +59,31 @@ public class ConfigTest {
     /**
      * Test is to get the service provider configurations from service provider.
      **/
-    public TestResult performTest() throws CriticalComplianceException, ComplianceException{
+    public ArrayList<TestResult> performTest() throws CriticalComplianceException, ComplianceException{
+        ArrayList<TestResult> testResults = new ArrayList<>();
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            TestCase annos = method.getAnnotation(TestCase.class);
+            if (annos != null) {
+                try {
+                    testResults.add((TestResult) method.invoke(this));
+                } catch (InvocationTargetException e) {
+                    try{
+                        throw  e.getCause();
+                    } catch (ComplianceException e1) {
+                        throw e1;
+                    } catch (CriticalComplianceException e1){
+                        testResults.add(e1.getResult());
+                    } catch (Throwable throwable) {
+                        throw new ComplianceException("Error occurred in Config Test.");
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ComplianceException("Error occurred in Config Test.");
+                }
 
-       return getServiceProviderConfigTest();
+            }
+        }
+        return testResults;
     }
 
     /**
@@ -163,6 +182,4 @@ public class ConfigTest {
                             responseStatus, subTests));
         }
     }
-
-
 }
