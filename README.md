@@ -103,7 +103,7 @@ The current implememtation tests the following aspects of the SCIM 2.0 implement
 3. Add @TestCase annotation to your method.
 ```
 @TestCase
-public void cutomTestsCase() {
+public void customTestCase() {
   .....
 }
 ```
