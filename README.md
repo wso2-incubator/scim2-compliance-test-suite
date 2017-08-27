@@ -1,6 +1,6 @@
 # SCIM 2.0 Compliance Test Suite
 
-Developed by : Vindula Jayawardana (vindula.13@cse.mrt.ac.lk)
+Developed by : Vindula Jayawardana
 
 ## What is SCIM ? 
 
@@ -107,5 +107,6 @@ public void customTestCase() {
   .....
 }
 ```
+4. Rebuild the project and run.
 
 This project is an ongoing project and we value your contributions. We are open for PRs. For any clarifications, reach us through vindula.13@cse.mrt.ac.lk
