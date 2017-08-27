@@ -22,7 +22,7 @@ The test suite generates a detailed analysis view and comprehensive report upon 
 ```
 mvn clean install
 ```
-2. Install java cerificate as explained by [here](http://www.mkyong.com/webservices/jax-ws/suncertpathbuilderexception-unable-to-find-valid-certification-path-to-requested-target/).
+2. Install java certificate as explained by [here](http://www.mkyong.com/webservices/jax-ws/suncertpathbuilderexception-unable-to-find-valid-certification-path-to-requested-target/).
 
 3. Deploy the scimproxycompliance.war and run it.
 
