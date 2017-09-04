@@ -23,11 +23,12 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -58,7 +59,12 @@ public class HTTPClient {
 
             SSLConnectionSocketFactory sslsf = null;
             try {
-                sslsf = new SSLConnectionSocketFactory(builder.build());
+                HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                };
+                sslsf = new SSLConnectionSocketFactory(builder.build(), allHostsValid);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new ComplianceException("Error in setting up the http client");
             }
