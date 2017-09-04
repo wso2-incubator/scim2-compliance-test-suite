@@ -44,7 +44,7 @@ public class HTTPClient {
 
     public static HttpClient getHttpClient() throws ComplianceException {
         if(httpClient == null) {
-            TrustStrategy trustAllStrategy = new TrustStrategy(){
+            TrustStrategy trustAllStrategy = new TrustStrategy() {
                 public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                     return true;
                 }
@@ -59,7 +59,7 @@ public class HTTPClient {
             SSLConnectionSocketFactory sslsf = null;
             try {
                 sslsf = new SSLConnectionSocketFactory(builder.build());
-            } catch (NoSuchAlgorithmException | KeyManagementException e){
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new ComplianceException("Error in setting up the http client");
             }
             httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
