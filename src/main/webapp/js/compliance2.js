@@ -139,7 +139,7 @@ $(document).ready(
                     left: 'auto'
                 });
                 checked = true;
-                $.post("/compliance2/test2", data, handleResponse).error(handleError);
+                $.post("compliance2/test2", data, handleResponse).error(handleError);
                 return false;
             }
         };
