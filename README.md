@@ -1,15 +1,13 @@
 # SCIM 2.0 Compliance Test Suite
 
-Developed by : Vindula Jayawardana
-
-## What is SCIM ? 
+## What is SCIM ?
 
 The System for Cross-domain Identity Management (SCIM) specification is designed to make managing user identities in cloud-based applications and services easier. The specification suite seeks to build upon experience with existing schemas and deployments, placing specific emphasis on simplicity of development and integration, while applying existing authentication, authorization, and privacy models. Its intent is to reduce the cost and complexity of user management operations by providing a common user schema and extension model, as well as binding documents to provide patterns for exchanging this schema using standard protocols. In essence: make it fast, cheap, and easy to move users in to, out of, and around the cloud.
 
 ## SCIM 2.0 Compliance Test Suite
 
 <p align="center">
-<img align="middle" src="https://github.com/Vindulamj/scim2-compliance-test-suite/blob/master/logo.png"  width="350px" height = "140px">
+<img align="middle" src="https://github.com/wso2-incubator/scim2-compliance-test-suite/blob/master/logo.png"  width="350px" height = "140px">
 </p>
 
 This project is on implementing the SCIM 2.0 compliance test suite which can be run on both the cloud and on premise. In the test suite, it is intended to validate the supportability of a provided service provider, in terms of the SCIM 2.0 core specification and protocol specification.
@@ -109,4 +107,4 @@ public void customTestCase() {
 ```
 4. Rebuild the project and run.
 
-This project is an ongoing project and we value your contributions. We are open for PRs. For any clarifications, reach us through vindula.13@cse.mrt.ac.lk
+This project is an ongoing project and we value your contributions. We are open for PRs. For any clarifications, reach us through dev@wso2.org
