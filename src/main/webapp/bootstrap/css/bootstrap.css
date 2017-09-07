@@ -2509,6 +2509,9 @@ button.btn.small, input[type="submit"].btn.small {
 .navbar .brand:hover {
   text-decoration: none;
 }
+.navbar .logo:hover {
+  text-decoration: none;
+}
 .navbar .brand {
   float: left;
   display: block;
@@ -2518,6 +2521,19 @@ button.btn.small, input[type="submit"].btn.small {
   font-weight: 200;
   line-height: 1;
   color: #ffffff;
+}
+
+.navbar .logo {
+  float: right;
+  display: block;
+  padding: 8px 20px 12px 12px;
+  margin-right: 20px;
+  font-size: 20px;
+  font-weight: 200;
+  line-height: 1;
+  color: #ffffff;
+  height: 30px;
+  width: 80px;
 }
 .navbar .navbar-text {
   margin-bottom: 0;
