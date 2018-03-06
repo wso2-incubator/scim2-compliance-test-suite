@@ -20,6 +20,7 @@ import info.wso2.scim2.compliance.entities.Statistics;
 import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.CriticalComplianceException;
+import info.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 import info.wso2.scim2.compliance.pdf.PDFGenerator;
 import info.wso2.scim2.compliance.tests.*;
 import info.wso2.scim2.compliance.tests.BulkTest;
@@ -218,8 +219,9 @@ public class Compliance extends HttpServlet {
         // Sort Test
         SortTest sortTest = new SortTest(complianceTestMetaDataHolder);
         ArrayList<TestResult> sortTestResults = new ArrayList<>();
+        SCIMServiceProviderConfig scimServiceProviderConfig = complianceTestMetaDataHolder.getScimServiceProviderConfig();
         try {
-            if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getSortSupported()){
+            if (scimServiceProviderConfig != null && scimServiceProviderConfig.getSortSupported()){
                 try {
                     sortTestResults = sortTest.performTest();
                 } catch (ComplianceException e) {
@@ -239,7 +241,7 @@ public class Compliance extends HttpServlet {
         BulkTest bulkTest = new BulkTest(complianceTestMetaDataHolder);
         ArrayList<TestResult> bulkTestResults = new ArrayList<>();
         try {
-            if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getBulkSupported()){
+            if (scimServiceProviderConfig != null && scimServiceProviderConfig.getBulkSupported()){
                 try {
                     bulkTestResults = bulkTest.performTest();
                 } catch (ComplianceException e) {
