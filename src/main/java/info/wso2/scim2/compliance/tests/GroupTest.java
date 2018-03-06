@@ -20,6 +20,7 @@ import info.wso2.scim2.compliance.entities.TestResult;
 import info.wso2.scim2.compliance.exception.ComplianceException;
 import info.wso2.scim2.compliance.exception.GeneralComplianceException;
 import info.wso2.scim2.compliance.httpclient.HTTPClient;
+import info.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 import info.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
 import info.wso2.scim2.compliance.protocol.ComplianceUtils;
 import info.wso2.scim2.compliance.tests.common.ResponseValidateTests;
@@ -76,7 +77,8 @@ public class GroupTest {
             if (annos != null) {
                 try {
                     if(method.getName().equals("PatchGroupTest")){
-                        if (complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported()){
+                        SCIMServiceProviderConfig scimServiceProviderConfig = complianceTestMetaDataHolder.getScimServiceProviderConfig();
+                        if (scimServiceProviderConfig != null && scimServiceProviderConfig.getPatchSupported()){
                             testResults.add((TestResult) method.invoke(this));
                         } else {
                             testResults.add(new TestResult(TestResult.SKIPPED,
