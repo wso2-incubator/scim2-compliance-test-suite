@@ -1,0 +1,21 @@
+
+Q	java:S107("<Method has 8 parameters, which is greater than 7 authorized.(Êõß¶
+@
+java:S1181n"%Catch Exception instead of Throwable.(‡˜ÚÚøÿÿÿÿ
+’
+java:S1130+"wRemove the declaration of thrown exception 'javax.servlet.ServletException', as it cannot be thrown from method's body.(·å¬Ùýÿÿÿÿ
+H
+java:S1135^"2Complete the task associated to this TODO comment.(ºŸÿ¼
+n
+java:S2293a"YReplace the type specification in this constructor call with the diamond operator ("<>").(÷¸¾4
+t
+java:S22932"YReplace the type specification in this constructor call with the diamond operator ("<>").(ùž‰Êøÿÿÿÿ
+X
+java:S1905m"=Remove this unnecessary cast to "CritialComplienceException".(“‘õÝúÿÿÿÿ
+’
+java:S1130+"wRemove the declaration of thrown exception 'java.lang.InterruptedException', as it cannot be thrown from method's body.(·å¬Ùýÿÿÿÿ
+7	java:S131u""Add a default case to this switch.(…ƒÔí
+t
+java:S2293b"YReplace the type specification in this constructor call with the diamond operator ("<>").(ÃŒóÙøÿÿÿÿ
+M
+java:S1135-"2Complete the task associated to this TODO comment.(‚¸ƒþûÿÿÿÿ

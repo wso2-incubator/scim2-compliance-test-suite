@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/compliance.iml" filepath="$PROJECT_DIR$/compliance.iml" />
+      <module fileurl="file://$PROJECT_DIR$/org.wso2.scim2.compliance/org.wso2.scim2.compliance.iml" filepath="$PROJECT_DIR$/org.wso2.scim2.compliance/org.wso2.scim2.compliance.iml" />
+      <module fileurl="file://$PROJECT_DIR$/org.wso2.scim2.ui/org.wso2.scim2.ui.iml" filepath="$PROJECT_DIR$/org.wso2.scim2.ui/org.wso2.scim2.ui.iml" />
+    </modules>
+  </component>
+</project>

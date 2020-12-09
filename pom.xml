@@ -3,8 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>info.simplecloud.scimproxy</groupId>
 	<artifactId>compliance</artifactId>
-	<packaging>war</packaging>
+	<packaging>pom</packaging>
 	<version>0.1</version>
+	<modules>
+		<module>org.wso2.scim2.compliance</module>
+		<module>org.wso2.scim2.ui</module>
+	</modules>
 	<name>simplecloud.info</name>
 	<url>https://github.com/erdtman/simplecloud.info</url>
 	<properties>

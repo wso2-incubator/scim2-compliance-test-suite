@@ -1,0 +1,9 @@
+
+Q	java:S125"<This block of commented-out lines of code should be removed.(Ô€Æ™
+t
+java:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(ñØ˜¾ûÿÿÿÿ
+Ž
+java:S1319
+"sThe type of the "required" object should be an interface such as "List" rather than the implementation "ArrayList".(ÍÝ»ƒþÿÿÿÿ
+†
+java:S1319"pThe return type of this method should be an interface such as "List" rather than the implementation "ArrayList".(šèŽù

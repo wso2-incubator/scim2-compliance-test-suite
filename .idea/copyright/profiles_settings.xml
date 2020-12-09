@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="WSO2 License">
+    <module2copyright>
+      <element module="All" copyright="WSO2 License" />
+    </module2copyright>
+  </settings>
+</component>

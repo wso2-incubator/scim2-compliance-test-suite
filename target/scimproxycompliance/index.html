@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="css/prettify.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js" async></script>
+    <title>SCIM 2.0 Compliance Test</title>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a class="brand" href="/"><img src="img/logo/scim-logo.gif" /></a>
+                <a class="logo" href="/"><img src="img/logo/test-logo.png" /></a>
+            </div>
+        </div>
+    </div>
+    <div class="tabbable">
+        <div class="tab-content">
+            <div class="tab-pane active" id="complianceTest2">
+
+                <div class="well">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <span class="label label-important" style="float: right;">Beta</span>
+                            <h1>Compliance Test SCIM 2.0</h1>
+                            <p>
+                                Run test suite against an internet facing SCIM 2.0 server.
+                            </p>
+                            <form class="form-search">
+                                <input type="text" placeholder="https://scim-server" id="complianceUrl2" class="input span5">
+                                <button type="button" class="btn btn-primary" id="sendCompliance2">Go!</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <span class="label label float-right clickable" index="settings2" id="toggleSettings2">Settings <i id="settingsArrow2" class="icon-chevron-right icon-white arrow"></i></span>
+                        </div>
+                    </div>
+                    <div class="row-fluid hide" id="settings2">
+                        <div class="span12">
+                            <h3>Authentication</h3>
+                            <div class="alert alert-error hide" id="authenticationAlert2">
+                                Authentication required!
+                            </div>
+                            <form class="form-horizontal well">
+                                <div class="control-group">
+                                    <label class="control-label">Method</label>
+                                    <div class="controls" id="authMethodContainer2">
+                                        <select id="authMethod2">
+                                            <option value="basicAuth">HTTP-Basic</option>
+                                            <option value="oauthAuth">OAuth 2.0 (password grant)</option>
+                                            <option value="rawAuth">Raw Authorization header</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="basicAuth2" class="authMethod2 basicAuth oauthAuth">
+                                    <div class="control-group">
+                                        <label class="control-label" for="username2">Username</label>
+                                        <div class="controls">
+                                            <input id="username2" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="password2">Password</label>
+                                        <div class="controls">
+                                            <input  id="password2" type="password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="oauthAuth2" class="authMethod2 oauthAuth">
+                                    <div class="control-group">
+                                        <label class="control-label" for="oauthClientId2">ClientId</label>
+                                        <div class="controls">
+                                            <input  id="oauthClientId2" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="oauthClientSecret2">Client Secret</label>
+                                        <div class="controls">
+                                            <input  id="oauthClientSecret2" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="oauthAuthorizationServer2">Authorization Server</label>
+                                        <div class="controls">
+                                            <input  id="oauthAuthorizationServer2" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="rawAuth2" class="authMethod2 rawAuth">
+                                    <div class="control-group">
+                                        <label class="control-label" for="rawAuthorizationHeader2">Authorization Header</label>
+                                        <div class="controls">
+                                            <input id="rawAuthorizationHeader2" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="wrapper"><div class="content" id="spinner-container2" ></div></div>
+                <div class="hide" id="result-container2">
+                    <div class="well" >
+                        <div class="row-fluid">
+                            <div class="span6"><div id="compliance-chart2"></div></div>
+                            <div class="span6">
+                                <h2>Results</h2>
+                                <div id="compliance-statistics-text2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="well" id="compliance-result-container2"></div>
+                </div>
+                <div id="report-link-container" class="alert hide">
+                    <a href="" id ="report" >Download Report</a>If you can not open the file, right
+                    click on the link and select "Copy Link Location" and paste in a new window.
+                </div>
+
+                <div id="compliance-error-container2" class="alert alert-error hide">
+                    <div id="compliance-error2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <footer>
+        <p>SCIM 2.0 Compliance Test is developed under <a href="https://www.wso2.com/">WSO2</a> & based on SCIM 1.1 Compliance Test by <a href="http://www.simplecloud.info/">simplecloud.info</a></p>
+    </footer>
+</div>
+
+<script id="testTemplate" type="text/template">
+    {{#results}}
+    <div class="row-fluid my-row {{color}}">
+        <div class="row-fluid result-row">
+            <div class="span10">
+                <strong>{{name}}</strong>
+            </div>
+            <div class="span1">
+                <span class="label {{status_label}}" rel="tooltip" title="{{message}}">{{status_text}}</span>
+            </div>
+            <div class="span1">
+                <span index="{{index}}" class="label label-info float-right clickable">Wire <i class="icon-chevron-right icon-white arrow"></i></span>
+            </div>
+        </div>
+        <div class="row-fluid hidden" id="{{index}}">
+            <div class="row-fluid">
+                <div class="span12">
+                    <h6>&lt;&lt; Errors &gt;&gt;</h6>
+                    <pre class="prettyprint" title="{{message}}">{{message}}</pre>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <h6>&lt;&lt; Sub Tests &gt;&gt;</h6>
+                    <pre class="prettyprint">{{wire.tests}}</pre>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <h6>to server &gt;&gt;</h6>
+                    <pre class="prettyprint">{{wire.to_server}}</pre>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <h6>&lt;&lt; from server</h6>
+                    <pre class="prettyprint">{{wire.from_server}}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/results}}
+</script>
+
+<script id="statisticsTemplate" type="text/template">
+    <div class="alert alert-tests">Tests: {{total}} </div>
+    <div class="alert alert-success">Success: {{success}}</div>
+    <div class="alert alert-error">Failed: {{failed}}</div>
+    <div class="alert alert-info">Skipped: {{skipped}}</div>
+</script>
+
+<script id="authMethodTemplate" type="text/template">
+    {{#authMethods}}
+    <option supported="{{supported}}">{{name}}</option>
+    {{/authMethods}}
+</script>
+
+<script type="text/javascript" src="https://www.google.com/jsapi" ></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap-tab.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap-popover.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap-collapse.js"></script>
+<script type="text/javascript" src="prettify/prettify.js"></script>
+<script type="text/javascript" src="js/compliance2.js"></script>
+<script type="text/javascript" src="spin/spin.min.js"></script>
+<script type="text/javascript" src="spin/jquery.spin.js"></script>
+<script type="text/javascript" src="mustache/mustache.js"></script>
+<script type="text/javascript">
+    prettyPrint();
+    google.load('visualization', '1', {packages: ['corechart']});
+</script>
+</body>
+</html>
