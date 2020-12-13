@@ -20,6 +20,9 @@ package org.wso2.scim2.compliance.utils;
  */
 public class ComplianceConstants {
 
+    /**
+     * This method contains the constants used in a  request.
+     */
     public static class RequestCodeConstants {
 
         public static final String URL = "url";
@@ -35,6 +38,9 @@ public class ComplianceConstants {
         public static final String HTTPS = "https";
     }
 
+    /**
+     * This method contains the constants used in  tests.
+     */
     public static class TestConstants {
 
         public static final String LABEL_IMPORTANT = "label-important";
@@ -68,15 +74,61 @@ public class ComplianceConstants {
                 "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
     }
 
+    /**
+     * This method contains the defined constants used in tests.
+     */
     public static class DefinedInstances {
 
         public static String DEFINED_USER_PASSWORD = "7019asd84";
         public static String DEFINED_USER_USERNAME = "bjensenexamplecom";
 
         public static String DEFINED_USER =
-                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\":[{" +
+                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"examplecom\",\"emails\":[{" +
                         "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": \"1234A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"1234A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
+        public static String definedUser1 =
+                "{\"name\":{\"givenName\":\"Anjana\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\"," +
+                        "\"userName\": \"example1111\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"12345A\",\"manager\": {\"value\": \"Anjana\"}}}";
+
+        public static String definedUser2 =
+                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"example2111\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"123456A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
+        public static String definedUser3 =
+                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"example3111\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"1234567A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
+        public static String definedUser4 =
+                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"example4111\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"12345678A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
+        public static String definedUser5 =
+                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"example5111\",\"emails\":[{" +
+                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String DEFINED_UPDATED_USER =
                 "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\": [{" +

@@ -31,6 +31,7 @@ public class FactoryMain {
         ResourceType obj = e.getInstance("user");
         try {
             obj.getMethodTest();
+            System.out.println("get called");
         } catch (Exception ee) {
             System.out.println("here");
             System.out.println(ee);
