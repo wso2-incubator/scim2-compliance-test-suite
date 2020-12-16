@@ -68,6 +68,7 @@ public class ComplianceConstants {
         public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
         public static final String FILTER_CONTENT_TEST = "Filter Content Test";
         public static final String SORT_USERS_TEST = "Sort Users Test";
+        public static final String FILTER_USER_WITH_PAGINATION="filter with pagination Test";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
 
         public static final String EXTENSION_SCHEMA_URI =
@@ -84,49 +85,52 @@ public class ComplianceConstants {
 
         public static String DEFINED_USER =
                 "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
-                        " \"examplecom\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                        " \"loginUser\",\"emails\":[{" +
+                        "\"value\": \"kim@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"kim@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"1234A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser1 =
-                "{\"name\":{\"givenName\":\"Anjana\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\"," +
-                        "\"userName\": \"example1111\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                "{\"name\":{\"givenName\":\"Samindra\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\"," +
+                        "\"userName\": \"loginUser1\",\"emails\":[{" +
+                        "\"value\": \"Samindra@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"Samindra@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"12345A\",\"manager\": {\"value\": \"Anjana\"}}}";
+                        "\"12345A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser2 =
-                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
-                        " \"example2111\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                "{\"name\":{\"givenName\":\"Danny\",\"familyName\":\"Gomez\"},\"password\": \"7019asd84\"," +
+                        "\"userName\":" +
+                        " \"loginUser2\",\"emails\":[{" +
+                        "\"value\": \"danny@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"danny@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"123456A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser3 =
-                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
-                        " \"example3111\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                "{\"name\":{\"givenName\":\"Jason\",\"familyName\":\"Diesel\"},\"password\": \"7019asd84\"," +
+                        "\"userName\":" +
+                        " \"loginUser3\",\"emails\":[{" +
+                        "\"value\": \"json@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"json@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"1234567A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser4 =
-                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
-                        " \"example4111\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                "{\"name\":{\"givenName\":\"Tom\",\"familyName\":\"Hardy\"},\"password\": \"7019asd84\",\"userName\":" +
+                        " \"loginUser4\",\"emails\":[{" +
+                        "\"value\": \"tom@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"tom@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"12345678A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser5 =
-                "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
-                        " \"example5111\",\"emails\":[{" +
-                        "\"value\": \"bjensen@example.com\",\"type\": \"work\",\"primary\": true },{" +
-                        "\"value\": \"babs@jensen.org\",\"type\": \"home\"}], " +
+                "{\"name\":{\"givenName\":\"Taylor\",\"familyName\":\"Swift\"},\"password\": \"7019asd84\"," +
+                        "\"userName\":" +
+                        " \"loginUser5\",\"emails\":[{" +
+                        "\"value\": \"taylorn@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"taylor@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
 

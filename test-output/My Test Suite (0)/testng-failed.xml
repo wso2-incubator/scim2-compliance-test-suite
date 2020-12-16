@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [My Test Suite (0)]">
+  <test name="My Test" preserve-order="false">
+    <classes>
+      <class name="org.wso2.scim2.compliance.tests.SchemaTestImpl"/>
+    </classes>
+  </test> <!-- My Test -->
+</suite> <!-- Failed suite [My Test Suite (0)] -->

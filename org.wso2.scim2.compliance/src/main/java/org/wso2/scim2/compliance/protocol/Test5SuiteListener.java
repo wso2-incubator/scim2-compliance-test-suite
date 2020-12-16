@@ -18,24 +18,21 @@
 
 package org.wso2.scim2.compliance.protocol;
 
-import org.wso2.scim2.compliance.tests.ResourceType;
 
-/**
- * Method for calling factory.
- */
-public class FactoryMain {
 
-    public static void main(String a[]) {
+import org.testng.ISuite;
+import org.testng.ISuiteListener;
 
-        EndpointFactory e = new EndpointFactory();
-        ResourceType obj = e.getInstance("user");
-        try {
-            //obj.getMethodTest();
-            obj.postMethodTest();
-            System.out.println("post called");
-        } catch (Exception ee) {
-            System.out.println("here");
-            System.out.println(ee);
-        }
+public class Test5SuiteListener implements ISuiteListener {
+
+    @Override
+    public void onStart(ISuite suite) {
+        System.out.println("TestNG suite default output directory = "+suite.getOutputDirectory());
     }
+
+    @Override
+    public void onFinish(ISuite suite) {
+        System.out.println("TestNG invoked methods = " +suite.getAllInvokedMethods());
+    }
+
 }

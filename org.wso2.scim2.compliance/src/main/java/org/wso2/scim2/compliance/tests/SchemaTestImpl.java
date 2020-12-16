@@ -18,6 +18,8 @@
 
 package org.wso2.scim2.compliance.tests;
 
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
 import org.wso2.scim2.compliance.exception.GeneralComplianceException;
@@ -27,13 +29,34 @@ import org.wso2.scim2.compliance.exception.GeneralComplianceException;
  */
 public class SchemaTestImpl implements ResourceType {
 
+    @Test
+    public void test() {
+
+        System.out.println("Running test method");
+    }
+
+    @Test
+    public void test2() {
+
+        System.out.println("Running test method2");
+    }
+
+
+    @BeforeMethod
+    public void beforeTest() {
+
+        System.out.println("in before method");
+    }
+
     @Override
     public TestResult getMethodTest() throws GeneralComplianceException, ComplianceException {
-return null;
+
+        return null;
     }
 
     @Override
     public TestResult postMethodTest() throws GeneralComplianceException, ComplianceException {
+
         return null;
     }
 

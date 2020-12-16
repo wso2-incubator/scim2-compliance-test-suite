@@ -48,7 +48,6 @@ import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
 import java.util.ArrayList;
-import javax.swing.plaf.synth.SynthEditorPaneUI;
 
 /**
  * Implementation of  for User test cases.
@@ -57,10 +56,10 @@ public class UserTestImpl implements ResourceType {
 
     private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private String url;
-    private RequestPath[] arr;
+    private RequestPath[] requestPaths;
     private ArrayList<String> userIDs = new ArrayList<>();
-    private TestResult[] testResults;
-    private ArrayList<TestResult> arrL = new ArrayList<>();
+    //private TestResult[] testResults;
+    private ArrayList<TestResult> testResults = new ArrayList<>();
 
     /**
      * Initialize.
@@ -206,13 +205,29 @@ public class UserTestImpl implements ResourceType {
         }
     }
 
-    @Override
-    public TestResult getMethodTest() throws GeneralComplianceException, ComplianceException {
+    /**
+     * Method check whether return users are sorted or not.
+     *
+     * @param userList
+     * @return
+     * @throws CharonException
+     */
+    private boolean isUserListSorted(ArrayList<User> userList) throws CharonException {
 
-        //Initialize 5 users
+        boolean sorted = true;
+        for (int i = 1; i < userList.size(); i++) {
+            if (userList.get(i - 1).getId().compareTo(userList.get(i).getId()) > 0) {
+                sorted = false;
+            }
+        }
+        return sorted;
+    }
+
+    private void initiateData() throws ComplianceException, GeneralComplianceException {
+        // Initialize 5 users.
         createTestsUsers();
 
-        //Creating objects to store sub test information
+        // Creating objects to store sub test information.
         RequestPath obj1 = new RequestPath();
         obj1.setUrl("/");
         obj1.setTestCaseName("List Users");
@@ -221,26 +236,37 @@ public class UserTestImpl implements ResourceType {
         obj2.setUrl("/" + userIDs.get(0));
         obj2.setTestCaseName("Get user by ID");
 
-        //String value = (new ArrayList<>(userIDs.values())).get(0);
         RequestPath obj3 = new RequestPath();
-        obj3.setUrl("/?filter=userName+eq+example5111");
+        obj3.setUrl("/?filter=userName+eq+loginUser1");
         obj3.setTestCaseName("Get user with Filter");
 
         RequestPath obj4 = new RequestPath();
         obj4.setUrl("/?startIndex=1&count=2");
-        obj4.setTestCaseName("Get user with Pagination");
+        obj4.setTestCaseName("Get users with Pagination");
 
         RequestPath obj5 = new RequestPath();
         obj5.setUrl("/?sortBy=id&sortOrder=ascending");
         obj5.setTestCaseName("Sort test");
 
-        //This array hold the sub tests details
-        arr = new RequestPath[]{obj1, obj2, obj3, obj4, obj5};
+        RequestPath obj6 = new RequestPath();
+        obj6.setUrl("/?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        obj6.setTestCaseName("filter with pagination test");
 
-        for (int i = 0; i < arr.length; i++) {
-            System.out.println("Element at " + i + " : " + arr[i].getTestCaseName());
+        // This array hold the sub tests details.
+        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4, obj5, obj6};
 
-            String requestUrl = url + arr[i].getUrl();
+    }
+
+    @Override
+    public TestResult getMethodTest() throws GeneralComplianceException, ComplianceException {
+
+        // Initiate data necessary for getMethod test.
+        initiateData();
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            System.out.println("Element at " + i + " : " + requestPaths[i].getTestCaseName());
+
+            String requestUrl = url + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(requestUrl);
 
             HttpClient client = HTTPClient.getHttpClient();
@@ -257,7 +283,7 @@ public class UserTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -267,7 +293,7 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -275,7 +301,7 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
 
-                arrL.add(new TestResult(TestResult.ERROR, arr[i].getTestCaseName(),
+                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                         "Could not list the users at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
 
@@ -290,8 +316,8 @@ public class UserTestImpl implements ResourceType {
                 ArrayList<User> userList = new ArrayList<>();
                 User user = null;
                 try {
-                    //called only for user get by id
-                    if (arr[i].getTestCaseName() == "Get user by ID") {
+                    // Called only for user get by id.
+                    if (requestPaths[i].getTestCaseName() == "Get user by ID") {
 
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
 
@@ -302,7 +328,7 @@ public class UserTestImpl implements ResourceType {
 
                         } catch (BadRequestException | CharonException e) {
 
-                            arrL.add(new TestResult(TestResult.ERROR, "Get User",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
                                             subTests)));
@@ -323,7 +349,7 @@ public class UserTestImpl implements ResourceType {
 
                             } catch (BadRequestException | CharonException e) {
 
-                                arrL.add(new TestResult(TestResult.ERROR, arr[i].getTestCaseName(),
+                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                         "Response Validation Error",
                                         ComplianceUtils.getWire(method, responseString, headerString,
                                                 responseStatus, subTests)));
@@ -337,70 +363,233 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
 
-                    arrL.add(new TestResult(TestResult.ERROR, arr[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     continue;
                 }
-                // check for all created groups
-                try {
-                    //check for list of users returned
-                    subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
-                    ArrayList<String> returnedUserIDs = new ArrayList<>();
-                    for (User u : userList) {
-                        returnedUserIDs.add(u.getId());
-                    }
-                    for (String id : userIDs) {
-                        if (!returnedUserIDs.contains(id)) {
+                // Check for all created groups.
+                if (requestPaths[i].getTestCaseName() == "List Users") {
+                    try {
+                        //check for list of users returned
+                        subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
+                        ArrayList<String> returnedUserIDs = new ArrayList<>();
+                        for (User u : userList) {
+                            returnedUserIDs.add(u.getId());
+                        }
+                        for (String id : userIDs) {
+                            if (!returnedUserIDs.contains(id)) {
 
-//                            arrL.add(new TestResult(TestResult.ERROR, arr[i].getTestCaseName(),
-//                                    "Response does not contain all the created users",
-//                                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
-//                                            subTests)));
+                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                        "Response does not contain all the created users",
+                                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                                subTests)));
+                                continue;
+                            }
+                        }
+                    } catch (CharonException e) {
+
+//                    throw new ComplianceException(500, "Could not get the created user id");
+                        continue;
+                    }
+                } else if (requestPaths[i].getTestCaseName() == "Get user with Filter") {
+
+                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
+                    String value = "loginUser1";
+                    for (User user1 : userList) {
+                        try {
+                            if (!value.equals(user1.getUserName())) {
+
+                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                        "Response does not contain the expected users",
+                                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                                subTests)));
+                                continue;
+                            }
+                        } catch (CharonException e) {
                             continue;
                         }
                     }
-                } catch (CharonException e) {
+                } else if (requestPaths[i].getTestCaseName() == "Get users with Pagination") {
+                    subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
+                    if (userList.size() != 2) {
 
-//                    throw new ComplianceException(500, "Could not get the created user id");
-                    continue;
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Response does not contain right number of pagination.",
+                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                        subTests)));
+                        continue;
+                    }
+
+                } else if (requestPaths[i].getTestCaseName() == "Sort test") {
+                    subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
+                    try {
+                        if (isUserListSorted(userList)) {
+
+                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                    "Response does not contain the sorted list of users",
+                                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                            subTests)));
+                        }
+                    } catch (CharonException e) {
+                        continue;
+                    }
+                } else if (requestPaths[i].getTestCaseName() == "filter with pagination test") {
+
+                    subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
+
+                    if (userList.size() != 1) {
+
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Response does not contain right number of pagination.",
+                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                        subTests)));
+                        continue;
+                    }
+
+                    String value = "loginUser1";
+                    for (User user1 : userList) {
+                        try {
+                            if (!value.equals(user1.getUserName())) {
+
+                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                        "Response does not contain the expected users",
+                                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                                subTests)));
+                                continue;
+                            }
+                        } catch (CharonException e) {
+                            continue;
+                        }
+                    }
+
                 }
 
-                arrL.add(new TestResult
-                        (TestResult.SUCCESS, arr[i].getTestCaseName(),
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             } else {
 
-                arrL.add(new TestResult
-                        (TestResult.ERROR, arr[i].getTestCaseName(),
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             }
         }
 
-        System.out.println("out of loop");
-        //clean up users after all tasks
+        // Clean up users after all tasks.
         for (String id : userIDs) {
             cleanUpUser(id, "get users test");
         }
 
-        //This should be a array containing results
+        // This should be a array containing results.
         return new TestResult();
     }
 
     @Override
     public TestResult postMethodTest() throws GeneralComplianceException, ComplianceException {
 
+        User user = null;
+        HttpPost method = new HttpPost(url);
+        //create user test
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+        method.setHeader("Content-Type", "application/json");
+
+        HttpResponse response = null;
+        String responseString = "";
+        String headerString = "";
+        String responseStatus = "";
+        ArrayList<String> subTests = new ArrayList<>();
         try {
-            System.out.println("Hello from user");
-            return null;
+            // Create the user.
+            HttpEntity entity = new ByteArrayEntity
+                    (ComplianceConstants.DefinedInstances.DEFINED_USER.getBytes("UTF-8"));
+            method.setEntity(entity);
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            // Get all headers.
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " " +
+                    response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-            System.out.println("error");
-            System.out.println(e);
+            // Read the response body.
+            // Get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+            testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                    "Could not create default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
-        return null;
+
+        if (response.getStatusLine().getStatusCode() == 201) {
+            // Obtain the schema corresponding to user.
+            // Unless configured returns core-user schema or else returns extended user schema.
+            SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+
+            JSONDecoder jsonDecoder = new JSONDecoder();
+            try {
+                user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+
+            } catch (BadRequestException | CharonException | InternalErrorException e) {
+                try {
+                    cleanUpUser(user.getId(), "Create User");
+                } catch (CharonException e1) {
+                    testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                            "Could not retrieve the user id",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
+                testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                        "Could not decode the server response",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            try {
+                ResponseValidateTests.runValidateTests(user, schema, null, null, method,
+                        responseString, headerString, responseStatus, subTests);
+
+            } catch (BadRequestException | CharonException e) {
+                try {
+                    cleanUpUser(user.getId(), "Create User");
+                } catch (CharonException e1) {
+                    testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                            "Could not retrieve the user id",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
+                testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                        "Response Validation Error",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            try {
+                cleanUpUser(user.getId(), "Create User");
+            } catch (CharonException e1) {
+                testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                        "Could not retrieve the user id",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+            }
+            testResults.add(new TestResult
+                    (TestResult.SUCCESS, "Create User",
+                            "", ComplianceUtils.getWire(method, responseString,
+                            headerString, responseStatus, subTests)));
+        } else {
+            testResults.add(
+                    new TestResult
+                            (TestResult.ERROR, "Create User",
+                                    "", ComplianceUtils.getWire(method, responseString,
+                                    headerString, responseStatus, subTests)));
+        }
+        return new TestResult();
     }
 
     @Override
