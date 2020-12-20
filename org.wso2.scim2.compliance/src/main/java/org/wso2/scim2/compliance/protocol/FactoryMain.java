@@ -18,7 +18,10 @@
 
 package org.wso2.scim2.compliance.protocol;
 
+import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.tests.ResourceType;
+
+import java.util.ArrayList;
 
 /**
  * Method for calling factory.
@@ -30,11 +33,14 @@ public class FactoryMain {
         EndpointFactory e = new EndpointFactory();
         ResourceType obj = e.getInstance("user");
         try {
-            //obj.getMethodTest();
-            obj.postMethodTest();
-            System.out.println("post called");
+            ArrayList<TestResult> userTestResults;
+            //userTestResults = obj.getMethodTest();
+            //obj.postMethodTest();
+            obj.patchMethodTest();
+            System.out.println("Sucees");
+            //System.out.println(userTestResults.get(0).getName());
         } catch (Exception ee) {
-            System.out.println("here");
+            System.out.println("error ");
             System.out.println(ee);
         }
     }

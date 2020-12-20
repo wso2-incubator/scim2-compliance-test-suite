@@ -22,23 +22,25 @@ import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
 import org.wso2.scim2.compliance.exception.GeneralComplianceException;
 
+import java.util.ArrayList;
+
 /**
  * Interface for scim test cases.
  */
 public interface ResourceType {
 
-    TestResult getMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult postMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult patchMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult putMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult deleteMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult searchMethodTest() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException;
 
-    TestResult executeAllTests() throws GeneralComplianceException, ComplianceException;
+    ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException;
 
 }

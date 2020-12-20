@@ -68,7 +68,7 @@ public class ComplianceConstants {
         public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
         public static final String FILTER_CONTENT_TEST = "Filter Content Test";
         public static final String SORT_USERS_TEST = "Sort Users Test";
-        public static final String FILTER_USER_WITH_PAGINATION="filter with pagination Test";
+        public static final String FILTER_USER_WITH_PAGINATION = "Filter with pagination Test";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
 
         public static final String EXTENSION_SCHEMA_URI =
@@ -134,14 +134,36 @@ public class ComplianceConstants {
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
-        public static String DEFINED_UPDATED_USER =
-                "{\"password\": \"7019asd84\",\"userName\": \"bjensenexamplecom\",\"emails\": [{" +
-                        "\"value\": \"bjensen@wso2.com\",\"type\": \"work\",\"primary\": true}," +
-                        "{\"value\": \"babs@wso2.org\",\"type\": \"home\"}]}";
+        public static String definedUpdatedUser1 =
+                "{\"name\":{\"givenName\":\"Kims\",\"familyName\":\"Berry\"},\"password\": \"7019asd85\"," +
+                        "\"userName\":" +
+                        " \"loginUser\",\"emails\":[{" +
+                        "\"value\": \"kim@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"kim@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"1234A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
-        public static String DEFINED_PATCH_USER_PAYLOAD =
+        public static String definedUpdatedUser2 =
+                "{\"name\":{\"givenName\":\"Kimi\",\"familyName\":\"Berry\"},\"password\": \"7019asd85\"," +
+                        "\"userName\":" +
+                        " \"loginUserUpdated\",\"emails\":[{" +
+                        "\"value\": \"kimi@wso2.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"kim@example.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"1234A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
+        public static String definedPatchUserPayload1 =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
                         "\"Operations\":[{\"op\":\"add\",\"value\":{\"nickName\":\"shaggy\"}}]}";
+
+        public static String definedPatchUserPayload2 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"remove\"," +
+                        "\"path\":\"emails[type eq \\\"work\\\" and value ew \\\"example.com\\\"]\"}]}";
+
+        public static String definedPatchUserPayload3 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
+                        "\"Operations\":[{\"op\":\"replace\",\"path\":\"emails[type eq \\\"home\\\"]\"," +
+                        "\"value\":{\"type\":\"home\",\"value\":\"home@example.com\"}}]}";
 
         public static String DEFINED_BULK_REQUEST = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +

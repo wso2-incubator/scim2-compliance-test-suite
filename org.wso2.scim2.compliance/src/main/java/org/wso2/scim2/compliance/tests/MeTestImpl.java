@@ -22,49 +22,51 @@ import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
 import org.wso2.scim2.compliance.exception.GeneralComplianceException;
 
+import java.util.ArrayList;
+
 /**
  * Implementation of Me test cases.
  */
 public class MeTestImpl implements ResourceType {
 
     @Override
-    public TestResult getMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult postMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult patchMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult putMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult deleteMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult searchMethodTest() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
     @Override
-    public TestResult executeAllTests() throws GeneralComplianceException, ComplianceException {
+    public ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
