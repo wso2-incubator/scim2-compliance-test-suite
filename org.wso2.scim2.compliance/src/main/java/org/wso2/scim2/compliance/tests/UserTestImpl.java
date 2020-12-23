@@ -325,36 +325,52 @@ public class UserTestImpl implements ResourceType {
         obj1.setUrl("/");
         obj1.setTestCaseName("List Users");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setUrl("/" + userIDs.get(0));
-        obj2.setTestCaseName("Get user by ID");
+//        RequestPath obj2 = new RequestPath();
+//        obj2.setUrl("/" + userIDs.get(0));
+//        obj2.setTestCaseName("Get user by ID");
 
         RequestPath obj3 = new RequestPath();
-        obj3.setUrl("/?filter=userName+eq+loginUser1");
+        obj3.setUrl("?filter=userName+eq+loginUser1");
         obj3.setTestCaseName("Get user with Filter");
 
         RequestPath obj4 = new RequestPath();
-        obj4.setUrl("/?startIndex=1&count=2");
+        obj4.setUrl("?startIndex=1&count=2");
         obj4.setTestCaseName("Get users with Pagination");
 
         RequestPath obj5 = new RequestPath();
-        obj5.setUrl("/?sortBy=id&sortOrder=ascending");
+        obj5.setUrl("?sortBy=id&sortOrder=ascending");
         obj5.setTestCaseName("Sort test");
 
         RequestPath obj6 = new RequestPath();
-        obj6.setUrl("/?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        obj6.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
         obj6.setTestCaseName("Filter with pagination test");
 
         RequestPath obj7 = new RequestPath();
-        obj7.setUrl("/?startIndex=-1&count=2");
+        obj7.setUrl("?startIndex=-1&count=2");
         obj7.setTestCaseName("Get users having negative number as index");
 
         RequestPath obj8 = new RequestPath();
-        obj8.setUrl("/?count=2");
+        obj8.setUrl("?count=2");
         obj8.setTestCaseName("Get users without index and only using count");
 
+        RequestPath obj9 = new RequestPath();
+        obj9.setUrl("?attributes=userName,name.givenName");
+        obj9.setTestCaseName("Get users with specific attributes");
+
+        RequestPath obj10 = new RequestPath();
+        obj10.setUrl("?excludedAttributes=name.givenName,emails");
+        obj10.setTestCaseName("Get users with excluding attributes");
+
+//        RequestPath obj11 = new RequestPath();
+//        obj11.setUrl(String.format("/%s/?attributes=userName,name.givenName", userIDs.get(0)));
+//        obj11.setTestCaseName("Get a user with specific attributes");
+//
+//        RequestPath obj12 = new RequestPath();
+//        obj12.setUrl(String.format("/%s/?excludedAttributes=name.givenName,emails", userIDs.get(0)));
+//        obj12.setTestCaseName("Get a user with excluding attributes");
+
         // This array hold the sub tests details.
-        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8};
+        requestPaths = new RequestPath[]{obj1, obj3, obj4, obj5, obj6, obj7, obj8, obj9, obj10};
 
     }
 
@@ -386,6 +402,8 @@ public class UserTestImpl implements ResourceType {
             String responseString = "";
             String headerString = "";
             String responseStatus = "";
+            Integer startIndex = null;
+            Integer count = null;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -426,50 +444,32 @@ public class UserTestImpl implements ResourceType {
                 User user = null;
                 try {
                     // Called only for user get by id.
-                    if (requestPaths[i].getTestCaseName() == "Get user by ID") {
 
-                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    JSONObject jsonObj = new JSONObject(responseString);
+                    jsonObjResponse = jsonObj;
+                    JSONArray usersArray = jsonObj.getJSONArray("Resources");
+                    startIndex = (Integer) jsonObjResponse.get("startIndex");
+                    count = (Integer) jsonObjResponse.get("totalResults");
+                    JSONObject tmp;
 
+                    for (int j = 0; j < usersArray.length(); j++) {
+                        tmp = usersArray.getJSONObject(j);
+                        userList.add((User) jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
                         try {
-                            ResponseValidateTests.runValidateTests(user, schema, null,
-                                    null, method,
+                            ResponseValidateTests.runValidateTests(userList.get(j), schema,
+                                    null, null, method,
                                     responseString, headerString, responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
 
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
-                                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
-                                            subTests)));
+                                    ComplianceUtils.getWire(method, responseString, headerString,
+                                            responseStatus, subTests)));
                             continue;
                         }
-
-                    } else {
-                        JSONObject jsonObj = new JSONObject(responseString);
-                        jsonObjResponse = jsonObj;
-                        JSONArray usersArray = jsonObj.getJSONArray("Resources");
-                        JSONObject tmp;
-
-                        System.out.println(jsonObjResponse.get("startIndex"));
-
-                        for (int j = 0; j < usersArray.length(); j++) {
-                            tmp = usersArray.getJSONObject(j);
-                            userList.add((User) jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
-                            try {
-                                ResponseValidateTests.runValidateTests(userList.get(j), schema,
-                                        null, null, method,
-                                        responseString, headerString, responseStatus, subTests);
-
-                            } catch (BadRequestException | CharonException e) {
-
-                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                        "Response Validation Error",
-                                        ComplianceUtils.getWire(method, responseString, headerString,
-                                                responseStatus, subTests)));
-                                continue;
-                            }
-                        }
                     }
+
                 } catch (JSONException e) {
 
 //                    throw new ComplianceException(500, "Error in decoding the returned list resource.");
@@ -582,15 +582,6 @@ public class UserTestImpl implements ResourceType {
                 } else if (requestPaths[i].getTestCaseName() == "Get users without index and only using count") {
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
 
-                    Integer startIndex = null;
-                    Integer count = null;
-                    try {
-                        startIndex = (Integer) jsonObjResponse.get("startIndex");
-                        count = (Integer) jsonObjResponse.get("totalResults");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
                     if (startIndex != 1 && count != 2) {
 
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -621,6 +612,146 @@ public class UserTestImpl implements ResourceType {
         }
 
         // This should be a array containing results.
+        return testResults;
+    }
+
+    /**
+     * get user by Id test.
+     *
+     * @return array of TestResult
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
+    @Override
+    public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
+
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+
+        ArrayList<String> userIDs = new ArrayList<>();
+        RequestPath[] requestPaths;
+
+        RequestPath obj1 = new RequestPath();
+        obj1.setUrl("");
+        obj1.setTestCaseName("Get user by ID");
+
+        RequestPath obj2 = new RequestPath();
+        obj2.setUrl("?attributes=userName,name.givenName");
+        obj2.setTestCaseName("Get a user with specific attributes");
+
+        RequestPath obj3 = new RequestPath();
+        obj3.setUrl("?excludedAttributes=name.givenName,emails");
+        obj3.setTestCaseName("Get a user with excluding attributes");
+
+        RequestPath obj4 = new RequestPath();
+        obj4.setUrl("23");
+        obj4.setTestCaseName("User not found error response");
+
+        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4};
+
+        for (int i = 0; i < requestPaths.length; i++) {        //create default user;
+            String id = initiateUser("Get User");
+            User user = null;
+            String getUserURL = url + "/" + id + requestPaths[i].getUrl();
+
+            HttpGet method = new HttpGet(getUserURL);
+
+            HttpClient client = HTTPClient.getHttpClient();
+
+            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+
+            HttpResponse response = null;
+            String responseString = "";
+            String headerString = "";
+            String responseStatus = "";
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+
+            } catch (Exception e) {
+                // Read the response body.
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                //clean the created user
+                cleanUpUser(id, "Get User");
+                if (requestPaths[i].getTestCaseName() != "User not found error response") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not get the default user from url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    continue;
+                }
+            }
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                //obtain the schema corresponding to user
+                // unless configured returns core-user schema or else returns extended user schema)
+                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+
+                JSONDecoder jsonDecoder = new JSONDecoder();
+                try {
+                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+
+                } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    //clean the created user
+                    cleanUpUser(id, "Get User");
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    continue;
+                }
+                try {
+                    ResponseValidateTests.runValidateTests(user, schema, null,
+                            null, method,
+                            responseString, headerString, responseStatus, subTests);
+
+                } catch (BadRequestException | CharonException e) {
+                    //clean the created user
+                    cleanUpUser(id, "Get User");
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Response Validation Error",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    continue;
+
+                }
+
+                //clean the created user
+                cleanUpUser(id, "Get User");
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
+                    response.getStatusLine().getStatusCode() == 404) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
+
+            } else {
+                //clean the created user
+                cleanUpUser(id, "Get User");
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
+            }
+        }
         return testResults;
     }
 
@@ -693,7 +824,7 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestCaseName() != "Post User with same userName") {
-                    testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -711,7 +842,7 @@ public class UserTestImpl implements ResourceType {
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
 
-                    testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -721,26 +852,26 @@ public class UserTestImpl implements ResourceType {
 
                 } catch (BadRequestException | CharonException e) {
 
-                    testResults.add(new TestResult(TestResult.ERROR, "Create User",
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
 
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Create User",
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             } else if (response.getStatusLine().getStatusCode() == 409) {
 
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Create User with same userName",
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 409(conflict) message",
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
             } else {
                 testResults.add(
                         new TestResult
-                                (TestResult.ERROR, "Create User",
+                                (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                         "", ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
             }
@@ -772,6 +903,8 @@ public class UserTestImpl implements ResourceType {
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload1);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload2);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload4);
+
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
@@ -784,7 +917,10 @@ public class UserTestImpl implements ResourceType {
         RequestPath obj3 = new RequestPath();
         obj3.setTestCaseName("Patch User with replace operation");
 
-        requestPaths = new RequestPath[]{obj1, obj2,obj3};
+        RequestPath obj4 = new RequestPath();
+        obj4.setTestCaseName("Patch User with array of operations");
+
+        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4};
 
         for (int i = 0; i < requestPaths.length; i++) {
             String id = initiateUser("Patch User");
@@ -956,7 +1092,7 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers
+                //get all headers[
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -965,7 +1101,7 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 //clean the created user
                 cleanUpUser(id, "Update User");
-                testResults.add(new TestResult(TestResult.ERROR, "Update User",
+                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                         "Could not update the default user at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
 
@@ -983,7 +1119,7 @@ public class UserTestImpl implements ResourceType {
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     //clean the created user
                     cleanUpUser(id, "Update User");
-                    testResults.add(new TestResult(TestResult.ERROR, "Update User",
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -995,21 +1131,21 @@ public class UserTestImpl implements ResourceType {
                 } catch (BadRequestException | CharonException e) {
                     //clean the created user
                     cleanUpUser(id, "Update User");
-                    testResults.add(new TestResult(TestResult.ERROR, "Update User",
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
                 //clean the created user
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Update User",
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else {
                 //clean the created user
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
-                        (TestResult.ERROR, "Update User",
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             }
@@ -1027,63 +1163,92 @@ public class UserTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        String id = initiateUser("Delete User");
-        User user = null;
-        String deleteUserURL = null;
-        deleteUserURL = url + "/" + id;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
 
-        HttpDelete method = new HttpDelete(deleteUserURL);
+        ArrayList<String> userIDs = new ArrayList<>();
+        RequestPath[] requestPaths;
 
-        HttpClient client = HTTPClient.getHttpClient();
+        RequestPath obj1 = new RequestPath();
+        obj1.setUrl("");
+        obj1.setTestCaseName("Delete user by ID");
 
-        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        RequestPath obj2 = new RequestPath();
+        obj2.setUrl("23");
+        obj2.setTestCaseName("User not found error response");
 
-        HttpResponse response = null;
-        String responseString = "";
-        String headerString = "";
-        String responseStatus = "";
-        ArrayList<String> subTests = new ArrayList<>();
-        try {
+        requestPaths = new RequestPath[]{obj1, obj2};
 
-            response = client.execute(method);
-            // Read the response body.
-            responseString = new BasicResponseHandler().handleResponse(response);
-            //get all headers
-            Header[] headers = response.getAllHeaders();
-            for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+        for (int i = 0; i < requestPaths.length; i++) {
+            String id = initiateUser("Delete User");
+            User user = null;
+            String deleteUserURL = null;
+            deleteUserURL = url + "/" + id + requestPaths[i].getUrl();
+
+            HttpDelete method = new HttpDelete(deleteUserURL);
+
+            HttpClient client = HTTPClient.getHttpClient();
+
+            method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+
+            HttpResponse response = null;
+            String responseString = "";
+            String headerString = "";
+            String responseStatus = "";
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+
+            } catch (Exception e) {
+                // Read the response body.
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                //clean the created user
+                cleanUpUser(id, "Delete User");
+                if (requestPaths[i].getTestCaseName() != "User not found error response") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not delete the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
             }
-            responseStatus = response.getStatusLine().getStatusCode() + " "
-                    + response.getStatusLine().getReasonPhrase();
 
-        } catch (Exception e) {
-            // Read the response body.
-            //get all headers
-            Header[] headers = response.getAllHeaders();
-            for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+            if (response.getStatusLine().getStatusCode() == 204) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
+                    response.getStatusLine().getStatusCode() == 404) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404 message",
+                                ComplianceUtils.getWire(method, responseString, headerString,
+                                        responseStatus, subTests)));
+
+            } else {
+
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
             }
-            responseStatus = response.getStatusLine().getStatusCode() + " "
-                    + response.getStatusLine().getReasonPhrase();
-            //clean the created user
-            cleanUpUser(id, "Delete User");
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Delete User",
-                    "Could not delete the default user at url " + url,
-                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-        }
-
-        if (response.getStatusLine().getStatusCode() == 204) {
-            testResults.add(new TestResult
-                    (TestResult.SUCCESS, "Delete User",
-                            "", ComplianceUtils.getWire(method, responseString, headerString,
-                            responseStatus, subTests)));
-        } else {
-
-            testResults.add(new TestResult
-                    (TestResult.ERROR, "Delete User",
-                            "", ComplianceUtils.getWire(method, responseString, headerString,
-                            responseStatus, subTests)));
         }
         return testResults;
     }
@@ -1091,7 +1256,161 @@ public class UserTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        // Store test results.
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+
+        // Store userIDS of 5 users.
+        ArrayList<String> userIDs = createTestsUsers();
+
+        // Post bodies of search methods.
+        ArrayList<String> definedSearchMethods = new ArrayList<>();
+
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload1);
+        // definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload2);
+        //definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
+
+        RequestPath[] requestPaths;
+
+        RequestPath obj1 = new RequestPath();
+        obj1.setTestCaseName("Post user with filter and pagination query parameters");
+
+        RequestPath obj2 = new RequestPath();
+        obj2.setTestCaseName("Patch User with remove operation");
+
+        RequestPath obj3 = new RequestPath();
+        obj3.setTestCaseName("Patch User with replace operation");
+
+        requestPaths = new RequestPath[]{obj1};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+
+            String searchUsersUrl = null;
+            searchUsersUrl = url + "/.search";
+
+            HttpPost method = new HttpPost(searchUsersUrl);
+            //create user test
+            HttpClient client = HTTPClient.getHttpClient();
+
+            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+            method.setHeader("Content-Type", "application/json");
+
+            HttpResponse response = null;
+            String responseString = "";
+            String headerString = "";
+            String responseStatus = "";
+            Integer totalResults;
+            // JSONObject jsonObj = null;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                // Create the request.
+                HttpEntity entity = new ByteArrayEntity
+                        (definedSearchMethods.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " " +
+                        response.getStatusLine().getReasonPhrase();
+
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+
+                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                        "Could not create default user at url " + url,
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                continue;
+
+            }
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                //obtain the schema corresponding to user
+                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+                JSONDecoder jsonDecoder = new JSONDecoder();
+                ArrayList<User> userList = new ArrayList<>();
+                JSONObject jsonObjResponse = null;
+                User user = null;
+                try {
+
+                    JSONObject jsonObj = new JSONObject(responseString);
+                    jsonObjResponse = jsonObj;
+                    JSONArray usersArray = jsonObj.getJSONArray("Resources");
+                    totalResults = (Integer) jsonObjResponse.get("totalResults");
+                    JSONObject tmp;
+
+                    for (int j = 0; j < usersArray.length(); j++) {
+                        tmp = usersArray.getJSONObject(j);
+                        userList.add((User) jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
+                        try {
+                            ResponseValidateTests.runValidateTests(userList.get(j), schema,
+                                    null, null, method,
+                                    responseString, headerString, responseStatus, subTests);
+
+                        } catch (BadRequestException | CharonException e) {
+
+                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                    "Response Validation Error",
+                                    ComplianceUtils.getWire(method, responseString, headerString,
+                                            responseStatus, subTests)));
+                            continue;
+                        }
+                    }
+
+                } catch (JSONException e) {
+
+//                    throw new ComplianceException(500, "Error in decoding the returned list resource.");
+                    continue;
+                } catch (BadRequestException | CharonException | InternalErrorException e) {
+
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    continue;
+                }
+
+                if (totalResults == 5) {
+                    testResults.add(new TestResult
+                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                    "", ComplianceUtils.getWire(method, responseString,
+                                    headerString, responseStatus, subTests)));
+                }
+            } else if (response.getStatusLine().getStatusCode() == 409) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 409(conflict) message",
+                                ComplianceUtils.getWire(method, responseString,
+                                        headerString, responseStatus, subTests)));
+
+            } else {
+                testResults.add(
+                        new TestResult
+                                (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                        "", ComplianceUtils.getWire(method, responseString,
+                                        headerString, responseStatus, subTests)));
+            }
+        }
+
+        // Clean up users after all tasks.
+        for (String id : userIDs) {
+            cleanUpUser(id, "Search users");
+        }
+
+        return testResults;
     }
 
     @Override

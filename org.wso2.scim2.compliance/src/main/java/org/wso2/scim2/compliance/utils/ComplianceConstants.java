@@ -165,6 +165,17 @@ public class ComplianceConstants {
                         "\"Operations\":[{\"op\":\"replace\",\"path\":\"emails[type eq \\\"home\\\"]\"," +
                         "\"value\":{\"type\":\"home\",\"value\":\"home@example.com\"}}]}";
 
+        public static String definedPatchUserPayload4 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],\"Operations\":[{\"op\":\"add\"," +
+                        "\"value\":{\"nickName\":\"shaggy\"}},{\"op\":\"remove\",\"path\":\"emails[type eq " +
+                        "\\\"work\\\" and value ew \\\"example.com\\\"\"},{\"op\":\"replace\",\"path\":\"emails[type " +
+                        "eq \\\"home\\\"]\",\"value\":{\"type\":\"home\",\"value\":\"anjana@anjana.com\"}}]}";
+
+        public static String definedSearchUsersPayload1 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
+                        ".familyName\",\"userName\"],\"filter\":\"userName sw login\"," +
+                        "\"domain\": \"PRIMARY\",\"startIndex\":1,\"count\":10}";
+
         public static String DEFINED_BULK_REQUEST = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
                 "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +

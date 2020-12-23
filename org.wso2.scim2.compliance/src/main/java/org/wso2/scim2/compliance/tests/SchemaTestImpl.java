@@ -57,6 +57,12 @@ public class SchemaTestImpl implements ResourceType {
     }
 
     @Override
+    public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
+
+        return null;
+    }
+
+    @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;

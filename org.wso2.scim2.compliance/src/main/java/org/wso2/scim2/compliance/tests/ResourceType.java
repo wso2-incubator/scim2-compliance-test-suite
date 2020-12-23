@@ -31,6 +31,8 @@ public interface ResourceType {
 
     ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException;
 
+    ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException;
+
     ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException;
 
     ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException;
