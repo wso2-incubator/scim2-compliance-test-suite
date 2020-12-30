@@ -36,8 +36,9 @@ public class FactoryMain {
             ArrayList<TestResult> userTestResults;
             //userTestResults = obj.getMethodTest();
             // obj.getByIdMethodTest();
-            //obj.searchMethodTest();
-            obj.deleteMethodTest();
+            obj.searchMethodTest();
+            // obj.deleteMethodTest();
+            //obj.putMethodTest();
             System.out.println("Success");
             //System.out.println(userTestResults.get(0).getName());
         } catch (Exception ee) {

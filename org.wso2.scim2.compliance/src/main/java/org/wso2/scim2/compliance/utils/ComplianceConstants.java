@@ -134,6 +134,13 @@ public class ComplianceConstants {
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
                         "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
+        public static String definedWithoutUserNameUser =
+                "{\"name\":{\"givenName\":\"Samindra\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\",\"emails\":[{" +
+                        "\"value\": \"Samindra@example.com\",\"type\": \"work\",\"primary\": true },{" +
+                        "\"value\": \"Samindra@jensen.org\",\"type\": \"home\"}], " +
+                        "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
+                        "\"12345A\",\"manager\": {\"value\": \"Taylor\"}}}";
+
         public static String definedUpdatedUser1 =
                 "{\"name\":{\"givenName\":\"Kims\",\"familyName\":\"Berry\"},\"password\": \"7019asd85\"," +
                         "\"userName\":" +
@@ -171,9 +178,18 @@ public class ComplianceConstants {
                         "\\\"work\\\" and value ew \\\"example.com\\\"\"},{\"op\":\"replace\",\"path\":\"emails[type " +
                         "eq \\\"home\\\"]\",\"value\":{\"type\":\"home\",\"value\":\"anjana@anjana.com\"}}]}";
 
+        public static String definedPatchUserPayload5 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
+                        "\"Operations\":[{\"op\":\"remove\",\"value\":{\"nickName\":\"shaggy\"}}]}";
+
         public static String definedSearchUsersPayload1 =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
                         ".familyName\",\"userName\"],\"filter\":\"userName sw login\"," +
+                        "\"domain\": \"PRIMARY\",\"startIndex\":1,\"count\":10}";
+
+        public static String definedSearchUsersPayload2 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
+                        ".familyName\",\"userName\"],\"filter\":\"userName ssw login\"," +
                         "\"domain\": \"PRIMARY\",\"startIndex\":1,\"count\":10}";
 
         public static String DEFINED_BULK_REQUEST = "{\"failOnErrors\":1,\"schemas\":" +

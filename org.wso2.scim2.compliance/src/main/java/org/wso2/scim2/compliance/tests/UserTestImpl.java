@@ -94,7 +94,7 @@ public class UserTestImpl implements ResourceType {
         definedUsers.add(ComplianceConstants.DefinedInstances.definedUser5);
 
         HttpPost method = new HttpPost(url);
-        //create users
+        // Create users.
         HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -108,7 +108,7 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
             try {
-                //create the group
+                // Create the group.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
                 response = client.execute(method);
@@ -116,7 +116,7 @@ public class UserTestImpl implements ResourceType {
                 responseString = new BasicResponseHandler().handleResponse(response);
                 responseStatus = String.valueOf(response.getStatusLine().getStatusCode());
                 if (responseStatus.equals("201")) {
-                    //obtain the schema corresponding to group
+                    // Obtain the schema corresponding to group.
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
 
                     JSONDecoder jsonDecoder = new JSONDecoder();
@@ -160,7 +160,7 @@ public class UserTestImpl implements ResourceType {
         User user = null;
 
         HttpPost method = new HttpPost(url);
-        //create user test
+        // Create user test.
         HttpClient client = HTTPClient.getHttpClient();
 
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -173,14 +173,14 @@ public class UserTestImpl implements ResourceType {
         String responseStatus = "";
         ArrayList<String> subTests = new ArrayList<>();
         try {
-            //create the user
+            // Create the user.
             HttpEntity entity = new ByteArrayEntity
                     (ComplianceConstants.DefinedInstances.DEFINED_USER.getBytes("UTF-8"));
             method.setEntity(entity);
             response = client.execute(method);
             // Read the response body.
             responseString = new BasicResponseHandler().handleResponse(response);
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -190,7 +190,7 @@ public class UserTestImpl implements ResourceType {
 
         } catch (Exception e) {
             // Read the response body.
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -203,8 +203,8 @@ public class UserTestImpl implements ResourceType {
         }
 
         if (response.getStatusLine().getStatusCode() == 201) {
-            //obtain the schema corresponding to user
-            // unless configured returns core-user schema or else returns extended user schema
+            // Obtain the schema corresponding to user.
+            // Unless configured returns core-user schema or else returns extended user schema.
             SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
 
             JSONDecoder jsonDecoder = new JSONDecoder();
@@ -268,7 +268,7 @@ public class UserTestImpl implements ResourceType {
             response = client.execute(method);
             // Read the response body.
             responseString = new BasicResponseHandler().handleResponse(response);
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -278,7 +278,7 @@ public class UserTestImpl implements ResourceType {
 
         } catch (Exception e) {
             // Read the response body.
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -436,7 +436,7 @@ public class UserTestImpl implements ResourceType {
 
             if (response.getStatusLine().getStatusCode() == 200) {
 
-                //obtain the schema corresponding to user
+                // Obtain the schema corresponding to user.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 ArrayList<User> userList = new ArrayList<>();
@@ -670,7 +670,7 @@ public class UserTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -680,14 +680,14 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Get User");
                 if (requestPaths[i].getTestCaseName() != "User not found error response") {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -698,8 +698,8 @@ public class UserTestImpl implements ResourceType {
             }
 
             if (response.getStatusLine().getStatusCode() == 200) {
-                //obtain the schema corresponding to user
-                // unless configured returns core-user schema or else returns extended user schema)
+                // Obtain the schema corresponding to user.
+                // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
 
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -707,7 +707,7 @@ public class UserTestImpl implements ResourceType {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Get User");
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
@@ -720,7 +720,7 @@ public class UserTestImpl implements ResourceType {
                             responseString, headerString, responseStatus, subTests);
 
                 } catch (BadRequestException | CharonException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Get User");
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
@@ -729,7 +729,7 @@ public class UserTestImpl implements ResourceType {
 
                 }
 
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Get User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -744,7 +744,7 @@ public class UserTestImpl implements ResourceType {
                                 responseStatus, subTests)));
 
             } else {
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Get User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -772,6 +772,8 @@ public class UserTestImpl implements ResourceType {
 
         definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedWithoutUserNameUser);
+
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
@@ -781,7 +783,10 @@ public class UserTestImpl implements ResourceType {
         RequestPath obj2 = new RequestPath();
         obj2.setTestCaseName("Post User with same userName");
 
-        requestPaths = new RequestPath[]{obj1, obj2};
+        RequestPath obj3 = new RequestPath();
+        obj3.setTestCaseName("Post User without userName");
+
+        requestPaths = new RequestPath[]{obj1, obj2, obj3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             User user = null;
@@ -823,7 +828,7 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName() != "Post User with same userName") {
+                if (requestPaths[i].getTestCaseName() == "Post User") {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -861,11 +866,21 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
-            } else if (response.getStatusLine().getStatusCode() == 409) {
+            } else if (requestPaths[i].getTestCaseName() == "Post User with same userName" &&
+                    response.getStatusLine().getStatusCode() == 409) {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 409(conflict) message",
+                                ComplianceUtils.getWire(method, responseString,
+                                        headerString, responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "Post User without userName" &&
+                    response.getStatusLine().getStatusCode() == 400) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404(Required attribute userName is " +
+                                        "missing in the SCIM Object) message",
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
             } else {
@@ -904,6 +919,7 @@ public class UserTestImpl implements ResourceType {
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload2);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload4);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload5);
 
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
@@ -920,7 +936,10 @@ public class UserTestImpl implements ResourceType {
         RequestPath obj4 = new RequestPath();
         obj4.setTestCaseName("Patch User with array of operations");
 
-        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4};
+        RequestPath obj5 = new RequestPath();
+        obj5.setTestCaseName("Patch User error validation");
+
+        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4, obj5};
 
         for (int i = 0; i < requestPaths.length; i++) {
             String id = initiateUser("Patch User");
@@ -929,7 +948,7 @@ public class UserTestImpl implements ResourceType {
             patchUserURL = url + "/" + id;
 
             HttpPatch method = new HttpPatch(patchUserURL);
-            //create user test
+            // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
 
             method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -940,7 +959,7 @@ public class UserTestImpl implements ResourceType {
             String responseStatus = "";
             ArrayList<String> subTests = new ArrayList<>();
             try {
-                //patch the user
+                // Patch the user.
                 HttpEntity entity = new ByteArrayEntity
                         (definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
@@ -951,7 +970,7 @@ public class UserTestImpl implements ResourceType {
 
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -961,24 +980,27 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Patch User");
-                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                        "Could not patch the default user at url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-                continue;
+                if (requestPaths[i].getTestCaseName() != "Patch User error validation") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not patch the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    continue;
+                }
+
             }
 
             if (response.getStatusLine().getStatusCode() == 200) {
-                //obtain the schema corresponding to user
-                // unless configured returns core-user schema or else returns extended user schema)
+                // Obtain the schema corresponding to user.
+                // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
 
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -986,7 +1008,7 @@ public class UserTestImpl implements ResourceType {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Patch User");
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
@@ -999,21 +1021,31 @@ public class UserTestImpl implements ResourceType {
                             responseString, headerString, responseStatus, subTests);
 
                 } catch (BadRequestException | CharonException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Patch User");
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     continue;
                 }
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Patch User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "Patch User error validation" &&
+                    response.getStatusLine().getStatusCode() == 400) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error 400",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString,
+                                        responseStatus, subTests)));
+
             } else {
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Patch User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1071,7 +1103,7 @@ public class UserTestImpl implements ResourceType {
             String responseStatus = "";
             ArrayList<String> subTests = new ArrayList<>();
             try {
-                //update the user
+                // Update the user.
                 HttpEntity entity = new ByteArrayEntity
                         (definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
@@ -1082,7 +1114,7 @@ public class UserTestImpl implements ResourceType {
 
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -1092,24 +1124,26 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers[
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Update User");
-                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                        "Could not update the default user at url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                if (requestPaths[i].getTestCaseName() != "Update user with schema violation") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not update the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
 
             }
 
             if (response.getStatusLine().getStatusCode() == 200) {
-                //obtain the schema corresponding to user
-                // unless configured returns core-user schema or else returns extended user schema)
+                // Obtain the schema corresponding to user.
+                // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
 
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -1129,20 +1163,30 @@ public class UserTestImpl implements ResourceType {
                             responseString, headerString, responseStatus, subTests);
 
                 } catch (BadRequestException | CharonException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Update User");
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "", ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "Update user with schema violation" &&
+                    response.getStatusLine().getStatusCode() == 400) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error 400",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString,
+                                        responseStatus, subTests)));
+
             } else {
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1202,7 +1246,7 @@ public class UserTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -1212,14 +1256,14 @@ public class UserTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Read the response body.
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString += header.getName() + " : " + header.getValue() + "\n";
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                //clean the created user
+                // Clean the created user.
                 cleanUpUser(id, "Delete User");
                 if (requestPaths[i].getTestCaseName() != "User not found error response") {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1267,7 +1311,7 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> definedSearchMethods = new ArrayList<>();
 
         definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload1);
-        // definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload2);
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload2);
         //definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
 
         RequestPath[] requestPaths;
@@ -1276,12 +1320,9 @@ public class UserTestImpl implements ResourceType {
         obj1.setTestCaseName("Post user with filter and pagination query parameters");
 
         RequestPath obj2 = new RequestPath();
-        obj2.setTestCaseName("Patch User with remove operation");
+        obj2.setTestCaseName("Post user and validate error message");
 
-        RequestPath obj3 = new RequestPath();
-        obj3.setTestCaseName("Patch User with replace operation");
-
-        requestPaths = new RequestPath[]{obj1};
+        requestPaths = new RequestPath[]{obj1, obj2};
 
         for (int i = 0; i < requestPaths.length; i++) {
 
@@ -1289,7 +1330,7 @@ public class UserTestImpl implements ResourceType {
             searchUsersUrl = url + "/.search";
 
             HttpPost method = new HttpPost(searchUsersUrl);
-            //create user test
+            // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
 
             method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -1330,15 +1371,16 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
 
-                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                        "Could not create default user at url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-                continue;
+                if (requestPaths[i].getTestCaseName() != "Post user and validate error message") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not create default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                }
 
             }
 
             if (response.getStatusLine().getStatusCode() == 200) {
-                //obtain the schema corresponding to user
+                // Obtain the schema corresponding to user.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 ArrayList<User> userList = new ArrayList<>();
@@ -1388,11 +1430,12 @@ public class UserTestImpl implements ResourceType {
                                     "", ComplianceUtils.getWire(method, responseString,
                                     headerString, responseStatus, subTests)));
                 }
-            } else if (response.getStatusLine().getStatusCode() == 409) {
+            } else if (requestPaths[i].getTestCaseName() == "Post user and validate error message"
+                    && response.getStatusLine().getStatusCode() == 400) {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "Server successfully given the expected error 409(conflict) message",
+                                "Service Provider successfully given the expected error 400 message",
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
 
