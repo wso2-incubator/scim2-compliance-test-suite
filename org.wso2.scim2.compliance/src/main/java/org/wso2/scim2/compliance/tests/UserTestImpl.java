@@ -18,6 +18,7 @@
 
 package org.wso2.scim2.compliance.tests;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -50,6 +51,7 @@ import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Implementation of  for User test cases.
@@ -108,7 +110,7 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
             try {
-                // Create the group.
+                // Create Users.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
                 response = client.execute(method);
@@ -116,9 +118,8 @@ public class UserTestImpl implements ResourceType {
                 responseString = new BasicResponseHandler().handleResponse(response);
                 responseStatus = String.valueOf(response.getStatusLine().getStatusCode());
                 if (responseStatus.equals("201")) {
-                    // Obtain the schema corresponding to group.
+                    // Obtain the schema corresponding to the user.
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
-
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     User user = null;
                     try {
@@ -131,7 +132,6 @@ public class UserTestImpl implements ResourceType {
                     }
                     userIDs.add(user.getId());
                 }
-
             } catch (Exception e) {
                 // Read the response body.
                 Header[] headers = response.getAllHeaders();
@@ -155,7 +155,7 @@ public class UserTestImpl implements ResourceType {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
-    public String initiateUser(String testName) throws GeneralComplianceException, ComplianceException {
+    private String initiateUser(String testName) throws GeneralComplianceException, ComplianceException {
 
         User user = null;
 
@@ -316,61 +316,67 @@ public class UserTestImpl implements ResourceType {
         return sorted;
     }
 
+    private static String generateUniqueID() {
+
+        return UUID.randomUUID().toString();
+    }
+
     private void initiateData() throws ComplianceException, GeneralComplianceException {
         // Initialize 5 users.
         createTestsUsers();
 
         // Creating objects to store sub test information.
-        RequestPath obj1 = new RequestPath();
-        obj1.setUrl("/");
-        obj1.setTestCaseName("List Users");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setUrl("/");
+        requestPath1.setTestCaseName("List Users");
 
-//        RequestPath obj2 = new RequestPath();
-//        obj2.setUrl("/" + userIDs.get(0));
-//        obj2.setTestCaseName("Get user by ID");
+//        RequestPath requestPath2 = new RequestPath();
+//        requestPath2.setUrl("/" + userIDs.get(0));
+//        requestPath2.setTestCaseName("Get user by ID");
 
-        RequestPath obj3 = new RequestPath();
-        obj3.setUrl("?filter=userName+eq+loginUser1");
-        obj3.setTestCaseName("Get user with Filter");
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setUrl("?filter=userName+eq+loginUser1");
+        requestPath3.setTestCaseName("Get user with Filter");
 
-        RequestPath obj4 = new RequestPath();
-        obj4.setUrl("?startIndex=1&count=2");
-        obj4.setTestCaseName("Get users with Pagination");
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setUrl("?startIndex=1&count=2");
+        requestPath4.setTestCaseName("Get users with Pagination");
 
-        RequestPath obj5 = new RequestPath();
-        obj5.setUrl("?sortBy=id&sortOrder=ascending");
-        obj5.setTestCaseName("Sort test");
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setUrl("?sortBy=id&sortOrder=ascending");
+        requestPath5.setTestCaseName("Sort test");
 
-        RequestPath obj6 = new RequestPath();
-        obj6.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
-        obj6.setTestCaseName("Filter with pagination test");
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        requestPath6.setTestCaseName("Filter with pagination test");
 
-        RequestPath obj7 = new RequestPath();
-        obj7.setUrl("?startIndex=-1&count=2");
-        obj7.setTestCaseName("Get users having negative number as index");
+        RequestPath requestPath7 = new RequestPath();
+        requestPath7.setUrl("?startIndex=-1&count=2");
+        requestPath7.setTestCaseName("Get users having negative number as index");
 
-        RequestPath obj8 = new RequestPath();
-        obj8.setUrl("?count=2");
-        obj8.setTestCaseName("Get users without index and only using count");
+        RequestPath requestPath8 = new RequestPath();
+        requestPath8.setUrl("?count=2");
+        requestPath8.setTestCaseName("Get users without index and only using count");
 
-        RequestPath obj9 = new RequestPath();
-        obj9.setUrl("?attributes=userName,name.givenName");
-        obj9.setTestCaseName("Get users with specific attributes");
+        RequestPath requestPath9 = new RequestPath();
+        requestPath9.setUrl("?attributes=userName,name.givenName");
+        requestPath9.setTestCaseName("Get users with specific attributes");
 
-        RequestPath obj10 = new RequestPath();
-        obj10.setUrl("?excludedAttributes=name.givenName,emails");
-        obj10.setTestCaseName("Get users with excluding attributes");
+        RequestPath requestPath10 = new RequestPath();
+        requestPath10.setUrl("?excludedAttributes=name.givenName,emails");
+        requestPath10.setTestCaseName("Get users with excluding attributes");
 
-//        RequestPath obj11 = new RequestPath();
-//        obj11.setUrl(String.format("/%s/?attributes=userName,name.givenName", userIDs.get(0)));
-//        obj11.setTestCaseName("Get a user with specific attributes");
+//        RequestPath requestPath11 = new RequestPath();
+//        requestPath11.setUrl(String.format("/%s/?attributes=userName,name.givenName", userIDs.get(0)));
+//        requestPath11.setTestCaseName("Get a user with specific attributes");
 //
-//        RequestPath obj12 = new RequestPath();
-//        obj12.setUrl(String.format("/%s/?excludedAttributes=name.givenName,emails", userIDs.get(0)));
-//        obj12.setTestCaseName("Get a user with excluding attributes");
+//        RequestPath requestPath12 = new RequestPath();
+//        requestPath12.setUrl(String.format("/%s/?excludedAttributes=name.givenName,emails", userIDs.get(0)));
+//        requestPath12.setTestCaseName("Get a user with excluding attributes");
 
         // This array hold the sub tests details.
-        requestPaths = new RequestPath[]{obj1, obj3, obj4, obj5, obj6, obj7, obj8, obj9, obj10};
+        requestPaths = new RequestPath[]{requestPath1, requestPath3, requestPath4, requestPath5, requestPath6,
+                requestPath7, requestPath8, requestPath9, requestPath10};
 
     }
 
@@ -388,7 +394,6 @@ public class UserTestImpl implements ResourceType {
         initiateData();
 
         for (int i = 0; i < requestPaths.length; i++) {
-            System.out.println("Element at " + i + " : " + requestPaths[i].getTestCaseName());
 
             String requestUrl = url + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(requestUrl);
@@ -631,23 +636,23 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setUrl("");
-        obj1.setTestCaseName("Get user by ID");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setUrl(StringUtils.EMPTY);
+        requestPath1.setTestCaseName("Get user by ID");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setUrl("?attributes=userName,name.givenName");
-        obj2.setTestCaseName("Get a user with specific attributes");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setUrl("?attributes=userName,name.givenName");
+        requestPath2.setTestCaseName("Get a user with specific attributes");
 
-        RequestPath obj3 = new RequestPath();
-        obj3.setUrl("?excludedAttributes=name.givenName,emails");
-        obj3.setTestCaseName("Get a user with excluding attributes");
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setUrl("?excludedAttributes=name.givenName,emails");
+        requestPath3.setTestCaseName("Get a user with excluding attributes");
 
-        RequestPath obj4 = new RequestPath();
-        obj4.setUrl("23");
-        obj4.setTestCaseName("User not found error response");
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setUrl(generateUniqueID());
+        requestPath4.setTestCaseName("User not found error response");
 
-        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {        //create default user;
             String id = initiateUser("Get User");
@@ -777,16 +782,16 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setTestCaseName("Post User");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Post User");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setTestCaseName("Post User with same userName");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Post User with same userName");
 
-        RequestPath obj3 = new RequestPath();
-        obj3.setTestCaseName("Post User without userName");
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Post User without userName");
 
-        requestPaths = new RequestPath[]{obj1, obj2, obj3};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             User user = null;
@@ -924,22 +929,22 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setTestCaseName("Patch User with add operation");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Patch User with add operation");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setTestCaseName("Patch User with remove operation");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Patch User with remove operation");
 
-        RequestPath obj3 = new RequestPath();
-        obj3.setTestCaseName("Patch User with replace operation");
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Patch User with replace operation");
 
-        RequestPath obj4 = new RequestPath();
-        obj4.setTestCaseName("Patch User with array of operations");
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setTestCaseName("Patch User with array of operations");
 
-        RequestPath obj5 = new RequestPath();
-        obj5.setTestCaseName("Patch User error validation");
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setTestCaseName("Patch User error validation");
 
-        requestPaths = new RequestPath[]{obj1, obj2, obj3, obj4, obj5};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
 
         for (int i = 0; i < requestPaths.length; i++) {
             String id = initiateUser("Patch User");
@@ -1076,13 +1081,13 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setTestCaseName("Update User");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Update User");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setTestCaseName("Update user with schema violation");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Update user with schema violation");
 
-        requestPaths = new RequestPath[]{obj1, obj2};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
 
@@ -1213,15 +1218,15 @@ public class UserTestImpl implements ResourceType {
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setUrl("");
-        obj1.setTestCaseName("Delete user by ID");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setUrl("");
+        requestPath1.setTestCaseName("Delete user by ID");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setUrl("23");
-        obj2.setTestCaseName("User not found error response");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setUrl("23");
+        requestPath2.setTestCaseName("User not found error response");
 
-        requestPaths = new RequestPath[]{obj1, obj2};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
             String id = initiateUser("Delete User");
@@ -1316,13 +1321,13 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath[] requestPaths;
 
-        RequestPath obj1 = new RequestPath();
-        obj1.setTestCaseName("Post user with filter and pagination query parameters");
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Post user with filter and pagination query parameters");
 
-        RequestPath obj2 = new RequestPath();
-        obj2.setTestCaseName("Post user and validate error message");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Post user and validate error message");
 
-        requestPaths = new RequestPath[]{obj1, obj2};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
 
