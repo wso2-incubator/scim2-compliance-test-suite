@@ -83,7 +83,7 @@ public class ComplianceConstants {
         public static String DEFINED_USER_PASSWORD = "7019asd84";
         public static String DEFINED_USER_USERNAME = "bjensenexamplecom";
 
-        public static String DEFINED_USER =
+        public static String defineUser =
                 "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
                         " \"loginUser\",\"emails\":[{" +
                         "\"value\": \"kim@example.com\",\"type\": \"work\",\"primary\": true },{" +

@@ -15,11 +15,6 @@
  */
 package org.wso2.scim2.compliance.tests.common;
 
-import org.wso2.scim2.compliance.entities.TestResult;
-import org.wso2.scim2.compliance.exception.ComplianceException;
-import org.wso2.scim2.compliance.exception.GeneralComplianceException;
-import org.wso2.scim2.compliance.protocol.ComplianceUtils;
-import org.wso2.scim2.compliance.utils.ComplianceConstants;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.wso2.charon3.core.attributes.AbstractAttribute;
 import org.wso2.charon3.core.attributes.Attribute;
@@ -33,6 +28,11 @@ import org.wso2.charon3.core.schema.AttributeSchema;
 import org.wso2.charon3.core.schema.SCIMAttributeSchema;
 import org.wso2.charon3.core.schema.SCIMDefinitions;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
+import org.wso2.scim2.compliance.entities.TestResult;
+import org.wso2.scim2.compliance.exception.ComplianceException;
+import org.wso2.scim2.compliance.exception.GeneralComplianceException;
+import org.wso2.scim2.compliance.protocol.ComplianceUtils;
+import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +46,7 @@ public class ResponseValidateTests {
 
     /**
      * Main method to handle validation tests.
+     *
      * @param scimObject
      * @param schema
      * @param requestedAttributes
@@ -118,7 +119,7 @@ public class ResponseValidateTests {
                             "Object.";
                     throw new GeneralComplianceException
                             (new TestResult(TestResult.ERROR, "Required Attribute Test",
-                            error, ComplianceUtils.getWire(method, responseString,
+                                    error, ComplianceUtils.getWire(method, responseString,
                                     headerString, responseStatus, subTests)));
                 }
             }
@@ -130,13 +131,13 @@ public class ResponseValidateTests {
     }
 
     /*
-         * Validate SCIMObject for required sub attributes given the object and the corresponding schema.
-         *
-         * @param attribute
-         * @param attributeSchema
-         * @throws CharonException
-         * @throws BadRequestException
-         */
+     * Validate SCIMObject for required sub attributes given the object and the corresponding schema.
+     *
+     * @param attribute
+     * @param attributeSchema
+     * @throws CharonException
+     * @throws BadRequestException
+     */
     private static void validateSCIMObjectForRequiredSubAttributes(AbstractAttribute attribute,
                                                                    AttributeSchema attributeSchema,
                                                                    HttpRequestBase method,
@@ -145,6 +146,7 @@ public class ResponseValidateTests {
                                                                    String responseStatus,
                                                                    ArrayList<String> subTests)
             throws GeneralComplianceException, CharonException, ComplianceException {
+
         if (attribute != null) {
             List<SCIMAttributeSchema> subAttributesSchemaList =
                     ((SCIMAttributeSchema) attributeSchema).getSubAttributeSchemas();
@@ -159,8 +161,8 @@ public class ResponseValidateTests {
                                         + " is missing in the SCIM Attribute: " + attribute.getName();
                                 throw new GeneralComplianceException
                                         (new TestResult(TestResult.ERROR, "Required Attribute Test",
-                                        error, ComplianceUtils.getWire(method, responseString, headerString,
-                                        responseStatus, subTests)));
+                                                error, ComplianceUtils.getWire(method, responseString, headerString,
+                                                responseStatus, subTests)));
                             }
                         } else if (attribute instanceof MultiValuedAttribute) {
                             List<Attribute> values =
@@ -172,8 +174,8 @@ public class ResponseValidateTests {
                                                 + ", is missing in the SCIM Attribute: " + attribute.getName();
                                         throw new GeneralComplianceException
                                                 (new TestResult(TestResult.ERROR, "Required Attribute Test",
-                                                error, ComplianceUtils.getWire(method, responseString,
-                                                headerString, responseStatus, subTests)));
+                                                        error, ComplianceUtils.getWire(method, responseString,
+                                                        headerString, responseStatus, subTests)));
                                     }
                                 }
                             }
@@ -234,13 +236,13 @@ public class ResponseValidateTests {
     }
 
     /*
-    * This method is to remove any defined and requested attributes and include
-    * requested attributes if not they have been removed.
-    *
-    * @param scimObject
-    * @param requestedAttributes
-    * @param requestedExcludingAttributes
-    */
+     * This method is to remove any defined and requested attributes and include
+     * requested attributes if not they have been removed.
+     *
+     * @param scimObject
+     * @param requestedAttributes
+     * @param requestedExcludingAttributes
+     */
     public static void validateReturnedAttributes(AbstractSCIMObject scimObject,
                                                   String requestedAttributes,
                                                   String requestedExcludingAttributes,
@@ -248,7 +250,9 @@ public class ResponseValidateTests {
                                                   String responseString,
                                                   String headerString,
                                                   String responseStatus,
-                                                  ArrayList<String> subTests) throws GeneralComplianceException, ComplianceException {
+                                                  ArrayList<String> subTests) throws GeneralComplianceException,
+            ComplianceException {
+
         List<String> requestedAttributesList = null;
         List<String> requestedExcludingAttributesList = null;
 
@@ -287,24 +291,30 @@ public class ResponseValidateTests {
                             || attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                             && (!requestedAttributesList.contains(attribute.getName())
                             && !isSubAttributeExistsInList(requestedAttributesList, attribute))) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability " +
+                                "Test ",
                                 "Attribute : " + attribute.getName() + " violates mutability condition.",
-                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                        subTests)));
                     }
                 } else if (requestedExcludingAttributes != null) {
                     //removing attributes which has returned as request. This is because no request is made
                     if (attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability  " +
+                                "Test",
                                 "Attribute : " + attribute.getName() + " violates mutability condition.",
-                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                        subTests)));
                     }
                     //if exclude attribute is set, set of exclude attributes need to be
                     // removed from the default set of attributes
                     if ((attribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                             && requestedExcludingAttributesList.contains(attribute.getName())) {
-                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability " +
+                                "Test ",
                                 "Attribute : " + attribute.getName() + " violates mutability condition.",
-                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                                ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
+                                        subTests)));
                     }
                 }
             }
@@ -402,6 +412,7 @@ public class ResponseValidateTests {
      */
     private static boolean isSubAttributeExistsInList(List<String> requestedAttributes,
                                                       Attribute attribute) {
+
         List<Attribute> subAttributes = null;
         if (attribute instanceof MultiValuedAttribute) {
             subAttributes =
@@ -458,6 +469,7 @@ public class ResponseValidateTests {
      */
     private static boolean isSubSubAttributeExistsInList(List<String> requestedAttributes,
                                                          Attribute grandParentAttribute, Attribute parentAttribute) {
+
         List<Attribute> subAttributes = null;
         if (parentAttribute instanceof MultiValuedAttribute) {
             subAttributes = (List<Attribute>)
@@ -510,19 +522,22 @@ public class ResponseValidateTests {
                                                          String responseString,
                                                          String headerString,
                                                          String responseStatus,
-                                                         ArrayList<String> subTests) throws GeneralComplianceException, ComplianceException {
+                                                         ArrayList<String> subTests) throws
+            GeneralComplianceException, ComplianceException {
 
         if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                    "Attribute : " + attribute.getName()+ "." +
-                            subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                    "Attribute : " + attribute.getName() + "." +
+                            subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability  " +
+                            "condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                        "Attribute : " + attribute.getName()+ "." +
-                                subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                        "Attribute : " + attribute.getName() + "." +
+                                subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability " +
+                                "condition.",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
@@ -537,16 +552,18 @@ public class ResponseValidateTests {
                         !requestedAttributesList.contains(attribute.getName()) &&
                         !isSubSubAttributeExistsInList(requestedAttributesList, attribute, subSimpleAttribute))) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
                 //removing attributes which has returned as request. This is because no request is made
                 if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
                 //if exclude attribute is set, set of exclude attributes need to be
@@ -555,13 +572,13 @@ public class ResponseValidateTests {
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subSimpleAttribute.getName())) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             }
         }
-
 
     }
 
@@ -592,20 +609,22 @@ public class ResponseValidateTests {
                                                             String responseString,
                                                             String headerString,
                                                             String responseStatus,
-                                                            ArrayList<String> subTests) throws GeneralComplianceException, ComplianceException {
-
+                                                            ArrayList<String> subTests)
+            throws GeneralComplianceException, ComplianceException {
 
         if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                    "Attribute : " + attribute.getName()+ "." +
-                            subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                    "Attribute : " + attribute.getName() + "." +
+                            subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability " +
+                            "condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                        "Attribute : " + attribute.getName()+ "." +
-                                subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                        "Attribute : " + attribute.getName() + "." +
+                                subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability " +
+                                "condition.",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
@@ -620,16 +639,18 @@ public class ResponseValidateTests {
                         !requestedAttributesList.contains(attribute.getName()) &&
                         !requestedAttributesList.contains(attribute.getName() + "." + subAttribute.getName()))) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
                 //removing attributes which has returned as request. This is because no request is made
                 if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
                 //if exclude attribute is set, set of exclude attributes need to be
@@ -638,8 +659,9 @@ public class ResponseValidateTests {
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName() + "." + subSimpleAttribute.getName())) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
-                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates mutability condition.",
+                            "Attribute : " + attribute.getName() + "." +
+                                    subAttribute.getName() + "." + subSimpleAttribute.getName() + " violates " +
+                                    "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             }
@@ -672,12 +694,12 @@ public class ResponseValidateTests {
                                                        HttpRequestBase method,
                                                        String responseString,
                                                        String headerString,
-                                                       String responseStatus,
-                                                       ArrayList<String> subTests) throws GeneralComplianceException, ComplianceException {
+                                                       String responseStatus, ArrayList<String> subTests)
+            throws GeneralComplianceException, ComplianceException {
         //check for never/request attributes.
         if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                    "Attribute : " + attribute.getName()+ "." +
+                    "Attribute : " + attribute.getName() + "." +
                             subAttribute.getName() + " violates mutability condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -686,7 +708,7 @@ public class ResponseValidateTests {
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                        "Attribute : " + attribute.getName()+ "." +
+                        "Attribute : " + attribute.getName() + "." +
                                 subAttribute.getName() + " violates mutability condition.",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -703,7 +725,7 @@ public class ResponseValidateTests {
                         !requestedAttributesList.contains(attribute.getName() + "." + subAttribute.getName()) &&
                         !subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.ALWAYS))) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -711,7 +733,7 @@ public class ResponseValidateTests {
                 //removing attributes which has returned as request. This is because no request is made
                 if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -721,7 +743,7 @@ public class ResponseValidateTests {
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName() + "." + subSubAttribute.getName())) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -751,12 +773,12 @@ public class ResponseValidateTests {
                                                     HttpRequestBase method,
                                                     String responseString,
                                                     String headerString,
-                                                    String responseStatus,
-                                                    ArrayList<String> subTests) throws GeneralComplianceException, ComplianceException {
+                                                    String responseStatus, ArrayList<String> subTests)
+            throws GeneralComplianceException, ComplianceException {
         //check for never/request attributes.
         if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                    "Attribute : " + attribute.getName()+ "." +
+                    "Attribute : " + attribute.getName() + "." +
                             subAttribute.getName() + " violates mutability condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
@@ -765,7 +787,7 @@ public class ResponseValidateTests {
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                        "Attribute : " + attribute.getName()+ "." +
+                        "Attribute : " + attribute.getName() + "." +
                                 subAttribute.getName() + " violates mutability condition.",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
@@ -781,7 +803,7 @@ public class ResponseValidateTests {
                         !requestedAttributesList.contains(attribute.getName()) &&
                         !isSubSubAttributeExistsInList(requestedAttributesList, attribute, subAttribute))) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -789,7 +811,7 @@ public class ResponseValidateTests {
                 //removing attributes which has returned as request. This is because no request is made
                 if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
@@ -799,7 +821,7 @@ public class ResponseValidateTests {
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName())) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
-                            "Attribute : " + attribute.getName()+ "." +
+                            "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }

@@ -42,7 +42,7 @@ public class EndpointFactory {
         if (str.equals("user")) {
             return new UserTestImpl(complianceTestMetaDataHolder);
         } else if (str.equals("group")) {
-            return new GroupTestImpl();
+            return new GroupTestImpl(complianceTestMetaDataHolder);
         }
         return null;
     }

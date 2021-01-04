@@ -50,6 +50,7 @@ import org.wso2.scim2.compliance.tests.common.ResponseValidateTests;
 import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -86,14 +87,20 @@ public class UserTestImpl implements ResourceType {
      * @throws ComplianceException
      * @throws GeneralComplianceException
      */
-    private ArrayList<String> createTestsUsers() throws ComplianceException, GeneralComplianceException {
+    private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
+            GeneralComplianceException {
 
         ArrayList<String> definedUsers = new ArrayList<>();
-        definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
-        definedUsers.add(ComplianceConstants.DefinedInstances.definedUser2);
-        definedUsers.add(ComplianceConstants.DefinedInstances.definedUser3);
-        definedUsers.add(ComplianceConstants.DefinedInstances.definedUser4);
-        definedUsers.add(ComplianceConstants.DefinedInstances.definedUser5);
+
+        if (noOfUsers == "One") {
+            definedUsers.add(ComplianceConstants.DefinedInstances.defineUser);
+        } else if (noOfUsers == "Many") {
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser2);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser3);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser4);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser5);
+        }
 
         HttpPost method = new HttpPost(url);
         // Create users.
@@ -104,9 +111,9 @@ public class UserTestImpl implements ResourceType {
         method.setHeader("Content-Type", "application/json");
 
         HttpResponse response = null;
-        String responseString = "";
-        String headerString = "";
-        String responseStatus = "";
+        String responseString = StringUtils.EMPTY;
+        String headerString = StringUtils.EMPTY;
+        String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
             try {
@@ -168,14 +175,14 @@ public class UserTestImpl implements ResourceType {
         method.setHeader("Content-Type", "application/json");
 
         HttpResponse response = null;
-        String responseString = "";
-        String headerString = "";
-        String responseStatus = "";
+        String responseString = StringUtils.EMPTY;
+        String headerString = StringUtils.EMPTY;
+        String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             // Create the user.
             HttpEntity entity = new ByteArrayEntity
-                    (ComplianceConstants.DefinedInstances.DEFINED_USER.getBytes("UTF-8"));
+                    (ComplianceConstants.DefinedInstances.defineUser.getBytes("UTF-8"));
             method.setEntity(entity);
             response = client.execute(method);
             // Read the response body.
@@ -247,7 +254,7 @@ public class UserTestImpl implements ResourceType {
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
-    public boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
+    private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
         String deleteUserURL = url + "/" + id;
 
@@ -259,9 +266,9 @@ public class UserTestImpl implements ResourceType {
         method.setHeader("Accept", "application/json");
 
         HttpResponse response = null;
-        String responseString = "";
-        String headerString = "";
-        String responseStatus = "";
+        String responseString = StringUtils.EMPTY;
+        String headerString = StringUtils.EMPTY;
+        String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         try {
 
@@ -323,7 +330,7 @@ public class UserTestImpl implements ResourceType {
 
     private void initiateData() throws ComplianceException, GeneralComplianceException {
         // Initialize 5 users.
-        createTestsUsers();
+        createTestsUsers("Many");
 
         // Creating objects to store sub test information.
         RequestPath requestPath1 = new RequestPath();
@@ -404,9 +411,9 @@ public class UserTestImpl implements ResourceType {
             method.setHeader("Accept", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             Integer startIndex = null;
             Integer count = null;
             ArrayList<String> subTests = new ArrayList<>();
@@ -600,13 +607,13 @@ public class UserTestImpl implements ResourceType {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             } else {
 
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             }
         }
@@ -654,8 +661,11 @@ public class UserTestImpl implements ResourceType {
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
-        for (int i = 0; i < requestPaths.length; i++) {        //create default user;
-            String id = initiateUser("Get User");
+        for (int i = 0; i < requestPaths.length; i++) {
+            //create default user;
+            ArrayList<String> userID = null;
+            userID = createTestsUsers("One");
+            String id = userID.get(i);
             User user = null;
             String getUserURL = url + "/" + id + requestPaths[i].getUrl();
 
@@ -667,9 +677,9 @@ public class UserTestImpl implements ResourceType {
             method.setHeader("Accept", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -738,22 +748,21 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Get User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
                     response.getStatusLine().getStatusCode() == 404) {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
-
             } else {
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             }
         }
@@ -804,9 +813,9 @@ public class UserTestImpl implements ResourceType {
             method.setHeader("Content-Type", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Create the user.
@@ -814,6 +823,7 @@ public class UserTestImpl implements ResourceType {
                         (definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
                 response = client.execute(method);
+
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
                 // Get all headers.
@@ -869,7 +879,7 @@ public class UserTestImpl implements ResourceType {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString, responseStatus, subTests)));
             } else if (requestPaths[i].getTestCaseName() == "Post User with same userName" &&
                     response.getStatusLine().getStatusCode() == 409) {
@@ -892,7 +902,7 @@ public class UserTestImpl implements ResourceType {
                 testResults.add(
                         new TestResult
                                 (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                        "", ComplianceUtils.getWire(method, responseString,
+                                        StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
             }
         }
@@ -947,7 +957,10 @@ public class UserTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
 
         for (int i = 0; i < requestPaths.length; i++) {
-            String id = initiateUser("Patch User");
+            //create default user;
+            ArrayList<String> userID = null;
+            userID = createTestsUsers("One");
+            String id = userID.get(i);
             User user = null;
             String patchUserURL = null;
             patchUserURL = url + "/" + id;
@@ -959,9 +972,9 @@ public class UserTestImpl implements ResourceType {
             method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Patch the user.
@@ -1037,7 +1050,7 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Patch User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else if (requestPaths[i].getTestCaseName() == "Patch User error validation" &&
                     response.getStatusLine().getStatusCode() == 400) {
@@ -1054,7 +1067,7 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Patch User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             }
         }
@@ -1090,8 +1103,10 @@ public class UserTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
-
-            String id = initiateUser("Update User");
+            //create default user;
+            ArrayList<String> userID = null;
+            userID = createTestsUsers("One");
+            String id = userID.get(i);
             User user = null;
             String updateUserURL = null;
             updateUserURL = url + "/" + id;
@@ -1103,9 +1118,9 @@ public class UserTestImpl implements ResourceType {
             method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Update the user.
@@ -1178,7 +1193,7 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else if (requestPaths[i].getTestCaseName() == "Update user with schema violation" &&
                     response.getStatusLine().getStatusCode() == 400) {
@@ -1195,7 +1210,7 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Update User");
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             }
         }
@@ -1219,17 +1234,20 @@ public class UserTestImpl implements ResourceType {
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
-        requestPath1.setUrl("");
+        requestPath1.setUrl(StringUtils.EMPTY);
         requestPath1.setTestCaseName("Delete user by ID");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setUrl("23");
+        requestPath2.setUrl(generateUniqueID());
         requestPath2.setTestCaseName("User not found error response");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
-            String id = initiateUser("Delete User");
+            //create default user;
+            ArrayList<String> userID = null;
+            userID = createTestsUsers("One");
+            String id = userID.get(i);
             User user = null;
             String deleteUserURL = null;
             deleteUserURL = url + "/" + id + requestPaths[i].getUrl();
@@ -1242,9 +1260,9 @@ public class UserTestImpl implements ResourceType {
             method.setHeader("Accept", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             try {
 
@@ -1280,7 +1298,7 @@ public class UserTestImpl implements ResourceType {
             if (response.getStatusLine().getStatusCode() == 204) {
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
                     response.getStatusLine().getStatusCode() == 404) {
@@ -1295,7 +1313,7 @@ public class UserTestImpl implements ResourceType {
 
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString, headerString,
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             }
         }
@@ -1310,7 +1328,7 @@ public class UserTestImpl implements ResourceType {
         testResults = new ArrayList<>();
 
         // Store userIDS of 5 users.
-        ArrayList<String> userIDs = createTestsUsers();
+        ArrayList<String> userIDs = createTestsUsers("Many");
 
         // Post bodies of search methods.
         ArrayList<String> definedSearchMethods = new ArrayList<>();
@@ -1343,9 +1361,9 @@ public class UserTestImpl implements ResourceType {
             method.setHeader("Content-Type", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            String headerString = StringUtils.EMPTY;
+            String responseStatus = StringUtils.EMPTY;
             Integer totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
@@ -1432,7 +1450,7 @@ public class UserTestImpl implements ResourceType {
                 if (totalResults == 5) {
                     testResults.add(new TestResult
                             (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                    "", ComplianceUtils.getWire(method, responseString,
+                                    StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                     headerString, responseStatus, subTests)));
                 }
             } else if (requestPaths[i].getTestCaseName() == "Post user and validate error message"
@@ -1448,7 +1466,7 @@ public class UserTestImpl implements ResourceType {
                 testResults.add(
                         new TestResult
                                 (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                        "", ComplianceUtils.getWire(method, responseString,
+                                        StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));
             }
         }
