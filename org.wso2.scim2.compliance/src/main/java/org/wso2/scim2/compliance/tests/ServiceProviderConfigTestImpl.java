@@ -18,9 +18,28 @@
 
 package org.wso2.scim2.compliance.tests;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.wso2.charon3.core.encoder.JSONDecoder;
+import org.wso2.charon3.core.exceptions.BadRequestException;
+import org.wso2.charon3.core.exceptions.CharonException;
+import org.wso2.charon3.core.exceptions.InternalErrorException;
+import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
+import org.wso2.scim2.compliance.exception.CriticalComplianceException;
 import org.wso2.scim2.compliance.exception.GeneralComplianceException;
+import org.wso2.scim2.compliance.httpclient.HTTPClient;
+import org.wso2.scim2.compliance.objects.SCIMSchema;
+import org.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
+import org.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
+import org.wso2.scim2.compliance.protocol.ComplianceUtils;
+import org.wso2.scim2.compliance.tests.common.ResponseValidateTests;
+import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
 import java.util.ArrayList;
 
@@ -29,10 +48,120 @@ import java.util.ArrayList;
  */
 public class ServiceProviderConfigTestImpl implements ResourceType {
 
+    private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
+    private SCIMServiceProviderConfig scimServiceProviderConfig = null;
+
+    /**
+     * Initializer.
+     *
+     * @param complianceTestMetaDataHolder
+     */
+    public ServiceProviderConfigTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
+
+        this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
+    }
+
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+        Boolean errorOccured = false;
+        // Construct the endpoint url
+        String url = complianceTestMetaDataHolder.getUrl() +
+                ComplianceConstants.TestConstants.SERVICE_PROVIDER_ENDPOINT;
+
+        // specify the get request
+        HttpGet method = new HttpGet(url);
+
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+        method.setHeader("Content-Type", "application/json");
+
+        HttpResponse response = null;
+        String responseString = StringUtils.EMPTY;
+        String headerString = StringUtils.EMPTY;
+        String responseStatus = StringUtils.EMPTY;
+        ArrayList<String> subTests = new ArrayList<>();
+
+        try {
+            //get the service provider configs
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            //get all headers
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+
+        } catch (Exception e) {
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString += header.getName() + " : " + header.getValue() + "\n";
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+
+            testResults.add(new TestResult
+                    (TestResult.ERROR, "Get ServiceProviderConfig",
+                            "Could not get ServiceProviderConfig at url " + url,
+                            ComplianceUtils.getWire(method, responseString,
+                                    headerString, responseStatus, subTests)));
+            errorOccured = true;
+        }
+        if (response.getStatusLine().getStatusCode() == 200) {
+            //obtain the schema corresponding to serviceProviderConfig
+            SCIMResourceTypeSchema schema = complianceTestMetaDataHolder.getScimSchema().
+                    getServiceProviderConfigSchema();
+
+            JSONDecoder jsonDecoder = new JSONDecoder();
+            try {
+                scimServiceProviderConfig =
+                        (SCIMServiceProviderConfig)
+                                jsonDecoder.decodeResource(responseString, schema,
+                                        new SCIMServiceProviderConfig());
+                complianceTestMetaDataHolder.setScimServiceProviderConfig(scimServiceProviderConfig);
+
+                System.out.println(scimServiceProviderConfig.getEtagSupported());
+            } catch (BadRequestException | CharonException | InternalErrorException e) {
+                testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
+                        "Could not decode the server response",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                errorOccured = true;
+            }
+            try {
+                ResponseValidateTests.runValidateTests(scimServiceProviderConfig, schema, null, null, method,
+                        responseString, headerString, responseStatus, subTests);
+
+            } catch (BadRequestException | CharonException e) {
+                testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
+                        "Response Validation Error",
+                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                errorOccured = true;
+            } catch (GeneralComplianceException e) {
+                testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
+                        e.getResult().getMessage(), ComplianceUtils.getWire(method,
+                        responseString, headerString, responseStatus, subTests)));
+                errorOccured = true;
+            }
+            if (errorOccured == false) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, "Get ServiceProviderConfig",
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
+                                responseStatus, subTests)));
+            }
+        } else {
+            testResults.add(new TestResult
+                    (TestResult.ERROR, "Get ServiceProviderConfig",
+                            StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
+                            responseStatus, subTests)));
+        }
+        return testResults;
     }
 
     @Override

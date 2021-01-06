@@ -44,9 +44,11 @@ public class HTTPClient {
     private static CloseableHttpClient httpClient = null;
 
     public static HttpClient getHttpClient() throws ComplianceException {
-        if(httpClient == null) {
+
+        if (httpClient == null) {
             TrustStrategy trustAllStrategy = new TrustStrategy() {
                 public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
                     return true;
                 }
             };
@@ -61,6 +63,7 @@ public class HTTPClient {
             try {
                 HostnameVerifier allHostsValid = new HostnameVerifier() {
                     public boolean verify(String hostname, SSLSession session) {
+
                         return true;
                     }
                 };
@@ -74,8 +77,8 @@ public class HTTPClient {
         return httpClient;
     }
 
-    public static HttpRequestBase setAuthorizationHeader (ComplianceTestMetaDataHolder complianceTestMetaDataHolder,
-                                                          HttpRequestBase method) {
+    public static HttpRequestBase setAuthorizationHeader(ComplianceTestMetaDataHolder complianceTestMetaDataHolder,
+                                                         HttpRequestBase method) {
 
         String auth = complianceTestMetaDataHolder.getUsername() + ":" + complianceTestMetaDataHolder.getPassword();
         if (!auth.equals(":")) {
@@ -86,8 +89,8 @@ public class HTTPClient {
         return method;
     }
 
-    public static HttpRequestBase setAuthorizationHeader (String userName, String password,
-                                                          HttpRequestBase method) {
+    public static HttpRequestBase setAuthorizationHeader(String userName, String password,
+                                                         HttpRequestBase method) {
 
         String auth = userName + ":" + password;
         if (!auth.equals(":")) {

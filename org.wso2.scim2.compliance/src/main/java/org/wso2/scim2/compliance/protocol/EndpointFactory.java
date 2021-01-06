@@ -18,8 +18,10 @@
 
 package org.wso2.scim2.compliance.protocol;
 
+import org.wso2.scim2.compliance.objects.SCIMSchema;
 import org.wso2.scim2.compliance.tests.GroupTestImpl;
 import org.wso2.scim2.compliance.tests.ResourceType;
+import org.wso2.scim2.compliance.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.compliance.tests.UserTestImpl;
 
 /**
@@ -30,7 +32,7 @@ public class EndpointFactory {
     public ResourceType getInstance(String str) {
 
         ComplianceTestMetaDataHolder complianceTestMetaDataHolder = new ComplianceTestMetaDataHolder();
-        complianceTestMetaDataHolder.setUrl("https://localhost:9444/scim2");
+        complianceTestMetaDataHolder.setUrl("https://localhost:9443/scim2");
         complianceTestMetaDataHolder.setUsername("admin");
         complianceTestMetaDataHolder.setPassword("admin");
 //        complianceTestMetaDataHolder.setAuthorization_server(authorizationServer);
@@ -39,7 +41,14 @@ public class EndpointFactory {
 //        complianceTestMetaDataHolder.setClient_id(clientId);
 //        complianceTestMetaDataHolder.setClient_secret(clientSecret);
 
-        if (str.equals("user")) {
+        SCIMSchema scimSchema = new SCIMSchema();
+
+        // set the scim schema object
+        complianceTestMetaDataHolder.setScimSchema(scimSchema);
+
+        if (str.equals("serviceProviderConfig")) {
+            return new ServiceProviderConfigTestImpl(complianceTestMetaDataHolder);
+        } else if (str.equals("user")) {
             return new UserTestImpl(complianceTestMetaDataHolder);
         } else if (str.equals("group")) {
             return new GroupTestImpl(complianceTestMetaDataHolder);

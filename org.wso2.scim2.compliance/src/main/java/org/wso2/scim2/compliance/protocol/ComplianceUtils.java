@@ -32,6 +32,7 @@ public class ComplianceUtils {
 
     /**
      * method to get the wire.
+     *
      * @param method
      * @param responseBody
      * @param headerString
@@ -49,15 +50,15 @@ public class ComplianceUtils {
         StringBuffer subTestsPerformed = new StringBuffer();
 
         toServer.append(method.getRequestLine().getMethod()).append(" ");
-        toServer.append(method.getRequestLine().getUri()+"\n");
+        toServer.append(method.getRequestLine().getUri() + "\n");
         toServer.append(method.getRequestLine().getProtocolVersion().getProtocol());
         for (org.apache.http.Header header : method.getAllHeaders()) {
             toServer.append(header.getName()).append(": ").append(header.getValue()).append("\n");
         }
 
-        if(method.getMethod() != "GET" && method.getMethod() != "DELETE"){
+        if (method.getMethod() != "GET" && method.getMethod() != "DELETE") {
             try {
-                HttpEntity entity = ((HttpEntityEnclosingRequest)method).getEntity();
+                HttpEntity entity = ((HttpEntityEnclosingRequest) method).getEntity();
                 toServer.append(EntityUtils.toString(entity));
             } catch (Exception e) {
                 throw new ComplianceException(500, "Error in getting the request payload");
@@ -74,8 +75,8 @@ public class ComplianceUtils {
         return new Wire(toServer.toString(), fromServer.toString(), subTestsPerformed.toString());
     }
 
-
     public static Wire getWire(Throwable e) {
+
         return new Wire(ExceptionUtils.getFullStackTrace(e), "", "");
     }
 }

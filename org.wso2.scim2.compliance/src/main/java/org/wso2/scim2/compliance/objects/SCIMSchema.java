@@ -14,8 +14,9 @@ public class SCIMSchema {
     private SCIMResourceTypeSchema resourceTypeSchema = null;
 
     public SCIMResourceTypeSchema getServiceProviderConfigSchema() {
+
         if (serviceProviderConfigSchema == null) {
-            serviceProviderConfigSchema =  SCIMResourceSchemaManager.
+            serviceProviderConfigSchema = SCIMResourceSchemaManager.
                     getInstance().getServiceProviderConfigResourceSchema();
             return serviceProviderConfigSchema;
         }
@@ -23,11 +24,13 @@ public class SCIMSchema {
     }
 
     public void setServiceProviderConfigSchema(SCIMResourceTypeSchema serviceProviderConfigSchema) {
+
         this.serviceProviderConfigSchema = serviceProviderConfigSchema;
     }
 
     public SCIMResourceTypeSchema getUserSchema() {
-        if(userSchema == null){
+
+        if (userSchema == null) {
             userSchema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
             return userSchema;
         }
@@ -35,11 +38,13 @@ public class SCIMSchema {
     }
 
     public void setUserSchema(SCIMResourceTypeSchema userSchema) {
+
         this.userSchema = userSchema;
     }
 
     public SCIMResourceTypeSchema getGroupSchema() {
-        if(groupSchema == null){
+
+        if (groupSchema == null) {
             groupSchema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
             return groupSchema;
 
@@ -48,11 +53,13 @@ public class SCIMSchema {
     }
 
     public void setGroupSchema(SCIMResourceTypeSchema groupSchema) {
+
         this.groupSchema = groupSchema;
     }
 
     public SCIMResourceTypeSchema getResourceTypeSchema() {
-        if (resourceTypeSchema == null){
+
+        if (resourceTypeSchema == null) {
             resourceTypeSchema = SCIMResourceSchemaManager.getInstance().getResourceTypeResourceSchema();
             return resourceTypeSchema;
         }
@@ -60,6 +67,7 @@ public class SCIMSchema {
     }
 
     public void setResourceTypeSchema(SCIMResourceTypeSchema resourceTypeSchema) {
+
         this.resourceTypeSchema = resourceTypeSchema;
     }
 }

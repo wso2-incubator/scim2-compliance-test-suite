@@ -36,6 +36,7 @@ import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.objects.Group;
+import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.compliance.entities.TestResult;
@@ -48,7 +49,9 @@ import org.wso2.scim2.compliance.tests.common.ResponseValidateTests;
 import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Implementation of Group test cases.
@@ -58,6 +61,7 @@ public class GroupTestImpl implements ResourceType {
     private final ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private final String url;
     private ArrayList<String> groupIDs = new ArrayList<>();
+    private ArrayList<String> userIDs = new ArrayList<>();
 
     public GroupTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -70,6 +74,148 @@ public class GroupTestImpl implements ResourceType {
     }
 
     /**
+     * Create test users.
+     *
+     * @return
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
+    private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
+            GeneralComplianceException {
+
+        String url = complianceTestMetaDataHolder.getUrl() +
+                ComplianceConstants.TestConstants.USERS_ENDPOINT;
+
+        ArrayList<String> definedUsers = new ArrayList<>();
+
+        if (noOfUsers.equals("One")) {
+            definedUsers.add(ComplianceConstants.DefinedInstances.defineUser);
+        } else if (noOfUsers.equals("Many")) {
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser2);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser3);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser4);
+            definedUsers.add(ComplianceConstants.DefinedInstances.definedUser5);
+        }
+
+        HttpPost method = new HttpPost(url);
+        // Create users.
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+        method.setHeader("Content-Type", "application/json");
+
+        HttpResponse response = null;
+        String responseString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+        String responseStatus = StringUtils.EMPTY;
+        ArrayList<String> subTests = new ArrayList<>();
+        for (int i = 0; i < definedUsers.size(); i++) {
+            try {
+                // Create Users.
+                HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                responseStatus = String.valueOf(response.getStatusLine().getStatusCode());
+                if (responseStatus.equals("201")) {
+                    // Obtain the schema corresponding to the user.
+                    SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+                    JSONDecoder jsonDecoder = new JSONDecoder();
+                    User user = null;
+                    try {
+                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                                "Could not decode the server response of users create.",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
+                    }
+                    userIDs.add(user.getId());
+                }
+            } catch (Exception e) {
+                // Read the response body.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
+                        "Could not create default users at url " + url,
+                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus, subTests)));
+            }
+        }
+        return userIDs;
+    }
+
+    /**
+     * This method cleans up the created used with the given id.
+     *
+     * @param id
+     * @return
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
+    private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
+
+        String url = complianceTestMetaDataHolder.getUrl() +
+                ComplianceConstants.TestConstants.USERS_ENDPOINT;
+
+        String deleteUserURL = url + "/" + id;
+
+        HttpDelete method = new HttpDelete(deleteUserURL);
+
+        HttpClient client = HTTPClient.getHttpClient();
+
+        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+
+        HttpResponse response = null;
+        String responseString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+        String responseStatus = StringUtils.EMPTY;
+        ArrayList<String> subTests = new ArrayList<>();
+        try {
+
+            response = client.execute(method);
+            // Read the response body.
+            responseString = new BasicResponseHandler().handleResponse(response);
+            // Get all headers.
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                   headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+
+        } catch (Exception e) {
+            // Read the response body.
+            // Get all headers.
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+            }
+            responseStatus = response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase();
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not delete the default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                            subTests)));
+        }
+        if (response.getStatusLine().getStatusCode() == 204) {
+            return true;
+        } else {
+            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
+                    "Could not delete the default user at url " + url,
+                    ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                            subTests)));
+        }
+    }
+
+    /**
      * Create test groups.
      *
      * @return groupIds
@@ -78,10 +224,20 @@ public class GroupTestImpl implements ResourceType {
      */
     private ArrayList<String> createTestsGroups() throws ComplianceException, GeneralComplianceException {
 
+        createTestsUsers("Many");
+
         ArrayList<String> definedGroups = new ArrayList<>();
         definedGroups.add("{\"displayName\": \"EYtXcD21\"}");
         definedGroups.add("{\"displayName\": \"BktqER22\"}");
         definedGroups.add("{\"displayName\": \"ZwLtOP23\"}");
+        definedGroups.add("{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]," +
+                "\"displayName\":\"XwLtOP23\",\"members\":[{\"value\":\"" + userIDs.get(0) + "\",\"displayName" +
+                "\":\"loginUser1\"}," +
+                "{\"value\":\"" + userIDs.get(1) + "\",\"displayName\":\"loginUser2\"},{\"value\":\"" + userIDs.get(2) +
+                "\",\"displayName\":\"loginUser3\"},{\"value\":\"" + userIDs.get(3) + "\",\"displayName" +
+                "\":\"loginUser4" +
+                "\"}," +
+                "{\"value\":\"" + userIDs.get(4) + "\",\"displayName\":\"loginUser5\"}]}");
 
         HttpPost method = new HttpPost(url);
         //create groups
@@ -92,14 +248,14 @@ public class GroupTestImpl implements ResourceType {
         method.setHeader("Content-Type", "application/json");
 
         HttpResponse response = null;
-        String responseString = "";
+        String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder();
-        String responseStatus = "";
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < definedGroups.size(); i++) {
             try {
                 //create the group
-                HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -110,7 +266,7 @@ public class GroupTestImpl implements ResourceType {
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
 
                     JSONDecoder jsonDecoder = new JSONDecoder();
-                    Group group = null;
+                    Group group;
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
@@ -126,7 +282,7 @@ public class GroupTestImpl implements ResourceType {
                 // Read the response body.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
-                    headerString.append(header.getName()).append(" : ").append(header.getValue()).append("\n");
+                       headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
@@ -142,8 +298,8 @@ public class GroupTestImpl implements ResourceType {
     /**
      * This method cleans the group with the given groupId and the user with the given id.
      *
-     * @param groupId
-     * @param testName
+     * @param groupId  contains id
+     * @param testName contains name of the test
      * @return
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -162,9 +318,9 @@ public class GroupTestImpl implements ResourceType {
         method.setHeader("Accept", "application/json");
 
         HttpResponse response = null;
-        String responseString = "";
-        String headerString = "";
-        String responseStatus = "";
+        String responseString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+        String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         try {
 
@@ -174,7 +330,7 @@ public class GroupTestImpl implements ResourceType {
             //get all headers
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                   headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
@@ -184,13 +340,14 @@ public class GroupTestImpl implements ResourceType {
             //get all headers
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                   headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default group at url " + url,
-                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                            subTests)));
         }
 
         if (response.getStatusLine().getStatusCode() == 204) {
@@ -198,7 +355,8 @@ public class GroupTestImpl implements ResourceType {
         } else {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default group at url " + url,
-                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                    ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                            subTests)));
         }
     }
 
@@ -214,12 +372,48 @@ public class GroupTestImpl implements ResourceType {
 
         RequestPath requestPath1 = new RequestPath();
         requestPath1.setUrl(StringUtils.EMPTY);
-        requestPath1.setTestCaseName("Get all groups");
+        requestPath1.setTestCaseName("List groups");
 
-        requestPaths = new RequestPath[]{requestPath1};
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setUrl("?filter=displayName+eq+EYtXcD21");
+        requestPath2.setTestCaseName("Get groups with Filter");
+
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setUrl("?startIndex=1&count=2");
+        requestPath3.setTestCaseName("Get users with Pagination");
+
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
+        requestPath4.setTestCaseName("Sort test");
+
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        requestPath5.setTestCaseName("Filter with pagination test");
+
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setUrl("?startIndex=-1&count=2");
+        requestPath6.setTestCaseName("Get users having negative number as index");
+
+        RequestPath requestPath7 = new RequestPath();
+        requestPath7.setUrl("?count=2");
+        requestPath7.setTestCaseName("Get users without index and only using count");
+
+        RequestPath requestPath8 = new RequestPath();
+        requestPath8.setUrl("?attributes=userName,name.givenName");
+        requestPath8.setTestCaseName("Get users with specific attributes");
+
+        RequestPath requestPath9 = new RequestPath();
+        requestPath9.setUrl("?excludedAttributes=name.givenName,emails");
+        requestPath9.setTestCaseName("Get users with excluding attributes");
+
+        // This array hold the sub tests details.
+        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+//        , requestPath3, requestPath4, requestPath5,
+//                requestPath6, requestPath7, requestPath8, requestPath9};
 
         for (int i = 0; i < requestPaths.length; i++) {
-            HttpGet method = new HttpGet(url);
+            String requestUrl = url + requestPaths[i].getUrl();
+            HttpGet method = new HttpGet(requestUrl);
 
             HttpClient client = HTTPClient.getHttpClient();
 
@@ -227,9 +421,9 @@ public class GroupTestImpl implements ResourceType {
             method.setHeader("Accept", "application/json");
 
             HttpResponse response = null;
-            String responseString = "";
-            String headerString = "";
-            String responseStatus = "";
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -238,7 +432,7 @@ public class GroupTestImpl implements ResourceType {
                 //get all headers
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
-                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                       headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
@@ -248,14 +442,15 @@ public class GroupTestImpl implements ResourceType {
                 //get all headers
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
-                    headerString += header.getName() + " : " + header.getValue() + "\n";
+                       headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
 
-               testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                         "Could not list the groups at url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                subTests)));
             }
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -274,13 +469,13 @@ public class GroupTestImpl implements ResourceType {
                         try {
                             ResponseValidateTests.runValidateTests(groupList.get(j), schema,
                                     null, null, method,
-                                    responseString, headerString, responseStatus, subTests);
+                                    responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
 
-                           testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
-                                    ComplianceUtils.getWire(method, responseString, headerString,
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests)));
                         }
                     }
@@ -292,42 +487,67 @@ public class GroupTestImpl implements ResourceType {
 
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
                 }
-                // check for all created groups
-                try {
+                if (requestPaths[i].getTestCaseName() == "List groups") { // check for all created groups
+                    try {
 
-                    subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
+                        subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
 
-                    ArrayList<String> returnedGroupIDs = new ArrayList<>();
-                    for (Group group : groupList) {
-                        returnedGroupIDs.add(group.getId());
+                        ArrayList<String> returnedGroupIDs = new ArrayList<>();
+                        for (Group group : groupList) {
+                            returnedGroupIDs.add(group.getId());
+                        }
+                        for (String id : groupIDs) {
+                            if (!returnedGroupIDs.contains(id)) {
+
+                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                        "Response does not contain all the created groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests)));
+                            }
+                        }
+
+                    } catch (CharonException e) {
+
+                        throw new ComplianceException(500, "Could not get the created group id");
                     }
-                    for (String id : groupIDs) {
-                        if (!returnedGroupIDs.contains(id)) {
+                } else if (requestPaths[i].getTestCaseName() == "Get groups with Filter") {
+                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
 
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain all the created groups",
-                                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
-                                            subTests)));
+                    String value = "EYtXcD21";
+                    for (Group group : groupList) {
+                        try {
+                            if (!Objects.equals(value, group.getDisplayName())) {
+
+                                testResults.add(new TestResult(TestResult.ERROR, "Filter Groups",
+                                        "Response does not contain the expected groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests)));
+                                continue;
+                            }
+                        } catch (CharonException e) {
+                            continue;
                         }
                     }
-
-                } catch (CharonException e) {
-
-                    throw new ComplianceException(500, "Could not get the created group id");
                 }
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString,
-                                headerString, responseStatus, subTests)));
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
             } else {
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "", ComplianceUtils.getWire(method, responseString,
-                                headerString, responseStatus, subTests)));
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
             }
+        }
+
+        // Clean up users after all tasks.
+        for (String id : userIDs) {
+            cleanUpUser(id, "get users test");
         }
 
         for (String id : groupIDs) {

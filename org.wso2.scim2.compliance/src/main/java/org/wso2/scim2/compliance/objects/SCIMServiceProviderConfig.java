@@ -25,18 +25,40 @@ import org.wso2.charon3.core.objects.AbstractSCIMObject;
  */
 public class SCIMServiceProviderConfig extends AbstractSCIMObject {
 
-   public boolean getPatchSupported() throws CharonException {
-       Attribute patchAttribute  = getAttribute("patch");
-       return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
-   }
+    public boolean getPatchSupported() throws CharonException {
+
+        Attribute patchAttribute = getAttribute("patch");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
 
     public boolean getSortSupported() throws CharonException {
-        Attribute patchAttribute  = getAttribute("sort");
-        return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+
+        Attribute patchAttribute = getAttribute("sort");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
     }
 
     public boolean getBulkSupported() throws CharonException {
-        Attribute patchAttribute  = getAttribute("bulk");
-        return ((SimpleAttribute)(patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+
+        Attribute patchAttribute = getAttribute("bulk");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
     }
+
+    public boolean getFilterSupported() throws CharonException {
+
+        Attribute patchAttribute = getAttribute("filter");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
+
+    public boolean getEtagSupported() throws CharonException {
+
+        Attribute patchAttribute = getAttribute("etag");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
+
+    public boolean getChangePasswordSupported() throws CharonException {
+
+        Attribute patchAttribute = getAttribute("changePassword");
+        return ((SimpleAttribute) (patchAttribute.getSubAttribute("supported"))).getBooleanValue();
+    }
+
 }

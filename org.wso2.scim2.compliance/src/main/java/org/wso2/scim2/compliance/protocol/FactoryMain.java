@@ -33,11 +33,14 @@ public class FactoryMain {
         EndpointFactory e = new EndpointFactory();
         ResourceType obj = e.getInstance("user");
         ResourceType obj2 = e.getInstance("group");
+        ResourceType obj3 = e.getInstance("serviceProviderConfig");
         try {
             ArrayList<TestResult> userTestResults;
-            userTestResults = obj.deleteMethodTest();
+           //userTestResults = obj.getMethodTest();
 
-            // obj2.getMethodTest();
+            //obj2.getMethodTest();
+           obj2.getMethodTest();
+            //obj.patchMethodTest();
             System.out.println("Success");
 
         } catch (Exception ee) {

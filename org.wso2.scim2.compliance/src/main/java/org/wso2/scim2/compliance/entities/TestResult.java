@@ -26,14 +26,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class TestResult {
 
-    private static String[] statusLabels = new String[] { ComplianceConstants.TestConstants.LABEL_IMPORTANT,
+    private static String[] statusLabels = new String[]{ComplianceConstants.TestConstants.LABEL_IMPORTANT,
             ComplianceConstants.TestConstants.LABEL_SUCCESS, ComplianceConstants.TestConstants.LABEL_INFO};
 
-    private static String[] statusTexts  = new String[] { ComplianceConstants.TestConstants.FAILED,
-            ComplianceConstants.TestConstants.SUCCESS, ComplianceConstants.TestConstants.SKIPPED };
+    private static String[] statusTexts = new String[]{ComplianceConstants.TestConstants.FAILED,
+            ComplianceConstants.TestConstants.SUCCESS, ComplianceConstants.TestConstants.SKIPPED};
 
     public static final int ERROR = 0;
-    public static final int SUCCESS  = 1;
+    public static final int SUCCESS = 1;
     public static final int SKIPPED = 2;
 
     @XmlElement(name = "name")
@@ -53,10 +53,12 @@ public class TestResult {
 
     private int status;
 
-    public TestResult() {}
+    public TestResult() {
 
+    }
 
     public TestResult(int status, String name, String message, Wire wire) {
+
         this.name = name;
         this.message = message;
         this.wire = wire;
@@ -66,7 +68,8 @@ public class TestResult {
         this.statusLabel = statusLabels[status];
     }
 
-    public TestResult(int status, ComplianceException complianceException){
+    public TestResult(int status, ComplianceException complianceException) {
+
         this.name = complianceException.getDetail();
         this.message = "";
         this.wire = null;
@@ -77,27 +80,32 @@ public class TestResult {
     }
 
     public int getStatus() {
+
         return this.status;
     }
 
-
     public String getMessage() {
+
         return message;
     }
 
     public Wire getWire() {
+
         return wire;
     }
 
     public String getName() {
+
         return name;
     }
 
     public String getStatusText() {
+
         return statusText;
     }
 
     public String getStatusLabel() {
+
         return statusLabel;
     }
 }

@@ -50,7 +50,6 @@ import org.wso2.scim2.compliance.tests.common.ResponseValidateTests;
 import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
-
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -92,9 +91,9 @@ public class UserTestImpl implements ResourceType {
 
         ArrayList<String> definedUsers = new ArrayList<>();
 
-        if (noOfUsers == "One") {
+        if (noOfUsers.equals("One")) {
             definedUsers.add(ComplianceConstants.DefinedInstances.defineUser);
-        } else if (noOfUsers == "Many") {
+        } else if (noOfUsers.equals("Many")) {
             definedUsers.add(ComplianceConstants.DefinedInstances.definedUser1);
             definedUsers.add(ComplianceConstants.DefinedInstances.definedUser2);
             definedUsers.add(ComplianceConstants.DefinedInstances.definedUser3);
@@ -334,56 +333,44 @@ public class UserTestImpl implements ResourceType {
 
         // Creating objects to store sub test information.
         RequestPath requestPath1 = new RequestPath();
-        requestPath1.setUrl("/");
+        requestPath1.setUrl(StringUtils.EMPTY);
         requestPath1.setTestCaseName("List Users");
 
-//        RequestPath requestPath2 = new RequestPath();
-//        requestPath2.setUrl("/" + userIDs.get(0));
-//        requestPath2.setTestCaseName("Get user by ID");
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setUrl("?filter=userName+eq+loginUser1");
+        requestPath2.setTestCaseName("Get user with Filter");
 
         RequestPath requestPath3 = new RequestPath();
-        requestPath3.setUrl("?filter=userName+eq+loginUser1");
-        requestPath3.setTestCaseName("Get user with Filter");
+        requestPath3.setUrl("?startIndex=1&count=2");
+        requestPath3.setTestCaseName("Get users with Pagination");
 
         RequestPath requestPath4 = new RequestPath();
-        requestPath4.setUrl("?startIndex=1&count=2");
-        requestPath4.setTestCaseName("Get users with Pagination");
+        requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
+        requestPath4.setTestCaseName("Sort test");
 
         RequestPath requestPath5 = new RequestPath();
-        requestPath5.setUrl("?sortBy=id&sortOrder=ascending");
-        requestPath5.setTestCaseName("Sort test");
+        requestPath5.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        requestPath5.setTestCaseName("Filter with pagination test");
 
         RequestPath requestPath6 = new RequestPath();
-        requestPath6.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
-        requestPath6.setTestCaseName("Filter with pagination test");
+        requestPath6.setUrl("?startIndex=-1&count=2");
+        requestPath6.setTestCaseName("Get users having negative number as index");
 
         RequestPath requestPath7 = new RequestPath();
-        requestPath7.setUrl("?startIndex=-1&count=2");
-        requestPath7.setTestCaseName("Get users having negative number as index");
+        requestPath7.setUrl("?count=2");
+        requestPath7.setTestCaseName("Get users without index and only using count");
 
         RequestPath requestPath8 = new RequestPath();
-        requestPath8.setUrl("?count=2");
-        requestPath8.setTestCaseName("Get users without index and only using count");
+        requestPath8.setUrl("?attributes=userName,name.givenName");
+        requestPath8.setTestCaseName("Get users with specific attributes");
 
         RequestPath requestPath9 = new RequestPath();
-        requestPath9.setUrl("?attributes=userName,name.givenName");
-        requestPath9.setTestCaseName("Get users with specific attributes");
-
-        RequestPath requestPath10 = new RequestPath();
-        requestPath10.setUrl("?excludedAttributes=name.givenName,emails");
-        requestPath10.setTestCaseName("Get users with excluding attributes");
-
-//        RequestPath requestPath11 = new RequestPath();
-//        requestPath11.setUrl(String.format("/%s/?attributes=userName,name.givenName", userIDs.get(0)));
-//        requestPath11.setTestCaseName("Get a user with specific attributes");
-//
-//        RequestPath requestPath12 = new RequestPath();
-//        requestPath12.setUrl(String.format("/%s/?excludedAttributes=name.givenName,emails", userIDs.get(0)));
-//        requestPath12.setTestCaseName("Get a user with excluding attributes");
+        requestPath9.setUrl("?excludedAttributes=name.givenName,emails");
+        requestPath9.setTestCaseName("Get users with excluding attributes");
 
         // This array hold the sub tests details.
-        requestPaths = new RequestPath[]{requestPath1, requestPath3, requestPath4, requestPath5, requestPath6,
-                requestPath7, requestPath8, requestPath9, requestPath10};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6, requestPath7, requestPath8, requestPath9};
 
     }
 
@@ -925,6 +912,11 @@ public class UserTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
+        try {
+            System.out.println(complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported());
+        } catch (CharonException e) {
+            System.out.println(e);
+        }
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
