@@ -34,13 +34,16 @@ public class FactoryMain {
         ResourceType obj = e.getInstance("user");
         ResourceType obj2 = e.getInstance("group");
         ResourceType obj3 = e.getInstance("serviceProviderConfig");
+        ResourceType obj4 = e.getInstance("resourceType");
         try {
             ArrayList<TestResult> userTestResults;
-           //userTestResults = obj.getMethodTest();
+            //userTestResults = obj.getByIdMethodTest();
 
             //obj2.getMethodTest();
-           obj2.getMethodTest();
+            //  obj2.postMethodTest();
+            //  obj3.getMethodTest();
             //obj.patchMethodTest();
+            obj4.getMethodTest();
             System.out.println("Success");
 
         } catch (Exception ee) {

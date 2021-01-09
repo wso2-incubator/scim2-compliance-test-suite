@@ -154,96 +154,7 @@ public class UserTestImpl implements ResourceType {
         return userIDs;
     }
 
-    /**
-     * This method creates a user and return its id.
-     *
-     * @return
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
-     */
-    private String initiateUser(String testName) throws GeneralComplianceException, ComplianceException {
 
-        User user = null;
-
-        HttpPost method = new HttpPost(url);
-        // Create user test.
-        HttpClient client = HTTPClient.getHttpClient();
-
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
-
-        HttpResponse response = null;
-        String responseString = StringUtils.EMPTY;
-        String headerString = StringUtils.EMPTY;
-        String responseStatus = StringUtils.EMPTY;
-        ArrayList<String> subTests = new ArrayList<>();
-        try {
-            // Create the user.
-            HttpEntity entity = new ByteArrayEntity
-                    (ComplianceConstants.DefinedInstances.defineUser.getBytes("UTF-8"));
-            method.setEntity(entity);
-            response = client.execute(method);
-            // Read the response body.
-            responseString = new BasicResponseHandler().handleResponse(response);
-            // Get all headers.
-            Header[] headers = response.getAllHeaders();
-            for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
-            }
-            responseStatus = response.getStatusLine().getStatusCode() + " " +
-                    response.getStatusLine().getReasonPhrase();
-
-        } catch (Exception e) {
-            // Read the response body.
-            // Get all headers.
-            Header[] headers = response.getAllHeaders();
-            for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
-            }
-            responseStatus = response.getStatusLine().getStatusCode() + " "
-                    + response.getStatusLine().getReasonPhrase();
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
-                    "Could not create default user at url " + url,
-                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-        }
-
-        if (response.getStatusLine().getStatusCode() == 201) {
-            // Obtain the schema corresponding to user.
-            // Unless configured returns core-user schema or else returns extended user schema.
-            SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
-
-            JSONDecoder jsonDecoder = new JSONDecoder();
-            try {
-                user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
-
-            } catch (BadRequestException | CharonException | InternalErrorException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
-                        "Could not decode the server response",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-            }
-            try {
-                ResponseValidateTests.runValidateTests(user, schema, null, null, method,
-                        responseString, headerString, responseStatus, subTests);
-
-            } catch (BadRequestException | CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
-                        "Response validation error",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-            }
-            try {
-                return user.getId();
-            } catch (CharonException e) {
-                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
-                        "User id retrieval error occurred.",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-            }
-        } else {
-            throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
-                    "Initiating User caused an error.",
-                    ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
-        }
-    }
 
     /**
      * This method cleans up the created used with the given id.
@@ -483,7 +394,7 @@ public class UserTestImpl implements ResourceType {
 
                 // Check for all created groups.
                 if (requestPaths[i].getTestCaseName() == "List Users") {
-                    try {
+
                         //check for list of users returned
                         subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
                         ArrayList<String> returnedUserIDs = new ArrayList<>();
@@ -500,11 +411,7 @@ public class UserTestImpl implements ResourceType {
                                 continue;
                             }
                         }
-                    } catch (CharonException e) {
 
-//                    throw new ComplianceException(500, "Could not get the created user id");
-                        continue;
-                    }
                 } else if (requestPaths[i].getTestCaseName() == "Get user with Filter") {
 
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
@@ -742,7 +649,8 @@ public class UserTestImpl implements ResourceType {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
+                                "Server successfully given the expected error 404(User not found in the user store) " +
+                                        "message", ComplianceUtils.getWire(method, responseString, headerString,
                                 responseStatus, subTests)));
             } else {
                 // Clean the created user.
@@ -881,7 +789,7 @@ public class UserTestImpl implements ResourceType {
 
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "Server successfully given the expected error 404(Required attribute userName is " +
+                                "Server successfully given the expected error 400(Required attribute userName is " +
                                         "missing in the SCIM Object) message",
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString, responseStatus, subTests)));

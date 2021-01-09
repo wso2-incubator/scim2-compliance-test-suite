@@ -148,11 +148,11 @@ public class ResponseValidateTests {
             throws GeneralComplianceException, CharonException, ComplianceException {
 
         if (attribute != null) {
-            List<SCIMAttributeSchema> subAttributesSchemaList =
+            List<AttributeSchema> subAttributesSchemaList =
                     ((SCIMAttributeSchema) attributeSchema).getSubAttributeSchemas();
 
             if (subAttributesSchemaList != null) {
-                for (SCIMAttributeSchema subAttributeSchema : subAttributesSchemaList) {
+                for (AttributeSchema subAttributeSchema : subAttributesSchemaList) {
                     if (subAttributeSchema.getRequired()) {
 
                         if (attribute instanceof ComplexAttribute) {
@@ -194,7 +194,7 @@ public class ResponseValidateTests {
                             }
                         }
                     }
-                    List<SCIMAttributeSchema> subSubAttributesSchemaList =
+                    List<AttributeSchema> subSubAttributesSchemaList =
                             ((SCIMAttributeSchema) subAttributeSchema).getSubAttributeSchemas();
                     if (subSubAttributesSchemaList != null) {
                         validateSCIMObjectForRequiredSubAttributes(subAttribute, subAttributeSchema,

@@ -52,7 +52,7 @@ public class ComplianceConstants {
         public static final String SKIPPED = "Skipped";
 
         public static final String SERVICE_PROVIDER_ENDPOINT = "/ServiceProviderConfig";
-        public static final String RESOURCE_TYPE_ENDPOINT = "/ResourceType";
+        public static final String RESOURCE_TYPE_ENDPOINT = "/ResourceTypes";
         public static final String USERS_ENDPOINT = "/Users";
         public static final String GROUPS_ENDPOINT = "/Groups";
         public static final String ME_ENDPOINT = "/Me";
@@ -80,8 +80,8 @@ public class ComplianceConstants {
      */
     public static class DefinedInstances {
 
-        public static String DEFINED_USER_PASSWORD = "7019asd84";
-        public static String DEFINED_USER_USERNAME = "bjensenexamplecom";
+        public static String defineUserPassword = "7019asd84";
+        public static String defineUserName = "bjensenexamplecom";
 
         public static String defineUser =
                 "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +
@@ -135,7 +135,8 @@ public class ComplianceConstants {
                         "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedWithoutUserNameUser =
-                "{\"name\":{\"givenName\":\"Samindra\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\",\"emails\":[{" +
+                "{\"name\":{\"givenName\":\"Samindra\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\"," +
+                        "\"emails\":[{" +
                         "\"value\": \"Samindra@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"Samindra@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
@@ -192,7 +193,15 @@ public class ComplianceConstants {
                         ".familyName\",\"userName\"],\"filter\":\"userName ssw login\"," +
                         "\"domain\": \"PRIMARY\",\"startIndex\":1,\"count\":10}";
 
-        public static String DEFINED_BULK_REQUEST = "{\"failOnErrors\":1,\"schemas\":" +
+        public static String getDefinedSearchGroupsPayload1 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
+                        "\"count\":10,\"filter\":\"displayName eq XwLtOP23\"}";
+
+        public static String getDefinedSearchGroupsPayload2 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
+                        "\"count\":10,\"filter\":\"displayName esq XwLtOP23\"}";
+
+        public static String defineBulkRequest = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
                 "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +
                 "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +

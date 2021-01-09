@@ -21,6 +21,7 @@ package org.wso2.scim2.compliance.protocol;
 import org.wso2.scim2.compliance.objects.SCIMSchema;
 import org.wso2.scim2.compliance.tests.GroupTestImpl;
 import org.wso2.scim2.compliance.tests.ResourceType;
+import org.wso2.scim2.compliance.tests.ResourceTypeTestImpl;
 import org.wso2.scim2.compliance.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.compliance.tests.UserTestImpl;
 
@@ -52,6 +53,8 @@ public class EndpointFactory {
             return new UserTestImpl(complianceTestMetaDataHolder);
         } else if (str.equals("group")) {
             return new GroupTestImpl(complianceTestMetaDataHolder);
+        } else if (str.equals("resourceType")) {
+            return new ResourceTypeTestImpl(complianceTestMetaDataHolder);
         }
         return null;
     }

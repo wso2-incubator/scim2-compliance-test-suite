@@ -194,8 +194,8 @@ public class SchemaBuilder {
 
                 }
             }
-            scimAttributeSchema.setSubAttributes(subAttributes);
-            attributeSchemaList.add(scimAttributeSchema);
+//            scimAttributeSchema.setSubAttributes(subAttributes);
+//            attributeSchemaList.add(scimAttributeSchema);
         }
         return SCIMResourceTypeSchema.createSCIMResourceSchema(schemaURIs,
                 attributeSchemaList.toArray(new SCIMAttributeSchema[attributeSchemaList.size()]));
