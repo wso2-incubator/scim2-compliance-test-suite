@@ -35,6 +35,7 @@ public class FactoryMain {
         ResourceType obj2 = e.getInstance("group");
         ResourceType obj3 = e.getInstance("serviceProviderConfig");
         ResourceType obj4 = e.getInstance("resourceType");
+        ResourceType obj5 = e.getInstance("schemaTest");
         try {
             ArrayList<TestResult> userTestResults;
             //userTestResults = obj.getByIdMethodTest();
@@ -43,7 +44,7 @@ public class FactoryMain {
             //  obj2.postMethodTest();
             //  obj3.getMethodTest();
             //obj.patchMethodTest();
-            obj4.getMethodTest();
+            obj5.getMethodTest();
             System.out.println("Success");
 
         } catch (Exception ee) {

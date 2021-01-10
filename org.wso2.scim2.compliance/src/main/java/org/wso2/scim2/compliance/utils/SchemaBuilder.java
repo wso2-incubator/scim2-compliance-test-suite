@@ -1,18 +1,19 @@
 package org.wso2.scim2.compliance.utils;
 
+import org.apache.http.client.methods.HttpGet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.wso2.charon3.core.schema.AttributeSchema;
+import org.wso2.charon3.core.schema.SCIMAttributeSchema;
+import org.wso2.charon3.core.schema.SCIMConstants;
+import org.wso2.charon3.core.schema.SCIMDefinitions;
+import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
 import org.wso2.scim2.compliance.exception.CriticalComplianceException;
 import org.wso2.scim2.compliance.objects.SCIMSchema;
 import org.wso2.scim2.compliance.protocol.ComplianceUtils;
-import org.apache.http.client.methods.HttpGet;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.wso2.charon3.core.schema.SCIMAttributeSchema;
-import org.wso2.charon3.core.schema.SCIMConstants;
-import org.wso2.charon3.core.schema.SCIMDefinitions;
-import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +84,8 @@ public class SchemaBuilder {
                     ArrayList currentAttributes = scimSchema.getUserSchema().getAttributesList();
                     SCIMResourceTypeSchema extensionSchema = buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(ComplianceConstants.TestConstants.EXTENSION_SCHEMA_URI)));
+                            new ArrayList<String>(Arrays.asList(ComplianceConstants.TestConstants.
+                                    EXTENSION_SCHEMA_URI)));
                     currentAttributes.add(extensionSchema.getAttributesList());
                     scimSchema.getUserSchema().setAttributeList(currentAttributes);
                 }
@@ -161,7 +163,7 @@ public class SchemaBuilder {
                     (attribute, resourceId + ":" + name,
                             method, responseStatus, subTests, headerString, jsonSchema, url);
 
-            ArrayList<SCIMAttributeSchema> subAttributes = new ArrayList<>();
+            ArrayList<AttributeSchema> subAttributes = new ArrayList<>();
 
             if (attribute.has("subAttributes")) {
                 JSONArray subAttributesArray = attribute.optJSONArray("subAttributes");
@@ -194,8 +196,8 @@ public class SchemaBuilder {
 
                 }
             }
-//            scimAttributeSchema.setSubAttributes(subAttributes);
-//            attributeSchemaList.add(scimAttributeSchema);
+            scimAttributeSchema.setSubAttributes(subAttributes);
+            attributeSchemaList.add(scimAttributeSchema);
         }
         return SCIMResourceTypeSchema.createSCIMResourceSchema(schemaURIs,
                 attributeSchemaList.toArray(new SCIMAttributeSchema[attributeSchemaList.size()]));

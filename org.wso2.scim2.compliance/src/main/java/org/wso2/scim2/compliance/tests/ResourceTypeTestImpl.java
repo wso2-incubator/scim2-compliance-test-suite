@@ -76,11 +76,11 @@ public class ResourceTypeTestImpl implements ResourceType {
         ArrayList<String> subTests = new ArrayList<>();
 
         try {
-            //get the resource types
+            // Get the resource types.
             response = client.execute(method);
             // Read the response body.
             responseString = new BasicResponseHandler().handleResponse(response);
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString += header.getName() + " : " + header.getValue() + "\n";
@@ -102,7 +102,7 @@ public class ResourceTypeTestImpl implements ResourceType {
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
-            //obtain the schema corresponding to resourceType
+            // Obtain the schema corresponding to resourceType.
             SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.
                     getInstance().getResourceTypeResourceSchema();
             JSONDecoder jsonDecoder = new JSONDecoder();
