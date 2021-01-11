@@ -81,7 +81,7 @@ public class ComplianceConstants {
     public static class DefinedInstances {
 
         public static String defineUserPassword = "7019asd84";
-        public static String defineUserName = "bjensenexamplecom";
+        public static String defineUserName = "loginUser";
 
         public static String defineUser =
                 "{\"name\":{\"givenName\":\"Kim\",\"familyName\":\"Berry\"},\"password\": \"7019asd84\",\"userName\":" +

@@ -36,15 +36,21 @@ public class FactoryMain {
         ResourceType obj3 = e.getInstance("serviceProviderConfig");
         ResourceType obj4 = e.getInstance("resourceType");
         ResourceType obj5 = e.getInstance("schemaTest");
+        ResourceType obj6 = e.getInstance("me");
         try {
             ArrayList<TestResult> userTestResults;
             //userTestResults = obj.getByIdMethodTest();
-
-            //obj2.getMethodTest();
-            //  obj2.postMethodTest();
+//            obj2.patchMethodTest();
+//            obj2.getByIdMethodTest();
+//            obj2.searchMethodTest();
+//            obj2.deleteMethodTest();
+//
+//            obj2.getMethodTest();
+//            obj2.postMethodTest();
             //  obj3.getMethodTest();
             //obj.patchMethodTest();
-            obj5.getMethodTest();
+//            obj2.putMethodTest();
+            obj6.getMethodTest();
             System.out.println("Success");
 
         } catch (Exception ee) {
