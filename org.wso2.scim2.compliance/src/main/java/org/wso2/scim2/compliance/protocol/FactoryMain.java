@@ -39,6 +39,9 @@ public class FactoryMain {
         ResourceType obj6 = e.getInstance("me");
         try {
             ArrayList<TestResult> userTestResults;
+            obj3.getMethodTest();
+            obj4.getMethodTest();
+            obj5.getMethodTest();
             //userTestResults = obj.getByIdMethodTest();
 //            obj2.patchMethodTest();
 //            obj2.getByIdMethodTest();
@@ -50,7 +53,8 @@ public class FactoryMain {
             //  obj3.getMethodTest();
             //obj.patchMethodTest();
 //            obj2.putMethodTest();
-            obj6.getMethodTest();
+          // obj6.patchMethodTest();
+            //obj.patchMethodTest();
             System.out.println("Success");
 
         } catch (Exception ee) {

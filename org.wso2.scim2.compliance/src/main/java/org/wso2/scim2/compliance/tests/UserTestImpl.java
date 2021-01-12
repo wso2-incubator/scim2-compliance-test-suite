@@ -748,11 +748,11 @@ public class UserTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        try {
-            System.out.println(complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported());
-        } catch (CharonException e) {
-            System.out.println(e);
-        }
+//        try {
+//            System.out.println(complianceTestMetaDataHolder.getScimServiceProviderConfig().getPatchSupported());
+//        } catch (CharonException e) {
+//            System.out.println(e);
+//        }
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
@@ -828,7 +828,7 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
-                cleanUpUser(id, "Patch User");
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
                 if (requestPaths[i].getTestCaseName() != "Patch User error validation") {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default user at url " + url,
@@ -846,7 +846,7 @@ public class UserTestImpl implements ResourceType {
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
-                    cleanUpUser(id, "Patch User");
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
@@ -858,14 +858,14 @@ public class UserTestImpl implements ResourceType {
                             responseString, headerString, responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
                     // Clean the created user.
-                    cleanUpUser(id, "Patch User");
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                     continue;
                 }
                 // Clean the created user.
-                cleanUpUser(id, "Patch User");
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
@@ -880,7 +880,7 @@ public class UserTestImpl implements ResourceType {
                                         responseStatus, subTests)));
             } else {
                 // Clean the created user.
-                cleanUpUser(id, "Patch User");
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,

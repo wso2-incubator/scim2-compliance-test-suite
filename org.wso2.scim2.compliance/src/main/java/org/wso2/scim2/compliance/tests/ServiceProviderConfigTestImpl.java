@@ -31,10 +31,10 @@ import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.compliance.entities.TestResult;
 import org.wso2.scim2.compliance.exception.ComplianceException;
-import org.wso2.scim2.compliance.exception.CriticalComplianceException;
+//import org.wso2.scim2.compliance.exception.CriticalComplianceException;
 import org.wso2.scim2.compliance.exception.GeneralComplianceException;
 import org.wso2.scim2.compliance.httpclient.HTTPClient;
-import org.wso2.scim2.compliance.objects.SCIMSchema;
+//import org.wso2.scim2.compliance.objects.SCIMSchema;
 import org.wso2.scim2.compliance.objects.SCIMServiceProviderConfig;
 import org.wso2.scim2.compliance.protocol.ComplianceTestMetaDataHolder;
 import org.wso2.scim2.compliance.protocol.ComplianceUtils;
@@ -61,6 +61,12 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
     }
 
+    /**
+     * Method to get the service provider configs.
+     * @return arrays pf test results
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -82,7 +88,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
 
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
-        String headerString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
 
@@ -94,7 +100,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
             //get all headers
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
@@ -102,7 +108,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         } catch (Exception e) {
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
@@ -111,7 +117,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
                     (TestResult.ERROR, "Get ServiceProviderConfig",
                             "Could not get ServiceProviderConfig at url " + url,
                             ComplianceUtils.getWire(method, responseString,
-                                    headerString, responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests)));
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
@@ -126,39 +132,39 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
                                 jsonDecoder.decodeResource(responseString, schema,
                                         new SCIMServiceProviderConfig());
                 complianceTestMetaDataHolder.setScimServiceProviderConfig(scimServiceProviderConfig);
-
-                System.out.println(scimServiceProviderConfig.getEtagSupported());
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         "Could not decode the server response",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                subTests)));
                 errorOccured = true;
             }
             try {
                 ResponseValidateTests.runValidateTests(scimServiceProviderConfig, schema, null, null, method,
-                        responseString, headerString, responseStatus, subTests);
+                        responseString, headerString.toString(), responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         "Response Validation Error",
-                        ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
+                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                subTests)));
                 errorOccured = true;
             } catch (GeneralComplianceException e) {
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         e.getResult().getMessage(), ComplianceUtils.getWire(method,
-                        responseString, headerString, responseStatus, subTests)));
+                        responseString, headerString.toString(), responseStatus, subTests)));
                 errorOccured = true;
             }
             if (errorOccured == false) {
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Get ServiceProviderConfig",
-                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
-                                responseStatus, subTests)));
+                        (TestResult.SUCCESS, "Get ServiceProviderConfig", StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
             }
         } else {
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get ServiceProviderConfig",
-                            StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
+                            StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString.toString(),
                             responseStatus, subTests)));
         }
         return testResults;

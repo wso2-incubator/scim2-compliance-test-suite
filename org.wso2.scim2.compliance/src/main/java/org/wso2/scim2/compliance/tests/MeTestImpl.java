@@ -25,7 +25,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.wso2.charon3.core.encoder.JSONDecoder;
@@ -70,7 +72,7 @@ public class MeTestImpl implements ResourceType {
     /**
      * Create test users.
      *
-     * @return
+     * @return array of userIds
      * @throws ComplianceException
      * @throws GeneralComplianceException
      */
@@ -148,8 +150,8 @@ public class MeTestImpl implements ResourceType {
     /**
      * This method cleans up the created used with the given id.
      *
-     * @param id
-     * @return
+     * @param id of a user and testcase name
+     * @return boolean
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
@@ -203,6 +205,12 @@ public class MeTestImpl implements ResourceType {
         }
     }
 
+    /**
+     * Get me test case.
+     * @return array of test results
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -262,11 +270,14 @@ public class MeTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                testResults.add(new TestResult(TestResult.ERROR,  requestPaths[i].getTestCaseName(),
-                        "Could not get the default user from url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
-                continue;
+                if (response.getStatusLine().getStatusCode() != 501 &
+                        response.getStatusLine().getStatusCode() != 308) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not get the default user from url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
                 // Obtain the schema corresponding to user.
@@ -277,7 +288,7 @@ public class MeTestImpl implements ResourceType {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    testResults.add(new TestResult(TestResult.ERROR,  requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests)));
@@ -288,19 +299,32 @@ public class MeTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    testResults.add(new TestResult(TestResult.ERROR,  requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests)));
                     continue;
                 }
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS,  requestPaths[i].getTestCaseName(), StringUtils.EMPTY, ComplianceUtils.getWire(method,
-                                responseString, headerString.toString(),
-                                responseStatus, subTests)));
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 308) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to redirect the client using HTTP status code 308 ",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
             } else {
                 testResults.add(new TestResult
-                        (TestResult.ERROR,  requestPaths[i].getTestCaseName(),
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests)));
             }
@@ -317,9 +341,8 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Create Me test case.
-     *
-     * @return
+     * Post me test case.
+     * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
@@ -387,7 +410,7 @@ public class MeTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (response.getStatusLine().getStatusCode() != 501 ||
+                if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308) {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
@@ -456,8 +479,8 @@ public class MeTestImpl implements ResourceType {
                                         responseStatus, subTests)));
             } else if (response.getStatusLine().getStatusCode() == 308) {
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                "service provider MAY choose to redirect the client using HTTP status code 308 ",
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                         subTests)));
             } else {
@@ -470,22 +493,429 @@ public class MeTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Patch me test case.
+     * @return array of test results
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+
+        ArrayList<String> definedUsers = new ArrayList<>();
+
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload1);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload2);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload4);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload5);
+
+        ArrayList<String> userIDs = new ArrayList<>();
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Patch Me with add operation");
+
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Patch Me with remove operation");
+
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Patch Me with replace operation");
+
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setTestCaseName("Patch Me with array of operations");
+
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setTestCaseName("Patch Me error validation");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            //create default user;
+            ArrayList<String> userID;
+            userID = createTestsUsers("One");
+            String id = userID.get(0);
+            User user = null;
+            String patchUserURL = null;
+            HttpPatch method = new HttpPatch(url);
+            // Create user test.
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpPatch) HTTPClient.setAuthorizationHeader(
+                    ComplianceConstants.DefinedInstances.defineUserName,
+                    ComplianceConstants.DefinedInstances.defineUserPassword,
+                    method);
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                // Patch the user.
+                HttpEntity entity = new ByteArrayEntity
+                        (definedUsers.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                method.setHeader("Accept", "application/json");
+                method.setHeader("Content-Type", "application/json");
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                // Clean the created user.
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                if (response.getStatusLine().getStatusCode() != 501 &
+                        response.getStatusLine().getStatusCode() != 308 & requestPaths[i].getTestCaseName() != "Patch" +
+                        " Me error validation") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not patch the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200) {
+                // Obtain the schema corresponding to user.
+                // Unless configured returns core-user schema or else returns extended user schema).
+                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+                JSONDecoder jsonDecoder = new JSONDecoder();
+                try {
+                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+
+                } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    // Clean the created user.
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+                try {
+                    ResponseValidateTests.runValidateTests(user, schema, null,
+                            null, method,
+                            responseString, headerString.toString(), responseStatus, subTests);
+                } catch (BadRequestException | CharonException e) {
+                    // Clean the created user.
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Response Validation Error",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+                // Clean the created user.
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "Patch Me error validation" &&
+                    response.getStatusLine().getStatusCode() == 400) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error 400",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 308) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to redirect the client using HTTP status code 308 ",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus,
+                                        subTests)));
+            } else {
+                // Clean the created user.
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            }
+        }
+        return testResults;
     }
 
+    /**
+     * Put me test case.
+     * @return array of test results
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+
+        ArrayList<String> definedUsers = new ArrayList<>();
+
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedUpdatedUser1);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedUpdatedUser2);
+        ArrayList<String> userIDs = new ArrayList<>();
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Update Me");
+
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Update Me with schema violation");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            User user = null;
+            ArrayList<String> userID = null;
+            // Create 1 test user.
+            userID = createTestsUsers("One");
+            String id = userID.get(0);
+            HttpPut method = new HttpPut(url);
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpPut) HTTPClient.setAuthorizationHeader(
+                    ComplianceConstants.DefinedInstances.defineUserName,
+                    ComplianceConstants.DefinedInstances.defineUserPassword,
+                    method);
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                //update the user
+                HttpEntity entity = new ByteArrayEntity
+                        (definedUsers.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                method.setHeader("Accept", "application/json");
+                method.setHeader("Content-Type", "application/json");
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+            } catch (Exception e) {
+                // Read the response body.
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                if (response.getStatusLine().getStatusCode() != 501 &
+                        response.getStatusLine().getStatusCode() != 308 &
+                        requestPaths[i].getTestCaseName() != "Update Me with schema violation") {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not update the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200) {
+                //obtain the schema corresponding to user
+                // unless configured returns core-user schema or else returns extended user schema)
+                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
+                JSONDecoder jsonDecoder = new JSONDecoder();
+                try {
+                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+
+                } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+                try {
+                    ResponseValidateTests.runValidateTests(user, schema, null,
+                            null, method,
+                            responseString, headerString.toString(), responseStatus, subTests);
+
+                } catch (BadRequestException | CharonException e) {
+                    cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Response Validation Error",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 308) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to redirect the client using HTTP status code 308 ",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
+            } else if (requestPaths[i].getTestCaseName() == "Update Me with " +
+                    "schema violation" &&
+                    response.getStatusLine().getStatusCode() == 400) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error 400",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else {
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            }
+        }
+        return testResults;
     }
 
+    /**
+     * Delete me test case.
+     * @return array of test results
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+
+        ArrayList<String> userIDs = new ArrayList<>();
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setUrl(StringUtils.EMPTY);
+        requestPath1.setTestCaseName("Delete user by ID");
+
+//        RequestPath requestPath2 = new RequestPath();
+//        requestPath2.setUrl(generateUniqueID());
+//        requestPath2.setTestCaseName("User not found error response");
+
+        requestPaths = new RequestPath[]{requestPath1};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            User user = null;
+            ArrayList<String> userID = null;
+            // Create 1 test user.
+            userID = createTestsUsers("One");
+            String id = userID.get(0);
+            HttpDelete method = new HttpDelete(url);
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpDelete) HTTPClient.setAuthorizationHeader(
+                    ComplianceConstants.DefinedInstances.defineUserName,
+                    ComplianceConstants.DefinedInstances.defineUserPassword,
+                    method);
+            method.setHeader("Accept", "application/json");
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                if (response.getStatusLine().getStatusCode() != 501 &
+                        response.getStatusLine().getStatusCode() != 308 &
+                        response.getStatusLine().getStatusCode() != 403) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not delete the default user at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+            }
+
+            if (response.getStatusLine().getStatusCode() == 204) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 308) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to redirect the client using HTTP status code 308 ",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
+            } else if (response.getStatusLine().getStatusCode() == 403) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "service provider choose to prohibit action giving 403",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
+            } else {
+                cleanUpUser(id, requestPaths[i].getTestCaseName());
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            }
+        }
+        return testResults;
     }
 
     @Override

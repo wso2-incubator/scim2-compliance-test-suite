@@ -80,7 +80,7 @@ public class SchemaTestImpl implements ResourceType {
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
-        String headerString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         try {
@@ -91,14 +91,14 @@ public class SchemaTestImpl implements ResourceType {
             // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
         } catch (Exception e) {
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
-                headerString += header.getName() + " : " + header.getValue() + "\n";
+                headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
@@ -106,31 +106,30 @@ public class SchemaTestImpl implements ResourceType {
                     (TestResult.ERROR, "Get Schemas",
                             "Could not get Schemas at url " + url,
                             ComplianceUtils.getWire(method, responseString,
-                                    headerString, responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests)));
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
             // Build the schemas according to service provider.
             try {
-                SchemaBuilder.buildSchema(responseString, method, headerString, responseStatus,
+                SchemaBuilder.buildSchema(responseString, method, headerString.toString(), responseStatus,
                         subTests, url, scimSchema);
             } catch (CriticalComplianceException e) {
                 testResults.add(new TestResult(TestResult.ERROR,
                         "Get ResourceType",
                         e.getResult().getMessage(), ComplianceUtils.getWire(method,
-                        responseString, headerString, responseStatus, subTests)));
+                        responseString, headerString.toString(), responseStatus, subTests)));
                 errorOccured = true;
             }
             if (errorOccured == false) {
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Get Schemas",
-                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
-                                responseStatus, subTests)));
+                        (TestResult.SUCCESS, "Get Schemas", StringUtils.EMPTY, ComplianceUtils.getWire(method,
+                                responseString, headerString.toString(), responseStatus, subTests)));
             }
         } else {
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get Schemas",
-                            StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString,
+                            StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString.toString(),
                             responseStatus, subTests)));
         }
         return testResults;
