@@ -40,8 +40,12 @@ public class FactoryMain {
         try {
             ArrayList<TestResult> userTestResults;
             obj3.getMethodTest();
-            obj4.getMethodTest();
-            obj5.getMethodTest();
+            //  obj.getMethodTest();
+            // obj.patchMethodTest();
+            obj2.patchMethodTest();
+            obj.patchMethodTest();
+            //  obj4.getMethodTest();
+            //obj5.getMethodTest();
             //userTestResults = obj.getByIdMethodTest();
 //            obj2.patchMethodTest();
 //            obj2.getByIdMethodTest();
@@ -53,7 +57,7 @@ public class FactoryMain {
             //  obj3.getMethodTest();
             //obj.patchMethodTest();
 //            obj2.putMethodTest();
-          // obj6.patchMethodTest();
+            // obj6.patchMethodTest();
             //obj.patchMethodTest();
             System.out.println("Success");
 

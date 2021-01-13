@@ -19,12 +19,13 @@
 package org.wso2.scim2.compliance.tests.model;
 
 /**
- * Implemetation of  URL builder.
+ * Implementation of  URL builder.
  */
 public class RequestPath {
 
     private String url;
     private String testCaseName;
+    private boolean supported = true;
 
     /**
      * Get url.
@@ -59,11 +60,31 @@ public class RequestPath {
     /**
      * Set testCaseName.
      *
-     * @param testCaseName to Function settestCaseName
+     * @param testCaseName to Function set testCaseName
      */
     public void setTestCaseName(String testCaseName) {
 
         this.testCaseName = testCaseName;
+    }
+
+    /**
+     * Get supported value.
+     *
+     * @return supported value.
+     */
+    public boolean getTestSupported() {
+
+        return supported;
+    }
+
+    /**
+     * Set supported value..
+     *
+     * @param supported value to Function setTestSupported
+     */
+    public void setTestSupported(boolean supported) {
+
+        this.supported = supported;
     }
 
 }

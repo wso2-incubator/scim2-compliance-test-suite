@@ -396,6 +396,12 @@ public class GroupTestImpl implements ResourceType {
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setUrl("?filter=displayName+eq+EYtXcD21");
         requestPath2.setTestCaseName("Get groups with Filter");
+        try {
+            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath2.setTestSupported(true);
+        }
 
         RequestPath requestPath3 = new RequestPath();
         requestPath3.setUrl("?startIndex=1&count=2");
@@ -404,10 +410,22 @@ public class GroupTestImpl implements ResourceType {
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
         requestPath4.setTestCaseName("Sort test");
+        try {
+            requestPath4.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getSortSupported());
+        } catch (Exception e) {
+            requestPath4.setTestSupported(true);
+        }
 
         RequestPath requestPath5 = new RequestPath();
         requestPath5.setUrl("?filter=displayName+eq+EYtXcD21&startIndex=1&count=1");
         requestPath5.setTestCaseName("Filter with pagination test");
+        try {
+            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath5.setTestSupported(true);
+        }
 
         RequestPath requestPath6 = new RequestPath();
         requestPath6.setUrl("?startIndex=-1&count=2");
@@ -462,12 +480,13 @@ public class GroupTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-
-                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                        "Could not list the groups at url " + url,
-                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
-                continue;
+                if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not list the groups at url " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
                 // Obtain the schema corresponding to group.
@@ -491,7 +510,6 @@ public class GroupTestImpl implements ResourceType {
                                     responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
-
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
@@ -597,6 +615,13 @@ public class GroupTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests)));
+            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
             } else {
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -928,18 +953,48 @@ public class GroupTestImpl implements ResourceType {
 
         RequestPath requestPath1 = new RequestPath();
         requestPath1.setTestCaseName("Patch group with add operation");
+        try {
+            requestPath1.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath1.setTestSupported(true);
+        }
 
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setTestCaseName("Patch group with remove operation");
+        try {
+            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath2.setTestSupported(true);
+        }
 
         RequestPath requestPath3 = new RequestPath();
         requestPath3.setTestCaseName("Patch group with replace operation");
+        try {
+            requestPath3.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath3.setTestSupported(true);
+        }
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setTestCaseName("Patch group with array of operations");
+        try {
+            requestPath4.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath4.setTestSupported(true);
+        }
 
         RequestPath requestPath5 = new RequestPath();
         requestPath5.setTestCaseName("Patch group error validation");
+        try {
+            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath5.setTestSupported(true);
+        }
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
 
@@ -983,7 +1038,9 @@ public class GroupTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 cleanUpGroup(id, "Patch Group");
-                if (requestPaths[i].getTestCaseName() != "Patch group error validation") {
+                if (requestPaths[i].getTestCaseName() != "Patch group error validation" &&
+                        requestPaths[i].getTestSupported() != false &&
+                        response.getStatusLine().getStatusCode() != 501) {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
@@ -1031,6 +1088,13 @@ public class GroupTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests)));
 
+            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
             } else {
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 testResults.add(new TestResult

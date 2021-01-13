@@ -73,38 +73,32 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
         Boolean errorOccured = false;
-        // Construct the endpoint url
+        // Construct the endpoint url.
         String url = complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.SERVICE_PROVIDER_ENDPOINT;
-
-        // specify the get request
+        // Specify the get request.
         HttpGet method = new HttpGet(url);
-
         HttpClient client = HTTPClient.getHttpClient();
-
         method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
-
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
-
         try {
-            //get the service provider configs
+            // Get the service provider configs.
             response = client.execute(method);
             // Read the response body.
             responseString = new BasicResponseHandler().handleResponse(response);
-            //get all headers
+            // Get all headers.
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-
         } catch (Exception e) {
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
@@ -112,7 +106,6 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get ServiceProviderConfig",
                             "Could not get ServiceProviderConfig at url " + url,
@@ -121,10 +114,9 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
-            //obtain the schema corresponding to serviceProviderConfig
+            // Obtain the schema corresponding to serviceProviderConfig.
             SCIMResourceTypeSchema schema = complianceTestMetaDataHolder.getScimSchema().
                     getServiceProviderConfigSchema();
-
             JSONDecoder jsonDecoder = new JSONDecoder();
             try {
                 scimServiceProviderConfig =
