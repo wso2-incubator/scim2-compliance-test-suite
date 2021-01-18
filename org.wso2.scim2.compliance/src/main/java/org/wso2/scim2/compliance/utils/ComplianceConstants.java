@@ -183,6 +183,31 @@ public class ComplianceConstants {
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
                         "\"Operations\":[{\"op\":\"remove\",\"value\":{\"nickName\":\"shaggy\"}}]}";
 
+        public static String definedPatchUserPayload6 = "{\n" +
+                "  \"schemas\": [\n" +
+                "    \"urn:ietf:params:scim:api:messages:2.0:PatchOp\"\n" +
+                "  ],\n" +
+                "  \"Operations\": [\n" +
+                "    {\n" +
+                "      \"op\": \"add\",\n" +
+                "        \"path\":\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager\",\n" +
+                "      \"value\": \n" +
+                "        {\n" +
+                "          \"value\": \"Civil\"\n" +
+                "        }\n" +
+                "      \n" +
+                "    },\n" +
+                "      {\"op\":\"replace\",\"path\":\"urn:ietf:params:scim:schemas:extension:enterprise:2" +
+                ".0:User:manager\",\"value\": \n" +
+                "        {\n" +
+                "          \"value\": \"Civil-sub\"\n" +
+                "        }},\n" +
+                "    {\"op\":\"remove\",\"path\":\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:" +
+                "User:manager\"}\n" +
+                "  \n" +
+                "  ]\n" +
+                "}";
+
         public static String definedSearchUsersPayload1 =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
                         ".familyName\",\"userName\"],\"filter\":\"userName sw login\"," +
@@ -201,13 +226,37 @@ public class ComplianceConstants {
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
                         "\"count\":10,\"filter\":\"displayName esq XwLtOP23\"}";
 
-        public static String defineBulkRequest = "{\"failOnErrors\":1,\"schemas\":" +
+        public static String defineBulkRequest1 = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
                 "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +
                 "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
-                "\"Alice\",\"password\":\"sachini\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"loginUser6\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
                 "\"bulkId\":\"ytrewq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
-                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"Bob\"," +
-                "\"password\":\"vindula\"}}]}";
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser7\"," +
+                "\"password\":\"pw13424\"}}]}";
+
+        public static String defineBulkRequest2 = " {\n" +
+                "    \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\": [\n" +
+                "       {\n" +
+                "            \"method\": \"POST\",\n" +
+                "            \"path\": \"/Groups\",\n" +
+                "            \"bulkId\": \"ytrewq\",\n" +
+                "            \"data\": {\n" +
+                "                \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\n" +
+                "                \"displayName\": \"Abx2312\"\n" +
+                "            }\n" +
+                "        },\n" +
+                "               {\n" +
+                "            \"method\": \"POST\",\n" +
+                "            \"path\": \"/Groups\",\n" +
+                "            \"bulkId\": \"ytrewq\",\n" +
+                "            \"data\": {\n" +
+                "                \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\n" +
+                "                \"displayName\": \"Cdx2142\"\n" +
+                "            }\n" +
+                "        }\n" +
+                "     ]\n" +
+                "}";
     }
 }

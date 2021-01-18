@@ -19,6 +19,7 @@
 package org.wso2.scim2.compliance.protocol;
 
 import org.wso2.scim2.compliance.objects.SCIMSchema;
+import org.wso2.scim2.compliance.tests.BulkTestImpl;
 import org.wso2.scim2.compliance.tests.GroupTestImpl;
 import org.wso2.scim2.compliance.tests.MeTestImpl;
 import org.wso2.scim2.compliance.tests.ResourceType;
@@ -61,6 +62,8 @@ public class EndpointFactory {
             return new SchemaTestImpl(complianceTestMetaDataHolder);
         } else if (str.equals("me")) {
             return new MeTestImpl(complianceTestMetaDataHolder);
+        } else if (str.equals("bulk")) {
+            return new BulkTestImpl(complianceTestMetaDataHolder);
         }
         return null;
     }

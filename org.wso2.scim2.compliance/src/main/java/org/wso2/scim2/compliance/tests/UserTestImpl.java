@@ -797,6 +797,7 @@ public class UserTestImpl implements ResourceType {
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload4);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload5);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload6);
 
         RequestPath[] requestPaths;
 
@@ -845,7 +846,17 @@ public class UserTestImpl implements ResourceType {
             requestPath5.setTestSupported(true);
         }
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setTestCaseName("Patch Enterprise User with array of operations");
+        try {
+            requestPath6.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath6.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6};
 
         for (int i = 0; i < requestPaths.length; i++) {
             //create default user;
