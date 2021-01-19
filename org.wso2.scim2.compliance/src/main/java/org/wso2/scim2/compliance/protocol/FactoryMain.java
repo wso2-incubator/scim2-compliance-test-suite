@@ -40,12 +40,12 @@ public class FactoryMain {
         ResourceType obj7 = e.getInstance("bulk");
         try {
             ArrayList<TestResult> userTestResults;
-          //  obj3.getMethodTest();
+            //  obj3.getMethodTest();
             //  obj.getMethodTest();
             // obj.patchMethodTest();
             // obj2.patchMethodTest();
             //obj.patchMethodTest();
-            obj7.postMethodTest();
+            obj7.deleteMethodTest();
             //  obj4.getMethodTest();
             //obj5.getMethodTest();
             //userTestResults = obj.getByIdMethodTest();

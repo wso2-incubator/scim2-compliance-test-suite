@@ -34,6 +34,7 @@ import org.wso2.charon3.core.encoder.JSONDecoder;
 import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
+import org.wso2.charon3.core.objects.Group;
 import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
@@ -46,6 +47,7 @@ import org.wso2.scim2.compliance.protocol.ComplianceUtils;
 import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -70,7 +72,7 @@ public class BulkTestImpl implements ResourceType {
     }
 
     /**
-     * Extract created user locations from the bulk response.
+     * Extract created user/group locations from the bulk response.
      *
      * @param response
      * @return
@@ -87,6 +89,27 @@ public class BulkTestImpl implements ResourceType {
             userLocations.add(location);
         }
         return userLocations;
+    }
+
+    /**
+     * Extract created status from the bulk response.
+     *
+     * @param response
+     * @return
+     * @throws JSONException
+     */
+    public ArrayList<Integer> getStatus(String response) throws JSONException {
+
+        ArrayList<Integer> statusCodes = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(response);
+        JSONArray jsonarray = jsonObject.optJSONArray("Operations");
+        for (int i = 0; i < jsonarray.length(); i++) {
+            JSONObject innerJsonObject = jsonarray.getJSONObject(i);
+            JSONObject innerJsonObject2 = innerJsonObject.getJSONObject("status");
+            Integer code = innerJsonObject2.getInt("code");
+            statusCodes.add(code);
+        }
+        return statusCodes;
     }
 
     /**
@@ -165,6 +188,95 @@ public class BulkTestImpl implements ResourceType {
             }
         }
         return userIDs;
+    }
+
+    /**
+     * Create test groups.
+     *
+     * @return groupIds
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
+    private ArrayList<String> createTestsGroups(ArrayList<String> userIDs, String noOfGroups) throws
+            ComplianceException, GeneralComplianceException {
+
+        String url = complianceTestMetaDataHolder.getUrl() +
+                ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
+
+        ArrayList<String> groupIDs = new ArrayList<>();
+        ArrayList<String> definedGroups = new ArrayList<>();
+
+        if (noOfGroups.equals("One")) {
+            definedGroups.add("{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]," +
+                    "\"displayName\":\"XwLtOP23\",\"members\":[{\"value\":\"" + userIDs.get(0) + "\",\"displayName" +
+                    "\":\"loginUser1\",\"$ref\":\"" + complianceTestMetaDataHolder.getUrl() +
+                    ComplianceConstants.TestConstants.USERS_ENDPOINT + "/" + userIDs.get(0) + "\"}," +
+                    "{\"value\":\"" + userIDs.get(1) + "\",\"displayName\":\"loginUser2\"},{\"value\":\"" +
+                    userIDs.get(2) + "\",\"displayName\":\"loginUser3\"},{\"value\":\"" + userIDs.get(3) +
+                    "\",\"displayName" + "\":\"loginUser4" + "\"}," +
+                    "{\"value\":\"" + userIDs.get(4) + "\",\"displayName\":\"loginUser5\"}]}");
+        } else if (noOfGroups.equals("Many")) {
+            definedGroups.add("{\"displayName\": \"EYtXcD21\"}");
+            definedGroups.add("{\"displayName\": \"BktqER22\"}");
+            definedGroups.add("{\"displayName\": \"ZwLtOP23\"}");
+            definedGroups.add("{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"]," +
+                    "\"displayName\":\"XwLtOP23\",\"members\":[{\"value\":\"" + userIDs.get(0) + "\",\"displayName" +
+                    "\":\"loginUser1\"}," + "{\"value\":\"" + userIDs.get(1) + "\",\"displayName\":\"loginUser2\"}," +
+                    "{\"value\":\"" + userIDs.get(2) + "\",\"displayName\":\"loginUser3\"},{\"value\":\"" +
+                    userIDs.get(3) + "\",\"displayName" + "\":\"loginUser4" + "\"}," +
+                    "{\"value\":\"" + userIDs.get(4) + "\",\"displayName\":\"loginUser5\"}]}");
+        }
+
+        HttpPost method = new HttpPost(url);
+        //create groups
+        HttpClient client = HTTPClient.getHttpClient();
+        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        method.setHeader("Accept", "application/json");
+        method.setHeader("Content-Type", "application/json");
+        HttpResponse response = null;
+        String responseString = StringUtils.EMPTY;
+        StringBuilder headerString = new StringBuilder();
+        String responseStatus;
+        ArrayList<String> subTests = new ArrayList<>();
+        for (int i = 0; i < definedGroups.size(); i++) {
+            try {
+                // Create the group.
+                HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                responseStatus = String.valueOf(response.getStatusLine().getStatusCode());
+                if (responseStatus.equals("201")) {
+                    // Obtain the schema corresponding to group.
+                    SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
+                    JSONDecoder jsonDecoder = new JSONDecoder();
+                    Group group;
+                    try {
+                        group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                    } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                                "Could not decode the server response of groups create.",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests)));
+                    }
+                    groupIDs.add(group.getId());
+                }
+            } catch (Exception e) {
+                // Read the response body.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
+                        "Could not create default groups at url " + url,
+                        ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                subTests)));
+            }
+        }
+        return groupIDs;
     }
 
     /**
@@ -281,10 +393,6 @@ public class BulkTestImpl implements ResourceType {
                 "                     {\n" +
                 "                    \"type\": \"User\",\n" +
                 "                     \"value\": \"" + userIDs.get(1) + "\"\n" +
-                "                    },\n" +
-                "                     {\n" +
-                "                    \"type\": \"User\",\n" +
-                "                     \"value\": \"" + userIDs.get(2) + "\"\n" +
                 "                    }\n" +
                 "                ]\n" +
                 "            }\n" +
@@ -299,11 +407,45 @@ public class BulkTestImpl implements ResourceType {
                 "                \"members\": [\n" +
                 "                    {\n" +
                 "                    \"type\": \"User\",\n" +
-                "                      \"value\": \"" + userIDs.get(3) + "\"\n" +
+                "                      \"value\": \"" + userIDs.get(2) + "\"\n" +
                 "                    },\n" +
                 "                     {\n" +
                 "                    \"type\": \"User\",\n" +
-                "                     \"value\": \"" + userIDs.get(4) + "\"\n" +
+                "                     \"value\": \"" + userIDs.get(3) + "\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        }\n" +
+                "     ]\n" +
+                "}");
+
+        definedBulkRequests.add(" {\"failOnErrors\":0,\n" +
+                "    \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\": [\n" +
+                "       {\n" +
+                "            \"method\": \"POST\",\n" +
+                "            \"path\": \"/Users\",\n" +
+                "            \"bulkId\": \"qwerty\",\n" +
+                "            \"data\": {\n" +
+                "                \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n" +
+                "                \"userName\": \"loginUser-11\",\n" +
+                "                \"password\":\"kim123\",\n" +
+                "                \"name\": {\n" +
+                "                    \"givenName\": \"Kim\",\n" +
+                "                    \"familyName\": \"Berry\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        },\n" +
+                "               {\n" +
+                "            \"method\": \"POST\",\n" +
+                "            \"path\": \"/Groups\",\n" +
+                "            \"bulkId\": \"ytrewq\",\n" +
+                "            \"data\": {\n" +
+                "                \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\n" +
+                "                \"displayName\": \"xa24121\",\n" +
+                "                \"members\": [\n" +
+                "                    {\n" +
+                "                    \"value\": \"" + userIDs.get(4) + "\"\n" +
                 "                    }\n" +
                 "                ]\n" +
                 "            }\n" +
@@ -341,7 +483,7 @@ public class BulkTestImpl implements ResourceType {
         }
 
         RequestPath requestPath4 = new RequestPath();
-        requestPath4.setTestCaseName("Bulk post operation with groups and users");
+        requestPath4.setTestCaseName("Bulk post operation with users and groups");
         try {
             requestPath4.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
                     .getBulkSupported());
@@ -358,16 +500,7 @@ public class BulkTestImpl implements ResourceType {
             requestPath5.setTestSupported(true);
         }
 
-        RequestPath requestPath6 = new RequestPath();
-        requestPath6.setTestCaseName("Patch Enterprise User with array of operations");
-        try {
-            requestPath6.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
-                    .getBulkSupported());
-        } catch (Exception e) {
-            requestPath6.setTestSupported(true);
-        }
-
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
             HttpPost method = new HttpPost(url);
@@ -458,7 +591,178 @@ public class BulkTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+        ArrayList<Integer> resourceStatusCodes = new ArrayList<>();
+        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> groupIDs = new ArrayList<>();
+        userIDs = createTestsUsers("Many");
+        groupIDs = createTestsGroups(userIDs, "Many");
+
+        ArrayList<String> definedBulkRequests = new ArrayList<>();
+
+        definedBulkRequests.add("{\n" +
+                "    \"failOnErrors\":1,\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(0) + "\"  \n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(1) + "\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(2) + "\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+        definedBulkRequests.add("{\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(0) + "\"  \n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(1) + "\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+
+        definedBulkRequests.add("{\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(2) + "\"  \n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(3) + "\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(3) + "\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"DELETE\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(4) + "\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Bulk delete operation with users");
+        try {
+            requestPath1.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath1.setTestSupported(true);
+        }
+
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Bulk delete operation with groups");
+        try {
+            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath2.setTestSupported(true);
+        }
+
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Bulk delete operation with users and groups");
+        try {
+            requestPath3.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath3.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            HttpPost method = new HttpPost(url);
+            // Create test.
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+            method.setHeader("Content-Type", "application/json");
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                HttpEntity entity = new ByteArrayEntity(definedBulkRequests.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " " +
+                        response.getStatusLine().getReasonPhrase();
+                //  Get the created user locations.
+                resourceStatusCodes = getStatus(responseString);
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                if (requestPaths[i].getTestSupported() != false) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not perform bulk request at " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+            }
+            Boolean pass = false;
+            for (Integer status : resourceStatusCodes) {
+                if (status == 204) {
+                    pass = true;
+                } else {
+                    pass = false;
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            } else if (requestPaths[i].getTestSupported() == false) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else {
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            }
+        }
+        // Clean up users after all tasks.
+//        for (String id : userIDs) {
+//            cleanUp(id, "User");
+//        }
+        return testResults;
     }
 
     @Override
