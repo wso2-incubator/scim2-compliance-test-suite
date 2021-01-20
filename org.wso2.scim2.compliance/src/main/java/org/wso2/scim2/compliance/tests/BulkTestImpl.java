@@ -579,13 +579,479 @@ public class BulkTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+        ArrayList<Integer> resourceStatusCodes = new ArrayList<>();
+        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> groupIDs = new ArrayList<>();
+        userIDs = createTestsUsers("Many");
+        groupIDs = createTestsGroups(userIDs, "Many");
+
+        ArrayList<String> definedBulkRequests = new ArrayList<>();
+
+        definedBulkRequests.add("{ \n" +
+                "    \"failOnErrors\": 1, \n" +
+                "    \"schemas\": [ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ], \n" +
+                "    \"Operations\": [\n" +
+                "        { \n" +
+                "            \"method\": \"PATCH\", \n" +
+                "            \"path\": \"/Users/" + userIDs.get(0) + "\", \n" +
+                "            \"data\": { \n" +
+                "                \"Operations\": [\n" +
+                "                    { \n" +
+                "                        \"op\": \"replace\", \n" +
+                "                        \"path\": \"name\", \n" +
+                "                        \"value\": \n" +
+                "                        { \n" +
+                "                            \"givenName\": \"john\", \n" +
+                "                            \"familyName\": \"Anderson\" \n" +
+                "                        }\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"op\": \"add\", \n" +
+                "                        \"path\": \"nickName\", \n" +
+                "                        \"value\": \"shaggy\"  \n" +
+                "                    }\n" +
+                "                ] \n" +
+                "            } \n" +
+                "        },\n" +
+                "        { \n" +
+                "            \"method\": \"PATCH\", \n" +
+                "            \"path\": \"/Users/" + userIDs.get(1) + "\", \n" +
+                "            \"data\": { \n" +
+                "                \"Operations\": [{ \n" +
+                "                    \"op\": \"remove\", \n" +
+                "                    \"path\": \"emails[type eq home]\"\n" +
+                "                }] \n" +
+                "            } \n" +
+                "        }\n" +
+                "    ] \n" +
+                "}");
+
+        definedBulkRequests.add("{ \n" +
+                "    \"schemas\": [ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ], \n" +
+                "    \"Operations\": [\n" +
+                " {\n" +
+                "           \"method\": \"PATCH\",\n" +
+                "           \"path\": \"/Groups/" + groupIDs.get(0) + "\",\n" +
+                "           \"data\": {\n" +
+                "               \"Operations\": [\n" +
+                "                   {\n" +
+                "                       \"op\": \"add\",\n" +
+                "                       \"value\": {\"members\":[\n" +
+                "                           {\n" +
+                "                           \"display\": \"loginUser1\",\n" +
+                "                           \"value\": \"" + userIDs.get(0) + "\"\n" +
+                "                           }\n" +
+                "                       ]}\n" +
+                "                   }\n" +
+                "               ]\n" +
+                "           }\n" +
+                "       },\n" +
+                "        {\n" +
+                "           \"method\": \"PATCH\",\n" +
+                "           \"path\": \"/Groups/" + groupIDs.get(3) + "\",\n" +
+                "           \"data\": {\n" +
+                "               \"Operations\": [\n" +
+                "                   {\n" +
+                "                        \"op\":\"remove\",\n" +
+                "                        \"path\":\"members[value eq \\\"" + userIDs.get(0) + "\\\"]\"\n" +
+                "                    }\n" +
+                "               ]\n" +
+                "           }\n" +
+                "       }\n" +
+                "    ] \n" +
+                "}");
+
+        definedBulkRequests.add("{ \n" +
+                "    \"schemas\": [ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ], \n" +
+                "    \"Operations\": [\n" +
+                " {\n" +
+                "           \"method\": \"PATCH\",\n" +
+                "           \"path\": \"/Groups/" + groupIDs.get(1) + "\",\n" +
+                "           \"data\": {\n" +
+                "               \"Operations\": [\n" +
+                "                   {\n" +
+                "                       \"op\": \"add\",\n" +
+                "                       \"value\": {\"members\":[\n" +
+                "                           {\n" +
+                "                           \"display\": \"loginUser1\",\n" +
+                "                           \"value\": \"" + userIDs.get(0) + "\"\n" +
+                "                           }\n" +
+                "                       ]}\n" +
+                "                   }\n" +
+                "               ]\n" +
+                "           }\n" +
+                "       },\n" +
+                "        { \n" +
+                "            \"method\": \"PATCH\", \n" +
+                "            \"path\": \"/Users/" + userIDs.get(1) + "\", \n" +
+                "            \"data\": { \n" +
+                "                \"Operations\": [{ \n" +
+                "                    \"op\": \"remove\", \n" +
+                "                    \"path\": \"emails[type eq home]\"\n" +
+                "                }] \n" +
+                "            } \n" +
+                "        }\n" +
+                "    ] \n" +
+                "}");
+
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Bulk patch operation with users");
+        try {
+            requestPath1.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath1.setTestSupported(true);
+        }
+
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Bulk patch operation with groups");
+        try {
+            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath2.setTestSupported(true);
+        }
+
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Bulk patch operation with users and groups");
+        try {
+            requestPath3.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath3.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            HttpPost method = new HttpPost(url);
+            // Create test.
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+            method.setHeader("Content-Type", "application/json");
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                HttpEntity entity = new ByteArrayEntity(definedBulkRequests.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " " +
+                        response.getStatusLine().getReasonPhrase();
+                //  Get the created user locations.
+                resourceStatusCodes = getStatus(responseString);
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                if (requestPaths[i].getTestSupported() != false) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not perform bulk request at " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+            }
+            Boolean pass = false;
+            for (Integer status : resourceStatusCodes) {
+                if (status == 200) {
+                    pass = true;
+                } else {
+                    pass = false;
+                    break;
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            } else if (requestPaths[i].getTestSupported() == false) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else {
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            }
+        }
+        //Clean up users.
+        for (String id : userIDs) {
+            cleanUp(id, "User");
+        }
+        //Clean up groups.
+        for (String id : groupIDs) {
+            cleanUp(id, "Group");
+        }
+        return testResults;
     }
 
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
-        return null;
+        ArrayList<TestResult> testResults;
+        testResults = new ArrayList<>();
+        ArrayList<Integer> resourceStatusCodes = new ArrayList<>();
+        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> groupIDs = new ArrayList<>();
+        userIDs = createTestsUsers("Many");
+        groupIDs = createTestsGroups(userIDs, "Many");
+
+        ArrayList<String> definedBulkRequests = new ArrayList<>();
+
+        definedBulkRequests.add("{\n" +
+                "    \"failOnErrors\":1,\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(0) + "\",\n" +
+                "            \"bulkId\": \"qwerty\",\n" +
+                "            \"data\":{\n" +
+                "                \"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n" +
+                "                \"userName\": \"loginUser1\",\n" +
+                "                \"name\": {\n" +
+                "                    \"givenName\": \"John\",\n" +
+                "                    \"familyName\": \"Berry\"\n" +
+                "                },\n" +
+                "                \"emails\": [\n" +
+                "                    {\n" +
+                "                        \"type\": \"home\",\n" +
+                "                        \"value\": \"john@gmail.com\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(1) + "\",\n" +
+                "            \"bulkId\":\"ytrewq\",\n" +
+                "            \"data\":{\n" +
+                "                \"schemas\":[\n" +
+                "                \"urn:ietf:params:scim:schemas:core:2.0:User\",\n" +
+                "                \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"\n" +
+                "                ],\n" +
+                "                \"userName\":\"loginUser2\",\n" +
+                "                \"name\": {\n" +
+                "                    \"givenName\": \"Smith\",\n" +
+                "                    \"familyName\": \"Berry\"\n" +
+                "                },\n" +
+                "                \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\":{\n" +
+                "                    \"employeeNumber\": \"12345\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+
+        definedBulkRequests.add("{\n" +
+                "    \"failOnErrors\":1,\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(0) + "\",\n" +
+                "            \"data\":{\n" +
+                "                \"displayName\": \"xs5231771\",\n" +
+                "                \"members\": [\n" +
+                "                    {\n" +
+                "                    \"display\": \"loginUser1\",\n" +
+                "                    \"value\": \"" + userIDs.get(0) + "\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(1) + "\",\n" +
+                "            \"data\":{\n" +
+                "                \"displayName\": \"Fvs132312\",\n" +
+                "                \"members\": [\n" +
+                "                    {\n" +
+                "                    \"display\": \"loginUser2\",\n" +
+                "                    \"value\": \"" + userIDs.get(1) + "\"\n" +
+                "                    }\n" +
+                "            ] \n" +
+                "            }\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+
+        definedBulkRequests.add("{\n" +
+                "    \"failOnErrors\":1,\n" +
+                "    \"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "    \"Operations\":[\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Users/" + userIDs.get(2) + "\",\n" +
+                "            \"bulkId\": \"qwerty\",\n" +
+                "            \"data\":{\n" +
+                "                \"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n" +
+                "                \"userName\": \"loginUser3\",\n" +
+                "                \"name\": {\n" +
+                "                    \"givenName\": \"John\",\n" +
+                "                    \"familyName\": \"Berry\"\n" +
+                "                },\n" +
+                "                \"emails\": [\n" +
+                "                    {\n" +
+                "                        \"type\": \"home\",\n" +
+                "                        \"value\": \"john@gmail.com\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"method\": \"PUT\",\n" +
+                "            \"path\": \"/Groups/" + groupIDs.get(2) + "\",\n" +
+                "            \"data\":{\n" +
+                "                \"displayName\": \"gfS232324\",\n" +
+                "                \"members\": [\n" +
+                "                    {\n" +
+                "                    \"display\": \"loginUser4\",\n" +
+                "                    \"value\": \"" + userIDs.get(3) + "\"\n" +
+                "                    }\n" +
+                "            ] \n" +
+                "            }\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}");
+
+        RequestPath[] requestPaths;
+
+        RequestPath requestPath1 = new RequestPath();
+        requestPath1.setTestCaseName("Bulk put operation with users");
+        try {
+            requestPath1.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath1.setTestSupported(true);
+        }
+
+        RequestPath requestPath2 = new RequestPath();
+        requestPath2.setTestCaseName("Bulk put operation with groups");
+        try {
+            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath2.setTestSupported(true);
+        }
+
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Bulk put operation with users and groups");
+        try {
+            requestPath3.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath3.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
+
+        for (int i = 0; i < requestPaths.length; i++) {
+            HttpPost method = new HttpPost(url);
+            // Create test.
+            HttpClient client = HTTPClient.getHttpClient();
+            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            method.setHeader("Accept", "application/json");
+            method.setHeader("Content-Type", "application/json");
+            HttpResponse response = null;
+            String responseString = StringUtils.EMPTY;
+            StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
+            String responseStatus = StringUtils.EMPTY;
+            ArrayList<String> subTests = new ArrayList<>();
+            try {
+                HttpEntity entity = new ByteArrayEntity(definedBulkRequests.get(i).getBytes("UTF-8"));
+                method.setEntity(entity);
+                response = client.execute(method);
+                // Read the response body.
+                responseString = new BasicResponseHandler().handleResponse(response);
+                //get all headers
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " " +
+                        response.getStatusLine().getReasonPhrase();
+                //  Get the created user locations.
+                resourceStatusCodes = getStatus(responseString);
+            } catch (Exception e) {
+                // Read the response body.
+                // Get all headers.
+                Header[] headers = response.getAllHeaders();
+                for (Header header : headers) {
+                    headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
+                }
+                responseStatus = response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase();
+                if (requestPaths[i].getTestSupported() != false) {
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not perform bulk request at " + url,
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests)));
+                    continue;
+                }
+            }
+            Boolean pass = false;
+            for (Integer status : resourceStatusCodes) {
+                if (status == 200) {
+                    pass = true;
+                } else {
+                    pass = false;
+                    break;
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            } else if (requestPaths[i].getTestSupported() == false) {
+                testResults.add(new TestResult
+                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                                "This functionality is not implemented. Hence given status code 501",
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(),
+                                        responseStatus, subTests)));
+            } else {
+                testResults.add(new TestResult
+                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                headerString.toString(), responseStatus, subTests)));
+            }
+        }
+        //Clean up users.
+        for (String id : userIDs) {
+            cleanUp(id, "User");
+        }
+        //Clean up groups.
+        for (String id : groupIDs) {
+            cleanUp(id, "Group");
+        }
+        return testResults;
     }
 
     @Override
@@ -596,6 +1062,7 @@ public class BulkTestImpl implements ResourceType {
         ArrayList<Integer> resourceStatusCodes = new ArrayList<>();
         ArrayList<String> userIDs = new ArrayList<>();
         ArrayList<String> groupIDs = new ArrayList<>();
+        Boolean error = false;
         userIDs = createTestsUsers("Many");
         groupIDs = createTestsGroups(userIDs, "Many");
 
@@ -722,6 +1189,7 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                error = true;
                 if (requestPaths[i].getTestSupported() != false) {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
@@ -736,10 +1204,10 @@ public class BulkTestImpl implements ResourceType {
                     pass = true;
                 } else {
                     pass = false;
+                    break;
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
-
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
@@ -758,10 +1226,17 @@ public class BulkTestImpl implements ResourceType {
                                 headerString.toString(), responseStatus, subTests)));
             }
         }
-        // Clean up users after all tasks.
-//        for (String id : userIDs) {
-//            cleanUp(id, "User");
-//        }
+
+        if (error == true) {
+            //Clean up users.
+            for (String id : userIDs) {
+                cleanUp(id, "User");
+            }
+            //Clean up groups.
+            for (String id : groupIDs) {
+                cleanUp(id, "Group");
+            }
+        }
         return testResults;
     }
 

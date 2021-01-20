@@ -45,6 +45,7 @@ public class FactoryMain {
             // obj.patchMethodTest();
             // obj2.patchMethodTest();
             //obj.patchMethodTest();
+            obj7.patchMethodTest();
             obj7.deleteMethodTest();
             //  obj4.getMethodTest();
             //obj5.getMethodTest();
