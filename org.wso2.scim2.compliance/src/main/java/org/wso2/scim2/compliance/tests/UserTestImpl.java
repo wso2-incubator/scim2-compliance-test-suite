@@ -343,7 +343,7 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false) {
+                if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not list the users at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
@@ -487,7 +487,7 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests)));
-            } else if (requestPaths[i].getTestSupported() == false) {
+            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
@@ -677,6 +677,7 @@ public class UserTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             User user = null;
             HttpPost method = new HttpPost(url);
             //create user test
@@ -743,6 +744,8 @@ public class UserTestImpl implements ResourceType {
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests)));
                 }
+                long stopTime = System.currentTimeMillis();
+                System.out.println(stopTime - startTime);
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,

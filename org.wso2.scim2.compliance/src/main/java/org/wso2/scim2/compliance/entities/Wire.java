@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Wire {
 
-    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>");
+    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>","<empty>");
 
     @XmlElement(name = "to_server")
     String toServer = "";
@@ -34,15 +34,19 @@ public class Wire {
     @XmlElement(name = "tests")
     String tests = "";
 
+    @XmlElement(name = "responseBody")
+    String responseBody = "";
+
     public Wire() {
 
     }
 
-    public Wire(String toServer, String fromServer, String tests) {
+    public Wire(String toServer, String fromServer, String tests, String responseBody) {
 
         this.toServer = toServer;
         this.fromServer = fromServer;
         this.tests = tests;
+        this.responseBody = responseBody;
     }
 
     public String getToServer() {
@@ -58,5 +62,10 @@ public class Wire {
     public String getTests() {
 
         return tests;
+    }
+
+    public String getResponseBody() {
+
+        return responseBody;
     }
 }

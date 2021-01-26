@@ -24,6 +24,7 @@ import org.wso2.scim2.compliance.tests.GroupTestImpl;
 import org.wso2.scim2.compliance.tests.MeTestImpl;
 import org.wso2.scim2.compliance.tests.ResourceType;
 import org.wso2.scim2.compliance.tests.ResourceTypeTestImpl;
+import org.wso2.scim2.compliance.tests.RolesTestImpl;
 import org.wso2.scim2.compliance.tests.SchemaTestImpl;
 import org.wso2.scim2.compliance.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.compliance.tests.UserTestImpl;
@@ -64,6 +65,8 @@ public class EndpointFactory {
             return new MeTestImpl(complianceTestMetaDataHolder);
         } else if (str.equals("bulk")) {
             return new BulkTestImpl(complianceTestMetaDataHolder);
+        } else if (str.equals("role")) {
+            return new RolesTestImpl(complianceTestMetaDataHolder);
         }
         return null;
     }

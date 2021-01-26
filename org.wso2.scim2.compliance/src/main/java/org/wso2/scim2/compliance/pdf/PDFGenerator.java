@@ -1,31 +1,37 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.scim2.compliance.pdf;
 
-import org.wso2.scim2.compliance.entities.Result;
-import org.wso2.scim2.compliance.entities.TestResult;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.wso2.scim2.compliance.entities.Result;
+import org.wso2.scim2.compliance.entities.TestResult;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -49,16 +55,16 @@ public class PDFGenerator {
 
         document = new PDDocument();
         if (finalResults.getErrorMessage() != "") {
-            //Creating a blank page
+            // Creating a blank page.
             PDPage blankPage = new PDPage();
-            //Adding the blank page to the document
+            // Adding the blank page to the document.
             document.addPage(blankPage);
 
         } else {
             for (int i = 0; i < finalResults.getResults().size(); i++) {
-                //Creating a blank page
+                // Creating a blank page.
                 PDPage blankPage = new PDPage();
-                //Adding the blank page to the document
+                // Adding the blank page to the document.
                 document.addPage(blankPage);
             }
         }
@@ -72,9 +78,11 @@ public class PDFGenerator {
      * @return
      * @throws IOException
      */
-    public static String GeneratePDFResults(Result finalResults, String fullPath) throws IOException {
+    public static String generatePdfResults(Result finalResults, String fullPath) throws IOException {
 
         init(finalResults);
+        // Loading a ttf file containing text style.
+        PDType0Font font = PDType0Font.load(document, new File("/home/anjanap/tr.ttf"));
         int pageNo = 0;
         for (TestResult testResult : finalResults.getResults()) {
             //Retrieving the pages of the document
@@ -82,8 +90,10 @@ public class PDFGenerator {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
             PDFont pdfFont = PDType1Font.HELVETICA;
-            float fontSize = 10;
-            float smallFontSize = 8;
+            float typeWriterFont = 30;
+            float titleFont = 10;
+            float fontSize = 8;
+            float smallFontSize = 7;
             float leading = 1.5f * fontSize;
 
             PDRectangle mediabox = page.getMediaBox();
@@ -129,43 +139,89 @@ public class PDFGenerator {
             contentStream.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+            Color titleColor = new Color(102, 0, 153);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText("Test Case Name : ");
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+            contentStream.setNonStrokingColor(titleColor);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testName);
-
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
-            contentStream.showText("Test Case Errors : ");
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testMessage);
 
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+            if (!testMessage.isEmpty()) {
+                contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+                contentStream.setNonStrokingColor(Color.BLACK);
+                contentStream.showText("Test Case Errors : ");
+                contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+                contentStream.setNonStrokingColor(Color.RED);
+                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testMessage);
+                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            }
+            Color statusColor = new Color(0, 102, 0);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText("Test Case Status : ");
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(statusColor);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testLabel);
+            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText(("To Server : "));
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
+            contentStream.setFont(PDType1Font.COURIER, smallFontSize);
+            contentStream.setNonStrokingColor(Color.BLUE);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, toServer);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, requestBody);
-
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
-            contentStream.showText("From Server : ");
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
-            printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, fromServer);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
-
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
-            contentStream.showText("Sub Tests Performed : ");
-            contentStream.setFont(PDType1Font.COURIER, fontSize);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, subTests);
+
+            JSONObject json = null; // Convert text to object
+            String r = null;
+            try {
+                r = testResult.getWire().getResponseBody();
+                json = new JSONObject(r);
+            } catch (Exception e) {
+                System.out.println("hello1");
+                json = null;
+            }
+
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.showText("From Server : ");
+            contentStream.setFont(PDType1Font.COURIER, smallFontSize);
+            contentStream.setNonStrokingColor(Color.BLUE);
+            printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, fromServer);
+            //printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+            if (json != null) {
+                try {
+                    if (json.getInt("totalResults") > 10) {
+//                        String r2 = json.toString(4);
+//                        List<String> r3 = getLines(r, fontSize, pdfFont, width);
+//                        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, r3);
+                        //printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+                        contentStream.showText("Response contains more than 10 results which is larger to show in one" +
+                                " page.");
+                    } else {
+                        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+                    }
+                } catch (JSONException e) {
+                    printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+                }
+            }
+            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+//            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+//            contentStream.setNonStrokingColor(Color.BLACK);
+//            contentStream.showText("Sub Tests Performed : ");
+//            contentStream.setFont(PDType1Font.COURIER, fontSize);
+//            contentStream.setNonStrokingColor(Color.BLUE);
+//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, subTests);
+//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
             //Ending the content stream
             contentStream.endText();
@@ -224,8 +280,9 @@ public class PDFGenerator {
         int lastSpace = -1;
         while (text.length() > 0) {
             int spaceIndex = text.indexOf(' ', lastSpace + 1);
-            if (spaceIndex < 0)
+            if (spaceIndex < 0) {
                 spaceIndex = text.length();
+            }
             String subString = text.substring(0, spaceIndex);
             float size = fontSize * pdfFont.getStringWidth(subString) / 1000;
             if (size > width) {

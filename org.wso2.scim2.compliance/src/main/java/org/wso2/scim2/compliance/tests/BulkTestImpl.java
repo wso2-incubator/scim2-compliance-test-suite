@@ -280,7 +280,7 @@ public class BulkTestImpl implements ResourceType {
     }
 
     /**
-     * This method cleans up the created used with the given id.
+     * This method cleans up resources.
      *
      * @param location
      * @return
