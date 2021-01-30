@@ -52,9 +52,21 @@ public class TestResult {
     Wire wire;
 
     private int status;
+    private long elapsedTime;
 
     public TestResult() {
 
+    }
+
+    public TestResult(int status, String name, String message, Wire wire, long elapsedTime) {
+
+        this.name = name;
+        this.message = message;
+        this.wire = wire;
+        this.status = status;
+        this.elapsedTime = elapsedTime;
+        this.statusText = statusTexts[status];
+        this.statusLabel = statusLabels[status];
     }
 
     public TestResult(int status, String name, String message, Wire wire) {
@@ -107,5 +119,10 @@ public class TestResult {
     public String getStatusLabel() {
 
         return statusLabel;
+    }
+
+    public long getElapsedTime() {
+
+        return this.elapsedTime;
     }
 }

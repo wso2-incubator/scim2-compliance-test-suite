@@ -110,6 +110,7 @@ public class GroupTestImpl implements ResourceType {
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
@@ -126,10 +127,11 @@ public class GroupTestImpl implements ResourceType {
                     try {
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     userIDs.add(user.getId());
                 }
@@ -141,10 +143,11 @@ public class GroupTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                         "Could not create default users at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return userIDs;
@@ -160,9 +163,9 @@ public class GroupTestImpl implements ResourceType {
      */
     private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         String url = complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
-
         String deleteUserURL = url + "/" + id;
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
@@ -193,18 +196,20 @@ public class GroupTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
         if (response.getStatusLine().getStatusCode() == 204) {
             return true;
         } else {
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
     }
 
@@ -254,6 +259,7 @@ public class GroupTestImpl implements ResourceType {
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedGroups.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create the group.
                 HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
@@ -270,10 +276,11 @@ public class GroupTestImpl implements ResourceType {
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     groupIDs.add(group.getId());
                 }
@@ -285,10 +292,11 @@ public class GroupTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Could not create default groups at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return groupIDs;
@@ -306,9 +314,9 @@ public class GroupTestImpl implements ResourceType {
     private boolean cleanUpGroup(String groupId, String testName)
             throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         String deleteGroupURL = null;
         deleteGroupURL = url + "/" + groupId;
-
         HttpDelete method = new HttpDelete(deleteGroupURL);
         HttpClient client = HTTPClient.getHttpClient();
         method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -338,18 +346,20 @@ public class GroupTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default group at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
         if (response.getStatusLine().getStatusCode() == 204) {
             return true;
         } else {
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default group at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
     }
 
@@ -448,6 +458,7 @@ public class GroupTestImpl implements ResourceType {
                 requestPath6, requestPath7, requestPath8, requestPath9};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             String requestUrl = url + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
@@ -481,10 +492,11 @@ public class GroupTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not list the groups at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -510,20 +522,22 @@ public class GroupTestImpl implements ResourceType {
                                     responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
                 } catch (JSONException e) {
                     throw new ComplianceException(500, "Error in decoding the returned list resource.");
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 if (requestPaths[i].getTestCaseName().equals("List groups")) { // check for all created groups
@@ -534,10 +548,11 @@ public class GroupTestImpl implements ResourceType {
                     }
                     for (String id : groupIDs) {
                         if (!returnedGroupIDs.contains(id)) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain all the created groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
@@ -546,10 +561,11 @@ public class GroupTestImpl implements ResourceType {
                     String value = "EYtXcD21";
                     for (Group group : groupList) {
                         if (!Objects.equals(value, group.getDisplayName())) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the expected groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
@@ -558,75 +574,84 @@ public class GroupTestImpl implements ResourceType {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
                     if (groupList.size() != 2) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of paginated groups",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                 } else if (requestPaths[i].getTestCaseName().equals("Sort test")) {
                     subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
                     try {
                         if (isGroupListSorted(groupList)) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the sorted list of groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     } catch (CharonException e) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain the sorted list of groups",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
 
                 } else if (requestPaths[i].getTestCaseName().equals("Filter with pagination test")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
                     if (groupList.size() != 1) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of users.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                     String value = "EYtXcD21";
                     for (Group group : groupList) {
                         if (!Objects.equals(value, group.getDisplayName())) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the expected groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
                 } else if (requestPaths[i].getTestCaseName().equals("Get groups without index and only using count")) {
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
                     if (startIndex != 1 && count != 2) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of pagination.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.
@@ -669,6 +694,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
@@ -709,10 +735,11 @@ public class GroupTestImpl implements ResourceType {
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 if (requestPaths[i].getTestCaseName() != "Group not found error response") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not get the default group from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -729,10 +756,11 @@ public class GroupTestImpl implements ResourceType {
                         cleanUpUser(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -745,10 +773,11 @@ public class GroupTestImpl implements ResourceType {
                         cleanUpUser(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 // Clean up users.
@@ -756,29 +785,31 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Group not found error response" &&
                     response.getStatusLine().getStatusCode() == 404) {
-
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 404(Group not found in the user store) " +
                                         "message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 // Clean up users.
                 for (String uId : userIDs) {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -818,6 +849,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             Group group = null;
             String definedGroup = null;
             definedGroup = definedGroups.get(i);
@@ -856,10 +888,11 @@ public class GroupTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestCaseName() == "Post group") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, "Create Group",
                             "Could not create default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -871,10 +904,11 @@ public class GroupTestImpl implements ResourceType {
                     group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     groupId = group.getId();
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, "Create Group",
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -882,36 +916,41 @@ public class GroupTestImpl implements ResourceType {
                             responseString, headerString.toString(), responseStatus, subTests);
 
                 } catch (BadRequestException | CharonException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, "Create Group",
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, "Create Group",
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Post group with same displayName" &&
                     response.getStatusLine().getStatusCode() == 409) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 409(conflict) message",
                                 ComplianceUtils.getWire(method, responseString,
-                                        headerString.toString(), responseStatus, subTests)));
+                                        headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Post group without displayName" &&
                     response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 400(Required attribute displayName is " +
                                         "missing in the SCIM Object) message",
                                 ComplianceUtils.getWire(method, responseString,
-                                        headerString.toString(), responseStatus, subTests)));
+                                        headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, "Create Group",
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.
@@ -999,6 +1038,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             Group group = null;
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
@@ -1041,10 +1081,11 @@ public class GroupTestImpl implements ResourceType {
                 if (requestPaths[i].getTestCaseName() != "Patch group error validation" &&
                         requestPaths[i].getTestSupported() != false &&
                         response.getStatusLine().getStatusCode() != 501) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -1057,10 +1098,11 @@ public class GroupTestImpl implements ResourceType {
                     group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -1069,38 +1111,43 @@ public class GroupTestImpl implements ResourceType {
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Patch group error validation" &&
                     response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Service Provider successfully given the expected error 400",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
 
             } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.
@@ -1147,6 +1194,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
@@ -1192,10 +1240,11 @@ public class GroupTestImpl implements ResourceType {
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 if (requestPaths[i].getTestCaseName() != "Update group with schema violation") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not update the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -1212,10 +1261,11 @@ public class GroupTestImpl implements ResourceType {
                         cleanUpUser(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -1229,10 +1279,11 @@ public class GroupTestImpl implements ResourceType {
                         cleanUpUser(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 // Clean up users.
@@ -1240,18 +1291,20 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Update group with schema violation" &&
                     response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Service Provider successfully given the expected error 400",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
 
             } else {
                 // Clean up users.
@@ -1259,10 +1312,11 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -1288,6 +1342,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
@@ -1329,10 +1384,11 @@ public class GroupTestImpl implements ResourceType {
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 if (requestPaths[i].getTestCaseName() != "Group not found error response") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
             }
             if (response.getStatusLine().getStatusCode() == 204) {
@@ -1340,18 +1396,19 @@ public class GroupTestImpl implements ResourceType {
                 for (String uId : userIDs) {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Group not found error response" &&
                     response.getStatusLine().getStatusCode() == 404) {
-
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 404 message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
 
             } else {
                 // Clean up users.
@@ -1359,10 +1416,11 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -1394,6 +1452,7 @@ public class GroupTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             String searchUsersUrl = null;
             searchUsersUrl = url + "/.search";
             HttpPost method = new HttpPost(searchUsersUrl);
@@ -1438,10 +1497,11 @@ public class GroupTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
 
                 if (requestPaths[i].getTestCaseName() != "Search group and validate error message") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -1467,41 +1527,46 @@ public class GroupTestImpl implements ResourceType {
                                     responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
                 } catch (JSONException e) {
                     throw new ComplianceException(500, "Error in decoding the returned list resource.");
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                    responseStatus, subTests)));
+                                    responseStatus, subTests), stopTime - startTime));
                     continue;
                 }
                 if (totalResults == 1) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult
                             (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                    headerString.toString(), responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
             } else if (requestPaths[i].getTestCaseName() == "Search group and validate error message"
                     && response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Service Provider successfully given the expected error 400 message",
                                 ComplianceUtils.getWire(method, responseString,
-                                        headerString.toString(), responseStatus, subTests)));
+                                        headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(
                         new TestResult
                                 (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                         StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                        headerString.toString(), responseStatus, subTests)));
+                                        headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.

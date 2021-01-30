@@ -18,6 +18,7 @@
 
 package org.wso2.scim2.compliance.protocol;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.scim2.compliance.entities.Result;
 import org.wso2.scim2.compliance.entities.Statistics;
 import org.wso2.scim2.compliance.entities.TestResult;
@@ -33,33 +34,190 @@ import javax.ws.rs.core.Context;
  * Method for calling factory.
  */
 public class FactoryMain {
+
     @Context
     static
     ServletContext context;
+
     public static void main(String a[]) {
 
-        EndpointFactory e = new EndpointFactory();
-        ResourceType obj = e.getInstance("user");
-        ResourceType obj2 = e.getInstance("group");
-        ResourceType obj3 = e.getInstance("serviceProviderConfig");
-        ResourceType obj4 = e.getInstance("resourceType");
-        ResourceType obj5 = e.getInstance("schemaTest");
-        ResourceType obj6 = e.getInstance("me");
-        ResourceType obj7 = e.getInstance("bulk");
-        ResourceType obj8 = e.getInstance("role");
+        EndpointFactory endFactory = new EndpointFactory();
+        ResourceType resourceType = endFactory.getInstance("user");
+        ResourceType resourceType2 = endFactory.getInstance("group");
+        ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");
+        ResourceType resourceType4 = endFactory.getInstance("resourceType");
+        ResourceType resourceType5 = endFactory.getInstance("schemaTest");
+        ResourceType resourceType6 = endFactory.getInstance("me");
+        ResourceType resourceType7 = endFactory.getInstance("bulk");
+        ResourceType resourceType8 = endFactory.getInstance("role");
         try {
-            ArrayList<TestResult> results = new ArrayList<TestResult>();;
+            ArrayList<TestResult> results = new ArrayList<TestResult>();
+
+            // ServiceProviderConfig
+            ArrayList<TestResult> serviceProviderResult;
+            serviceProviderResult = resourceType3.getMethodTest();
+            for (TestResult testResult : serviceProviderResult) {
+                results.add(testResult);
+            }
+
+            // resourceType
+            ArrayList<TestResult> resourceTypeResult;
+            resourceTypeResult = resourceType4.getMethodTest();
+            for (TestResult testResult : resourceTypeResult) {
+                results.add(testResult);
+            }
+
+            // schemaTest
+            ArrayList<TestResult> schemaTestResult;
+            schemaTestResult = resourceType5.getMethodTest();
+            for (TestResult testResult : schemaTestResult) {
+                results.add(testResult);
+            }
+
+            // User
             ArrayList<TestResult> userGetResult;
-            userGetResult = obj.getMethodTest();
+            userGetResult = resourceType.getMethodTest();
             for (TestResult testResult : userGetResult) {
                 results.add(testResult);
             }
 
             ArrayList<TestResult> userPostResult;
-            userPostResult = obj.postMethodTest();
+            userPostResult = resourceType.postMethodTest();
             for (TestResult testResult : userPostResult) {
                 results.add(testResult);
             }
+
+            ArrayList<TestResult> userPatchResult;
+            userPatchResult = resourceType.patchMethodTest();
+            for (TestResult testResult : userPatchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> userSearchResult;
+            userSearchResult = resourceType.searchMethodTest();
+            for (TestResult testResult : userSearchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> userPutResult;
+            userPutResult = resourceType.putMethodTest();
+            for (TestResult testResult : userPutResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> userDeleteResult;
+            userDeleteResult = resourceType.deleteMethodTest();
+            for (TestResult testResult : userDeleteResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> userGetByIDResult;
+            userGetByIDResult = resourceType.getByIdMethodTest();
+            for (TestResult testResult : userGetByIDResult) {
+                results.add(testResult);
+            }
+
+            // Group
+            ArrayList<TestResult> groupGetResult;
+            groupGetResult = resourceType2.getMethodTest();
+            for (TestResult testResult : groupGetResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupPostResult;
+            groupPostResult = resourceType2.postMethodTest();
+            for (TestResult testResult : groupPostResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupPatchResult;
+            groupPatchResult = resourceType2.patchMethodTest();
+            for (TestResult testResult : groupPatchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupSearchResult;
+            groupSearchResult = resourceType2.searchMethodTest();
+            for (TestResult testResult : groupSearchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupPutResult;
+            groupPutResult = resourceType2.putMethodTest();
+            for (TestResult testResult : groupPutResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupDeleteResult;
+            groupDeleteResult = resourceType2.deleteMethodTest();
+            for (TestResult testResult : groupDeleteResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> groupGetByIDResult;
+            groupGetByIDResult = resourceType2.getByIdMethodTest();
+            for (TestResult testResult : groupGetByIDResult) {
+                results.add(testResult);
+            }
+
+
+            // Me
+            ArrayList<TestResult> meGetResult;
+            meGetResult = resourceType6.getMethodTest();
+            for (TestResult testResult : meGetResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> mePostResult;
+            mePostResult = resourceType6.postMethodTest();
+            for (TestResult testResult : mePostResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> mePatchResult;
+            mePatchResult = resourceType6.patchMethodTest();
+            for (TestResult testResult : mePatchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> mePutResult;
+            mePutResult = resourceType6.putMethodTest();
+            for (TestResult testResult : mePutResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> meDeleteResult;
+            meDeleteResult = resourceType6.deleteMethodTest();
+            for (TestResult testResult : meDeleteResult) {
+                results.add(testResult);
+            }
+
+
+            // Bulk
+            ArrayList<TestResult> bulkPostResult;
+            bulkPostResult = resourceType7.postMethodTest();
+            for (TestResult testResult : bulkPostResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> bulkPatchResult;
+            bulkPatchResult = resourceType7.patchMethodTest();
+            for (TestResult testResult : bulkPatchResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> bulkPutResult;
+            bulkPutResult = resourceType7.putMethodTest();
+            for (TestResult testResult : bulkPutResult) {
+                results.add(testResult);
+            }
+
+            ArrayList<TestResult> bulkDeleteResult;
+            bulkDeleteResult = resourceType7.deleteMethodTest();
+            for (TestResult testResult : bulkDeleteResult) {
+                results.add(testResult);
+            }
+
 
 
             Statistics statistics = new Statistics();
@@ -77,7 +235,15 @@ public class FactoryMain {
                         break;
                 }
             }
+            long time = 0;
+            for (TestResult result : results) {
+                time += result.getElapsedTime();
+            }
+            statistics.setTime(time);
+
             Result finalResults = new Result(statistics, results);
+
+           // System.out.println(finalResults.getStatistics());
 
             //generate pdf results sheet
             try {

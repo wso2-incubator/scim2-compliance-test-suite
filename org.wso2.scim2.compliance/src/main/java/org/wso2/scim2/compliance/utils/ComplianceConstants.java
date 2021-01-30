@@ -65,6 +65,8 @@ public class ComplianceConstants {
         public static final String SCHEMA_LIST_TEST = "Schema List Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
         public static final String ATTRIBUTE_MUTABILITY_TEST = "Attribute Mutability Test";
+        public static final String STATUS_CODE = "Verify Status code";
+        public static final String LOCATION_HEADER = "Verify Location Header";
         public static final String ALL_GROUPS_IN_TEST = "All Groups In Test";
         public static final String ALL_USERS_IN_TEST = "All Users In Test";
         public static final String PAGINATION_USER_TEST = "Pagination User Test";

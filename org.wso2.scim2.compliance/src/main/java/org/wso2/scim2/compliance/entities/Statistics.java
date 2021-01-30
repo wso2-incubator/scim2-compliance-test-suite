@@ -32,6 +32,9 @@ public class Statistics {
     @XmlElement(name = "skipped")
     int skipped = 0;
 
+    @XmlElement(name = "time")
+    long time = 0;
+
     public Statistics() {
 
     }
@@ -49,5 +52,35 @@ public class Statistics {
     public void incFailed() {
 
         this.failed++;
+    }
+
+    public void setTime(long time) {
+
+        this.time = time;
+    }
+
+    public int getSuccess() {
+
+        return success;
+    }
+
+    public int getFailed() {
+
+        return failed;
+    }
+
+    public int getSkipped() {
+
+        return skipped;
+    }
+
+    public long getTime() {
+
+        return time;
+    }
+
+    public int getTotal() {
+
+        return (success + skipped + failed);
     }
 }

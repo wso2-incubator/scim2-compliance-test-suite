@@ -107,6 +107,7 @@ public class MeTestImpl implements ResourceType {
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
@@ -123,10 +124,11 @@ public class MeTestImpl implements ResourceType {
                     try {
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     userIDs.add(user.getId());
                 }
@@ -138,10 +140,11 @@ public class MeTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                         "Could not create default users at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return userIDs;
@@ -157,6 +160,7 @@ public class MeTestImpl implements ResourceType {
      */
     private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         String userEndpointURL = complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.USERS_ENDPOINT;
         String deleteUserURL = userEndpointURL + "/" + id;
@@ -190,23 +194,26 @@ public class MeTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
         if (response.getStatusLine().getStatusCode() == 204) {
             return true;
         } else {
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
     }
 
     /**
      * Get me test case.
+     *
      * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -236,6 +243,7 @@ public class MeTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             User user = null;
             String getMeURL = url + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(getMeURL);
@@ -272,10 +280,11 @@ public class MeTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not get the default user from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -288,10 +297,11 @@ public class MeTestImpl implements ResourceType {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -299,34 +309,39 @@ public class MeTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean the created user.
@@ -342,6 +357,7 @@ public class MeTestImpl implements ResourceType {
 
     /**
      * Post me test case.
+     *
      * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -373,6 +389,7 @@ public class MeTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             User user = null;
             HttpPost method = new HttpPost(url);
             method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -412,10 +429,11 @@ public class MeTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
             }
             if (response.getStatusLine().getStatusCode() == 201) {
@@ -429,15 +447,17 @@ public class MeTestImpl implements ResourceType {
                     try {
                         cleanUpUser(user.getId(), requestPaths[i].getTestCaseName());
                     } catch (GeneralComplianceException e1) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Could not retrieve the user id",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
@@ -448,46 +468,53 @@ public class MeTestImpl implements ResourceType {
                     try {
                         cleanUpUser(user.getId(), requestPaths[i].getTestCaseName());
                     } catch (GeneralComplianceException e1) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Could not retrieve the user id",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
                 try {
                     cleanUpUser(user.getId(), requestPaths[i].getTestCaseName());
                 } catch (GeneralComplianceException e1) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not retrieve the user id",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -495,6 +522,7 @@ public class MeTestImpl implements ResourceType {
 
     /**
      * Patch me test case.
+     *
      * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -534,6 +562,7 @@ public class MeTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             //create default user;
             ArrayList<String> userID;
             userID = createTestsUsers("One");
@@ -583,10 +612,11 @@ public class MeTestImpl implements ResourceType {
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308 & requestPaths[i].getTestCaseName() != "Patch" +
                         " Me error validation") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -601,10 +631,11 @@ public class MeTestImpl implements ResourceType {
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -614,47 +645,53 @@ public class MeTestImpl implements ResourceType {
                 } catch (BadRequestException | CharonException e) {
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 // Clean the created user.
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Patch Me error validation" &&
                     response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Service Provider successfully given the expected error 400",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else {
                 // Clean the created user.
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -662,6 +699,7 @@ public class MeTestImpl implements ResourceType {
 
     /**
      * Put me test case.
+     *
      * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -688,6 +726,7 @@ public class MeTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             User user = null;
             ArrayList<String> userID = null;
             // Create 1 test user.
@@ -734,10 +773,11 @@ public class MeTestImpl implements ResourceType {
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308 &
                         requestPaths[i].getTestCaseName() != "Update Me with schema violation") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not update the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -750,10 +790,11 @@ public class MeTestImpl implements ResourceType {
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -763,45 +804,51 @@ public class MeTestImpl implements ResourceType {
 
                 } catch (BadRequestException | CharonException e) {
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Update Me with " +
                     "schema violation" &&
                     response.getStatusLine().getStatusCode() == 400) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Service Provider successfully given the expected error 400",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;
@@ -809,6 +856,7 @@ public class MeTestImpl implements ResourceType {
 
     /**
      * Delete me test case.
+     *
      * @return array of test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -833,6 +881,7 @@ public class MeTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             User user = null;
             ArrayList<String> userID = null;
             // Create 1 test user.
@@ -875,44 +924,50 @@ public class MeTestImpl implements ResourceType {
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308 &
                         response.getStatusLine().getStatusCode() != 403) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
 
             if (response.getStatusLine().getStatusCode() == 204) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 403) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to prohibit action giving 403",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
             } else {
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;

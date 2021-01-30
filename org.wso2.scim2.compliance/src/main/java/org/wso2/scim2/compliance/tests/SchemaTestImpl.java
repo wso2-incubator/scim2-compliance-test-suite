@@ -65,6 +65,7 @@ public class SchemaTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
         // Set the scim schema object.
@@ -102,35 +103,52 @@ public class SchemaTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            // Check for status returned.
+            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+            subTests.add("Expected : 200");
+            subTests.add("Status : Failure");
+            subTests.add(StringUtils.EMPTY);
+            long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get Schemas",
                             "Could not get Schemas at url " + url,
                             ComplianceUtils.getWire(method, responseString,
-                                    headerString.toString(), responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests), stopTime - startTime));
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
+            // Check for status returned.
+            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+            subTests.add("Expected : 200");
+            subTests.add("Status : Success");
+            subTests.add(StringUtils.EMPTY);
             // Build the schemas according to service provider.
             try {
                 SchemaBuilder.buildSchema(responseString, method, headerString.toString(), responseStatus,
                         subTests, url, scimSchema);
             } catch (CriticalComplianceException e) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR,
-                        "Get ResourceType",
+                        "Get Schemas",
                         e.getResult().getMessage(), ComplianceUtils.getWire(method,
-                        responseString, headerString.toString(), responseStatus, subTests)));
+                        responseString, headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 errorOccured = true;
             }
-            if (errorOccured == false) {
+            if (!errorOccured) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, "Get Schemas", StringUtils.EMPTY, ComplianceUtils.getWire(method,
-                                responseString, headerString.toString(), responseStatus, subTests)));
+                                responseString, headerString.toString(), responseStatus, subTests),
+                                stopTime - startTime));
             }
         } else {
+            long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get Schemas",
                             StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                            responseStatus, subTests)));
+                            responseStatus, subTests), stopTime - startTime));
         }
         return testResults;
     }

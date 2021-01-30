@@ -150,6 +150,7 @@ public class BulkTestImpl implements ResourceType {
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
@@ -166,10 +167,11 @@ public class BulkTestImpl implements ResourceType {
                     try {
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     userIDs.add(user.getId());
                 }
@@ -181,10 +183,11 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                         "Could not create default users at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return userIDs;
@@ -239,6 +242,7 @@ public class BulkTestImpl implements ResourceType {
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedGroups.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create the group.
                 HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
@@ -255,10 +259,11 @@ public class BulkTestImpl implements ResourceType {
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     groupIDs.add(group.getId());
                 }
@@ -270,10 +275,11 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Could not create default groups at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return groupIDs;
@@ -289,17 +295,16 @@ public class BulkTestImpl implements ResourceType {
      */
     private boolean cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         String deleteUserURL;
 
         if (testName.equals("User")) {
             String url = complianceTestMetaDataHolder.getUrl() +
                     ComplianceConstants.TestConstants.USERS_ENDPOINT;
-
             deleteUserURL = url + "/" + location;
         } else if (testName.equals("Group")) {
             String url = complianceTestMetaDataHolder.getUrl() +
                     ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
-
             deleteUserURL = url + "/" + location;
         } else {
             deleteUserURL = location;
@@ -335,18 +340,20 @@ public class BulkTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
         if (response.getStatusLine().getStatusCode() == 204) {
             return true;
         } else {
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
     }
 
@@ -491,18 +498,10 @@ public class BulkTestImpl implements ResourceType {
             requestPath4.setTestSupported(true);
         }
 
-        RequestPath requestPath5 = new RequestPath();
-        requestPath5.setTestCaseName("Patch User error validation");
-        try {
-            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
-                    .getBulkSupported());
-        } catch (Exception e) {
-            requestPath5.setTestSupported(true);
-        }
-
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             HttpPost method = new HttpPost(url);
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
@@ -539,10 +538,11 @@ public class BulkTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() != false) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -551,22 +551,25 @@ public class BulkTestImpl implements ResourceType {
                 for (String location : createdResourceLocations) {
                     cleanUp(location, requestPaths[i].getTestCaseName());
                 }
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestSupported() == false) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.
@@ -728,6 +731,7 @@ public class BulkTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             HttpPost method = new HttpPost(url);
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
@@ -764,10 +768,11 @@ public class BulkTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() != false) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -781,22 +786,25 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestSupported() == false) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         //Clean up users.
@@ -972,6 +980,7 @@ public class BulkTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             HttpPost method = new HttpPost(url);
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
@@ -1008,10 +1017,11 @@ public class BulkTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() != false) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -1025,22 +1035,25 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestSupported() == false) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         //Clean up users.
@@ -1154,6 +1167,7 @@ public class BulkTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             HttpPost method = new HttpPost(url);
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
@@ -1191,10 +1205,11 @@ public class BulkTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 error = true;
                 if (requestPaths[i].getTestSupported() != false) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -1208,22 +1223,25 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestSupported() == false) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
 

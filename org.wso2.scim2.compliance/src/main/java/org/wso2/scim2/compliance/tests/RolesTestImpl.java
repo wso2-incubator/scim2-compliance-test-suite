@@ -109,6 +109,7 @@ public class RolesTestImpl implements ResourceType {
         String responseStatus = StringUtils.EMPTY;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedUsers.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
                 HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
@@ -125,10 +126,11 @@ public class RolesTestImpl implements ResourceType {
                     try {
                         user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                                 "Could not decode the server response of users create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     userIDs.add(user.getId());
                 }
@@ -140,10 +142,11 @@ public class RolesTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
                         "Could not create default users at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return userIDs;
@@ -198,6 +201,7 @@ public class RolesTestImpl implements ResourceType {
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedGroups.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create the group.
                 HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
@@ -214,10 +218,11 @@ public class RolesTestImpl implements ResourceType {
                     try {
                         group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     groupIDs.add(group.getId());
                 }
@@ -229,10 +234,11 @@ public class RolesTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Could not create default groups at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return groupIDs;
@@ -309,6 +315,7 @@ public class RolesTestImpl implements ResourceType {
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         for (int i = 0; i < definedRoles.size(); i++) {
+            long startTime = System.currentTimeMillis();
             try {
                 // Create the role.
                 HttpEntity entity = new ByteArrayEntity(definedRoles.get(i).getBytes(StandardCharsets.UTF_8));
@@ -325,10 +332,11 @@ public class RolesTestImpl implements ResourceType {
                     try {
                         role = (Role) jsonDecoder.decodeResource(responseString, schema, new Role());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
+                        long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                                 "Could not decode the server response of groups create.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                     }
                     roleIDs.add(role.getId());
                 }
@@ -340,10 +348,11 @@ public class RolesTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
+                long stopTime = System.currentTimeMillis();
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
                         "Could not create default groups at url " + url,
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
             }
         }
         return roleIDs;
@@ -359,22 +368,20 @@ public class RolesTestImpl implements ResourceType {
      */
     private boolean cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         String deleteUserURL;
 
         if (testName.equals("User")) {
             String url = complianceTestMetaDataHolder.getUrl() +
                     ComplianceConstants.TestConstants.USERS_ENDPOINT;
-
             deleteUserURL = url + "/" + location;
         } else if (testName.equals("Group")) {
             String url = complianceTestMetaDataHolder.getUrl() +
                     ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
-
             deleteUserURL = url + "/" + location;
         } else if (testName.equals("Role")) {
             String url = complianceTestMetaDataHolder.getUrl() +
                     ComplianceConstants.TestConstants.ROLES_ENDPOINT;
-
             deleteUserURL = url + "/" + location;
         } else {
             deleteUserURL = location;
@@ -400,7 +407,6 @@ public class RolesTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
-
         } catch (Exception e) {
             // Read the response body.
             // Get all headers.
@@ -410,18 +416,20 @@ public class RolesTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
         if (response.getStatusLine().getStatusCode() == 204) {
             return true;
         } else {
+            long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                            subTests)));
+                            subTests), stopTime - startTime));
         }
     }
 
@@ -518,6 +526,7 @@ public class RolesTestImpl implements ResourceType {
                 requestPath7};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             String requestUrl = url + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
@@ -552,10 +561,11 @@ public class RolesTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not list the roles at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -581,20 +591,22 @@ public class RolesTestImpl implements ResourceType {
                                     responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
                 } catch (JSONException e) {
                     throw new ComplianceException(500, "Error in decoding the returned list resource.");
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 if (requestPaths[i].getTestCaseName().equals("List roles")) { // check for all created roles
@@ -605,10 +617,11 @@ public class RolesTestImpl implements ResourceType {
                     }
                     for (String id : groupIDs) {
                         if (!returnedRoleIDs.contains(id)) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain all the created roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             errorOccur = true;
                             break;
                         }
@@ -618,10 +631,11 @@ public class RolesTestImpl implements ResourceType {
                     String value = "loginRole1";
                     for (Role role : roleList) {
                         if (!Objects.equals(value, role.getDisplayName())) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the expected roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
@@ -630,77 +644,86 @@ public class RolesTestImpl implements ResourceType {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
                     if (roleList.size() != 2) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of paginated roles",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                 } else if (requestPaths[i].getTestCaseName().equals("Sort test")) {
                     subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
                     try {
                         if (isRoleListSorted(roleList)) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the sorted list of roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     } catch (CharonException e) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain the sorted list of roles",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
 
                 } else if (requestPaths[i].getTestCaseName().equals("Filter with pagination test")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
                     if (roleList.size() != 1) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of users.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                     String value = "loginRole1";
                     for (Role role : roleList) {
                         if (!Objects.equals(value, role.getDisplayName())) {
+                            long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response does not contain the expected roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests)));
+                                            responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
                     }
                 } else if (requestPaths[i].getTestCaseName().equals("Get roles without index and only using count")) {
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
                     if (startIndex != 1 && count != 2) {
+                        long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 "Response does not contain right number of pagination.",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests)));
+                                        subTests), stopTime - startTime));
                         continue;
                     }
                 }
                 if (errorOccur == false) {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult
                             (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                    headerString.toString(), responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
             } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
         // Clean up users after all tasks.
@@ -748,6 +771,7 @@ public class RolesTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
+            long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             groupIds = createTestsGroups(userIDs, "Many");
             ArrayList<String> roleId = createTestsRoles(userIDs, groupIds, "One");
@@ -793,10 +817,11 @@ public class RolesTestImpl implements ResourceType {
                 }
                 cleanUp(id, requestPaths[i].getTestCaseName());
                 if (requestPaths[i].getTestCaseName() != "Group not found error response") {
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not get the default group from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
             }
@@ -817,10 +842,11 @@ public class RolesTestImpl implements ResourceType {
                         cleanUp(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUp(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 try {
@@ -837,10 +863,11 @@ public class RolesTestImpl implements ResourceType {
                         cleanUp(uId, requestPaths[i].getTestCaseName());
                     }
                     cleanUp(id, requestPaths[i].getTestCaseName());
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests)));
+                                    subTests), stopTime - startTime));
                     continue;
                 }
                 // Clean up users.
@@ -852,28 +879,31 @@ public class RolesTestImpl implements ResourceType {
                     cleanUp(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUp(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                headerString.toString(), responseStatus, subTests)));
+                                headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName() == "Role not found error response" &&
                     response.getStatusLine().getStatusCode() == 404) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 "Server successfully given the expected error 404(Role not found in the user store) " +
                                         "message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 // Clean up users.
                 for (String uId : userIDs) {
                     cleanUp(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUp(id, requestPaths[i].getTestCaseName());
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         }
         return testResults;

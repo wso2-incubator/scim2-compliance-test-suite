@@ -17,6 +17,7 @@
  */
 package org.wso2.scim2.compliance.tests.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.wso2.charon3.core.attributes.AbstractAttribute;
 import org.wso2.charon3.core.attributes.Attribute;
@@ -73,26 +74,46 @@ public class ResponseValidateTests {
                                         String responseStatus,
                                         ArrayList<String> subTests)
             throws BadRequestException, CharonException, GeneralComplianceException, ComplianceException {
-        //Check for required attributes
+
+        boolean requiredTest = false;
+        boolean schemaTest = false;
+        boolean definitionTest = false;
+        // Check for required attributes.
         if (!subTests.contains(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST);
+            subTests.add("Message  : Test for required attributes in response.");
+            requiredTest = true;
         }
         validateSCIMObjectForRequiredAttributes(scimObject, schema,
                 method, responseString, headerString, responseStatus, subTests);
-
-        //validate schema list
+        if (requiredTest) {
+            subTests.add("Status  : Success.");
+            subTests.add(StringUtils.EMPTY);
+        }
+        // Validate schema list.
         if (!subTests.contains(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST);
+            subTests.add("Message  : Test for presence of schema.");
+            schemaTest = true;
         }
         validateSchemaList(scimObject, schema, method, responseString, headerString, responseStatus, subTests);
-
+        if (schemaTest) {
+            subTests.add("Status  : Success.");
+            subTests.add(StringUtils.EMPTY);
+        }
+        // Validate attribute definitions.
         if (!subTests.contains(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST);
+            subTests.add("Message  : Test for attribute definitions.");
+            definitionTest = true;
         }
         validateReturnedAttributes((AbstractSCIMObject) scimObject, requestedAttributes,
                 requestedExcludingAttributes, method,
                 responseString, headerString, responseStatus, subTests);
-
+        if (definitionTest) {
+            subTests.add("Status  : Success.");
+            subTests.add(StringUtils.EMPTY);
+        }
     }
 
     /*

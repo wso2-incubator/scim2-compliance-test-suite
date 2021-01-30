@@ -61,7 +61,7 @@ public class PDFGenerator {
             document.addPage(blankPage);
 
         } else {
-            for (int i = 0; i < finalResults.getResults().size(); i++) {
+            for (int i = 0; i < finalResults.getResults().size() * 2; i++) {
                 // Creating a blank page.
                 PDPage blankPage = new PDPage();
                 // Adding the blank page to the document.
@@ -149,6 +149,17 @@ public class PDFGenerator {
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testName);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
+            Color timeColor = new Color(149, 69, 19);
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.showText("Test Case Elapsed Time(ms) : ");
+            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream.setNonStrokingColor(timeColor);
+            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            contentStream.showText(Long.toString(testResult.getElapsedTime()));
+            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
             if (!testMessage.isEmpty()) {
                 contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
                 contentStream.setNonStrokingColor(Color.BLACK);
@@ -160,18 +171,25 @@ public class PDFGenerator {
                 printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             }
             Color statusColor = new Color(0, 102, 0);
+            Color statusColor2 = new Color(204, 204, 0);
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText("Test Case Status : ");
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-            contentStream.setNonStrokingColor(statusColor);
+            if (testResult.getStatusText() == "Success") {
+                contentStream.setNonStrokingColor(statusColor);
+            } else if (testResult.getStatusText() == "Failed") {
+                contentStream.setNonStrokingColor(Color.red);
+            } else {
+                contentStream.setNonStrokingColor(statusColor2);
+            }
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testLabel);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.showText(("To Server : "));
+            contentStream.showText(("Request : "));
             contentStream.setFont(PDType1Font.COURIER, smallFontSize);
             contentStream.setNonStrokingColor(Color.BLUE);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
@@ -185,13 +203,12 @@ public class PDFGenerator {
                 r = testResult.getWire().getResponseBody();
                 json = new JSONObject(r);
             } catch (Exception e) {
-                System.out.println("hello1");
                 json = null;
             }
 
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.showText("From Server : ");
+            contentStream.showText("Response : ");
             contentStream.setFont(PDType1Font.COURIER, smallFontSize);
             contentStream.setNonStrokingColor(Color.BLUE);
             printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, fromServer);
@@ -213,21 +230,133 @@ public class PDFGenerator {
                 }
             }
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-
-//            contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-//            contentStream.setNonStrokingColor(Color.BLACK);
-//            contentStream.showText("Sub Tests Performed : ");
-//            contentStream.setFont(PDType1Font.COURIER, fontSize);
-//            contentStream.setNonStrokingColor(Color.BLUE);
-//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, subTests);
-//            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-
             //Ending the content stream
             contentStream.endText();
             contentStream.close();
             pageNo++;
+
+            //Retrieving the pages of the document
+            PDPage page2 = document.getPage(pageNo);
+            PDPageContentStream contentStream2 = new PDPageContentStream(document, page2);
+            //Drawing a rectangle
+            contentStream2.addRect(startX, startY - 5, width, 1);
+            //Begin text printing
+            contentStream2.fill();
+            contentStream2.beginText();
+            contentStream2.setFont(PDType1Font.TIMES_ITALIC, fontSize);
+            contentStream2.newLineAtOffset(startX, startY);
+            contentStream2.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
+            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+            contentStream2.setFont(PDType1Font.COURIER_BOLD, fontSize);
+            contentStream2.setNonStrokingColor(Color.BLACK);
+            contentStream2.showText("Assertions : ");
+            contentStream2.setFont(PDType1Font.COURIER, fontSize);
+            contentStream2.setNonStrokingColor(Color.BLUE);
+            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, subTests);
+            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+            //Ending the content stream
+            contentStream2.endText();
+            contentStream2.close();
+            pageNo++;
         }
+        //last page
+        PDPage blankPage = new PDPage();
+        // Adding the blank page to the document.
+        document.addPage(blankPage);
+        //Retrieving the pages of the document
+        PDPage page = document.getPage(pageNo);
+        PDPageContentStream contentStream = new PDPageContentStream(document, page);
+
+        PDFont pdfFont = PDType1Font.HELVETICA;
+        float typeWriterFont = 12;
+        float titleFont = 10;
+        float fontSize = 8;
+        float smallFontSize = 7;
+        float leading = 1.5f * fontSize;
+
+        PDRectangle mediabox = page.getMediaBox();
+        float margin = 42;
+        float width = mediabox.getWidth() - 2 * margin;
+        float startX = mediabox.getLowerLeftX() + margin;
+        float startY = mediabox.getUpperRightY() - margin;
+        List emptyLine = new ArrayList();
+        emptyLine.add(" ");
+
+        //Drawing a rectangle
+        contentStream.addRect(startX, startY - 5, width, 1);
+
+        //Begin text printing
+        contentStream.fill();
+        contentStream.beginText();
+        contentStream.setFont(PDType1Font.TIMES_ITALIC, fontSize);
+        contentStream.newLineAtOffset(startX, startY);
+
+        contentStream.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        Color titleColor = new Color(102, 0, 153);
+        Color dataColor = new Color(149, 69, 19);
+        contentStream.setFont(PDType1Font.COURIER_BOLD, typeWriterFont);
+        contentStream.setNonStrokingColor(titleColor);
+        contentStream.showText("Summary : ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.showText("Success Test cases: ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        contentStream.setNonStrokingColor(dataColor);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        contentStream.showText(Integer.toString(finalResults.getStatistics().getSuccess()));
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.showText("Failed Test cases : ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        contentStream.setNonStrokingColor(dataColor);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        contentStream.showText(Integer.toString(finalResults.getStatistics().getFailed()));
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.showText("Skipped Test cases : ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        contentStream.setNonStrokingColor(dataColor);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        contentStream.showText(Integer.toString(finalResults.getStatistics().getSkipped()));
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.showText("Total Test cases : ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        contentStream.setNonStrokingColor(dataColor);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        contentStream.showText(Integer.toString(finalResults.getStatistics().getTotal()));
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
+        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.showText("Time elapsed to run all Test cases(ms) : ");
+        contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
+        contentStream.setNonStrokingColor(dataColor);
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        contentStream.showText(Long.toString(finalResults.getStatistics().getTime()));
+        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+
+        //Ending the content stream
+        contentStream.endText();
+        contentStream.close();
+
         //save the document
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");

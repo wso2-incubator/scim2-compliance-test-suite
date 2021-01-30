@@ -63,6 +63,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
 
     /**
      * Method to get the service provider configs.
+     *
      * @return arrays pf test results
      * @throws GeneralComplianceException
      * @throws ComplianceException
@@ -70,6 +71,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
+        long startTime = System.currentTimeMillis();
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
         Boolean errorOccured = false;
@@ -106,14 +108,27 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
             }
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
+            // Check for status returned.
+            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+            subTests.add("Expected : 200");
+            subTests.add("Status : Failure");
+            subTests.add(StringUtils.EMPTY);
+            long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get ServiceProviderConfig",
                             "Could not get ServiceProviderConfig at url " + url,
                             ComplianceUtils.getWire(method, responseString,
-                                    headerString.toString(), responseStatus, subTests)));
+                                    headerString.toString(), responseStatus, subTests), stopTime - startTime));
             errorOccured = true;
         }
         if (response.getStatusLine().getStatusCode() == 200) {
+            // Check for status returned.
+            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+            subTests.add("Expected : 200");
+            subTests.add("Status : Success");
+            subTests.add(StringUtils.EMPTY);
             // Obtain the schema corresponding to serviceProviderConfig.
             SCIMResourceTypeSchema schema = complianceTestMetaDataHolder.getScimSchema().
                     getServiceProviderConfigSchema();
@@ -125,10 +140,11 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
                                         new SCIMServiceProviderConfig());
                 complianceTestMetaDataHolder.setScimServiceProviderConfig(scimServiceProviderConfig);
             } catch (BadRequestException | CharonException | InternalErrorException e) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
                 errorOccured = true;
             }
             try {
@@ -136,28 +152,34 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
                         responseString, headerString.toString(), responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
+                subTests.add("Status : Failure");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                subTests)));
+                                subTests), stopTime - startTime));
                 errorOccured = true;
             } catch (GeneralComplianceException e) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR, "Get ServiceProviderConfig",
                         e.getResult().getMessage(), ComplianceUtils.getWire(method,
-                        responseString, headerString.toString(), responseStatus, subTests)));
+                        responseString, headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 errorOccured = true;
             }
-            if (errorOccured == false) {
+            if (!errorOccured) {
+                long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, "Get ServiceProviderConfig", StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                        responseStatus, subTests)));
+                                        responseStatus, subTests), stopTime - startTime));
             }
         } else {
+            long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, "Get ServiceProviderConfig",
                             StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                            responseStatus, subTests)));
+                            responseStatus, subTests), stopTime - startTime));
         }
         return testResults;
     }
