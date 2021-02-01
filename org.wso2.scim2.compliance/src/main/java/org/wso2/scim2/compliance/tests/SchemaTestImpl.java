@@ -107,7 +107,7 @@ public class SchemaTestImpl implements ResourceType {
             subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
             subTests.add("Actual : " + response.getStatusLine().getStatusCode());
             subTests.add("Expected : 200");
-            subTests.add("Status : Failure");
+            subTests.add("Status : Failed");
             subTests.add(StringUtils.EMPTY);
             long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult

@@ -310,7 +310,7 @@ public class PDFGenerator {
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(Color.BLACK);
-        contentStream.showText("Success Test cases: ");
+        contentStream.showText("Success Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
         printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);

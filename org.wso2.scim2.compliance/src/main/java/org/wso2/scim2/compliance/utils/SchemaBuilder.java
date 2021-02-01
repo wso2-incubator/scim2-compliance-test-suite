@@ -1,5 +1,6 @@
 package org.wso2.scim2.compliance.utils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -228,10 +229,12 @@ public class SchemaBuilder {
                                                            String url)
             throws ComplianceException, CriticalComplianceException {
 
+        String attributeName = null;
         try {
             String name = "";
             if (attribute.optString("name") != null) {
                 name = attribute.optString("name");
+                attributeName = name;
             } else {
                 throw new CriticalComplianceException(new TestResult
                         (TestResult.ERROR, "Get Schema",
@@ -371,15 +374,24 @@ public class SchemaBuilder {
                 uniquenessDefinition = SCIMDefinitions.Uniqueness.SERVER;
             }
 
+            subTests.add("Schema " + attributeName + " definitions test");
+            subTests.add("Message : Check attributes definition follow SCIM specification.");
+            subTests.add("Status : Success");
+            subTests.add(StringUtils.EMPTY);
+
             return SCIMAttributeSchema.createSCIMAttributeSchema(uri, name, dataTypeDefinition,
                     multivalued, description, required, caseExact, mutabilityDefinition,
                     returnedDefinition, uniquenessDefinition,
                     null, null, null);
 
         } catch (JSONException e) {
+            subTests.add("Schema " + attributeName + " definitions test");
+            subTests.add("Message : Check attributes definition follow SCIM specification.");
+            subTests.add("Status : Failed");
+            subTests.add(StringUtils.EMPTY);
             throw new CriticalComplianceException(new TestResult
                     (TestResult.ERROR, "Get Schema",
-                            "Could not get schema at url " + url,
+                            e.getMessage() + "in attribute " + attributeName,
                             ComplianceUtils.getWire(method, jsonSchema,
                                     headerString, responseStatus, subTests)));
         }

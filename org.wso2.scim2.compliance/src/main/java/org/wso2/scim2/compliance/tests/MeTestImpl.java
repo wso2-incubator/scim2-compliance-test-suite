@@ -258,6 +258,7 @@ public class MeTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -265,6 +266,9 @@ public class MeTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -280,6 +284,12 @@ public class MeTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not get the default user from url " + url,
@@ -289,13 +299,18 @@ public class MeTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
-
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -304,11 +319,29 @@ public class MeTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
@@ -322,6 +355,12 @@ public class MeTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -330,6 +369,12 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 308");
+                subTests.add("Status : Permanent Redirect");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -402,6 +447,7 @@ public class MeTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 // Create the user.
                 HttpEntity entity = new ByteArrayEntity
@@ -413,6 +459,9 @@ public class MeTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
@@ -429,6 +478,12 @@ public class MeTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 201");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
@@ -437,6 +492,12 @@ public class MeTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 201) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
@@ -459,12 +520,29 @@ public class MeTestImpl implements ResourceType {
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + user.getId());
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + user.getId());
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
-
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     try {
                         cleanUpUser(user.getId(), requestPaths[i].getTestCaseName());
                     } catch (GeneralComplianceException e1) {
@@ -495,6 +573,12 @@ public class MeTestImpl implements ResourceType {
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -503,6 +587,12 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 308");
+                subTests.add("Status : Permanent Redirect");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -581,6 +671,7 @@ public class MeTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 // Patch the user.
                 HttpEntity entity = new ByteArrayEntity
@@ -594,6 +685,9 @@ public class MeTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -610,8 +704,14 @@ public class MeTestImpl implements ResourceType {
                 // Clean the created user.
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
                 if (response.getStatusLine().getStatusCode() != 501 &
-                        response.getStatusLine().getStatusCode() != 308 & requestPaths[i].getTestCaseName() != "Patch" +
-                        " Me error validation") {
+                        response.getStatusLine().getStatusCode() != 308 &
+                        !requestPaths[i].getTestCaseName().equals("Patch Me error validation")) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default user at url " + url,
@@ -621,13 +721,18 @@ public class MeTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
-
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
@@ -638,11 +743,29 @@ public class MeTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
                     long stopTime = System.currentTimeMillis();
@@ -659,8 +782,14 @@ public class MeTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Patch Me error validation" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Patch Me error validation") &&
                     response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -669,6 +798,12 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -677,6 +812,12 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 308");
+                subTests.add("Status : Permanent Redirect");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -743,6 +884,7 @@ public class MeTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 //update the user
                 HttpEntity entity = new ByteArrayEntity
@@ -756,6 +898,9 @@ public class MeTestImpl implements ResourceType {
                 //get all headers
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -772,7 +917,13 @@ public class MeTestImpl implements ResourceType {
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308 &
-                        requestPaths[i].getTestCaseName() != "Update Me with schema violation") {
+                        !requestPaths[i].getTestCaseName().equals("Update Me with schema violation")) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not update the default user at url " + url,
@@ -781,6 +932,12 @@ public class MeTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 //obtain the schema corresponding to user
                 // unless configured returns core-user schema or else returns extended user schema)
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
@@ -797,12 +954,29 @@ public class MeTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
-
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -818,6 +992,12 @@ public class MeTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -826,15 +1006,27 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 308");
+                subTests.add("Status : Permanent Redirect");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
                                 "service provider choose to redirect the client using HTTP status code 308 ",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                         subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Update Me with " +
-                    "schema violation" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Update Me with " +
+                    "schema violation") &&
                     response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -910,7 +1102,6 @@ public class MeTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-
             } catch (Exception e) {
                 // Read the response body.
                 // Get all headers.
@@ -924,6 +1115,12 @@ public class MeTestImpl implements ResourceType {
                 if (response.getStatusLine().getStatusCode() != 501 &
                         response.getStatusLine().getStatusCode() != 308 &
                         response.getStatusLine().getStatusCode() != 403) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 204");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default user at url " + url,
@@ -932,14 +1129,25 @@ public class MeTestImpl implements ResourceType {
                     continue;
                 }
             }
-
             if (response.getStatusLine().getStatusCode() == 204) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 204");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -948,6 +1156,12 @@ public class MeTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 308) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 308");
+                subTests.add("Status : Permanent Redirect");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -955,6 +1169,12 @@ public class MeTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                         subTests), stopTime - startTime));
             } else if (response.getStatusLine().getStatusCode() == 403) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Failed");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),

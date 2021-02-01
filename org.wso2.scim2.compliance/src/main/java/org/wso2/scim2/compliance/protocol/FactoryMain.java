@@ -243,8 +243,6 @@ public class FactoryMain {
 
             Result finalResults = new Result(statistics, results);
 
-           // System.out.println(finalResults.getStatistics());
-
             //generate pdf results sheet
             try {
                 String fullPath = "/home/anjanap/Desktop/SCIM2\n";

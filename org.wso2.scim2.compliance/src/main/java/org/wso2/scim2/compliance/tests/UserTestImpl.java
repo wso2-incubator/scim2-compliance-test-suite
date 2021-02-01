@@ -243,7 +243,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setUrl("?filter=userName+eq+loginUser1");
-        requestPath2.setTestCaseName("List users with Filter");
+        requestPath2.setTestCaseName("List users by filtering - userName eq");
         try {
             requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
                     getFilterSupported());
@@ -253,11 +253,11 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath3 = new RequestPath();
         requestPath3.setUrl("?startIndex=1&count=2");
-        requestPath3.setTestCaseName("List users with Pagination");
+        requestPath3.setTestCaseName("List users with pagination");
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
-        requestPath4.setTestCaseName("Sort test");
+        requestPath4.setTestCaseName("List users with user id sorting and ascending order");
         try {
             requestPath4.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
                     getSortSupported());
@@ -267,7 +267,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath5 = new RequestPath();
         requestPath5.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
-        requestPath5.setTestCaseName("Filter with pagination test");
+        requestPath5.setTestCaseName("List users with userName as filter with pagination");
         try {
             requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
                     getFilterSupported());
@@ -285,11 +285,11 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath8 = new RequestPath();
         requestPath8.setUrl("?attributes=userName,name.givenName");
-        requestPath8.setTestCaseName("List users with specific attributes");
+        requestPath8.setTestCaseName("List users with specific attributes username and givenName");
 
         RequestPath requestPath9 = new RequestPath();
         requestPath9.setUrl("?excludedAttributes=name.givenName,emails");
-        requestPath9.setTestCaseName("List users with excluding attributes");
+        requestPath9.setTestCaseName("List users with excluding attributes givenName and emails");
 
         // This array hold the sub tests details.
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
@@ -351,12 +351,12 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
+                if (requestPaths[i].getTestSupported() && response.getStatusLine().getStatusCode() != 501) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
                     subTests.add("Expected : 200");
-                    subTests.add("Status : Failure");
+                    subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -396,12 +396,15 @@ public class UserTestImpl implements ResourceType {
                                     responseString, headerString.toString(), responseStatus, subTests);
 
                         } catch (BadRequestException | CharonException e) {
+                            subTests.add("Status : Failed");
+                            subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            continue;
+                            errorOccur = true;
+                            break;
                         }
                     }
                 } catch (JSONException e) {
@@ -420,7 +423,7 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
                 // Check for all created groups.
-                if (requestPaths[i].getTestCaseName() == "List Users") {
+                if (requestPaths[i].getTestCaseName().equals("List Users")) {
                     //check for list of users returned
                     subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
                     ArrayList<String> returnedUserIDs = new ArrayList<>();
@@ -429,7 +432,8 @@ public class UserTestImpl implements ResourceType {
                     }
                     for (String id : userIDs) {
                         if (!returnedUserIDs.contains(id)) {
-                            subTests.add("Status : Failure");
+                            subTests.add("Message : Check the created 5 users are listed.");
+                            subTests.add("Status : Failed");
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -440,11 +444,12 @@ public class UserTestImpl implements ResourceType {
                             break;
                         }
                     }
-                    if (errorOccur == false) {
+                    if (!errorOccur) {
+                        subTests.add("Message : Check the created 5 users are listed.");
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName() == "List users with Filter") {
+                } else if (requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
                     String value = "loginUser1";
                     for (User user1 : userList) {
@@ -452,7 +457,7 @@ public class UserTestImpl implements ResourceType {
                             if (!value.equals(user1.getUserName())) {
                                 subTests.add("Actual : userName:" + user1.getUserName());
                                 subTests.add("Expected : userName:" + value);
-                                subTests.add("Status : Failure");
+                                subTests.add("Status : Failed");
                                 subTests.add(StringUtils.EMPTY);
                                 long stopTime = System.currentTimeMillis();
                                 testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -463,7 +468,7 @@ public class UserTestImpl implements ResourceType {
                                 break;
                             }
                         } catch (CharonException e) {
-                            subTests.add("Status : Failure");
+                            subTests.add("Status : Failed");
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -474,19 +479,19 @@ public class UserTestImpl implements ResourceType {
                             break;
                         }
                     }
-                    if (errorOccur == false) {
+                    if (!errorOccur) {
                         subTests.add("Actual : userName:" + value);
                         subTests.add("Expected : userName:" + value);
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName() == "List users with Pagination" ||
-                        requestPaths[i].getTestCaseName() == "List users having negative number as index") {
-                    subTests.add(requestPaths[i].getTestCaseName() + "Test");
+                } else if (requestPaths[i].getTestCaseName().equals("List users with pagination") ||
+                        requestPaths[i].getTestCaseName().equals("List users having negative number as index")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " Test");
                     if (userList.size() != 2) {
                         subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
                         subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failure");
+                        subTests.add("Status : Failed");
                         subTests.add(StringUtils.EMPTY);
                         long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -499,11 +504,12 @@ public class UserTestImpl implements ResourceType {
                     subTests.add("Expected : startIndex:1,totalResults:2");
                     subTests.add("Status : Success");
                     subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName() == "Sort test") {
+                } else if (requestPaths[i].getTestCaseName().equals("List users with user id sorting and ascending " +
+                        "order")) {
                     subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
                     try {
                         if (isUserListSorted(userList)) {
-                            subTests.add("Status : Failure");
+                            subTests.add("Status : Failed");
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -513,7 +519,7 @@ public class UserTestImpl implements ResourceType {
                             continue;
                         }
                     } catch (CharonException e) {
-                        subTests.add("Status : Failure");
+                        subTests.add("Status : Failed");
                         subTests.add(StringUtils.EMPTY);
                         long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -524,12 +530,13 @@ public class UserTestImpl implements ResourceType {
                     }
                     subTests.add("Status : Success");
                     subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName() == "Filter with pagination test") {
+                } else if (requestPaths[i].getTestCaseName().equals("List users with userName as filter with " +
+                        "pagination")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
                     if (userList.size() != 1) {
                         subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
                         subTests.add("Expected : startIndex:1,totalResults:1");
-                        subTests.add("Status : Failure");
+                        subTests.add("Status : Failed");
                         subTests.add(StringUtils.EMPTY);
                         long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -545,7 +552,7 @@ public class UserTestImpl implements ResourceType {
                                 subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size() +
                                         ",userName:" + user1.getUserName());
                                 subTests.add("Expected : startIndex:1,totalResults:1,userName:loginUser1");
-                                subTests.add("Status : Failure");
+                                subTests.add("Status : Failed");
                                 subTests.add(StringUtils.EMPTY);
                                 long stopTime = System.currentTimeMillis();
                                 testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -556,7 +563,7 @@ public class UserTestImpl implements ResourceType {
                                 break;
                             }
                         } catch (CharonException e) {
-                            subTests.add("Status : Failure");
+                            subTests.add("Status : Failed");
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -567,18 +574,18 @@ public class UserTestImpl implements ResourceType {
                             break;
                         }
                     }
-                    if (errorOccur == false) {
+                    if (!errorOccur) {
                         subTests.add("Actual : startIndex:1,totalResults:1,userName:loginUser1");
                         subTests.add("Expected : startIndex:1,totalResults:1,userName:loginUser1");
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName() == "List users without index and only using count") {
+                } else if (requestPaths[i].getTestCaseName().equals("List users without index and only using count")) {
                     subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
                     if (startIndex != 1 && count != 2) {
                         subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
                         subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failure");
+                        subTests.add("Status : Failed");
                         subTests.add(StringUtils.EMPTY);
                         long stopTime = System.currentTimeMillis();
                         testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -593,13 +600,13 @@ public class UserTestImpl implements ResourceType {
                     subTests.add(StringUtils.EMPTY);
                 }
                 long stopTime = System.currentTimeMillis();
-                if (errorOccur == false) {
+                if (!errorOccur) {
                     testResults.add(new TestResult
                             (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                     headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
-            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -660,13 +667,13 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl(generateUniqueID());
-        requestPath4.setTestCaseName("User not found error response");
+        requestPath4.setTestCaseName("Get a non existing user and validate user not found error response");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            //create default user;
+            // Create default user.
             ArrayList<String> userID = null;
             userID = createTestsUsers("One");
             String id = userID.get(0);
@@ -681,6 +688,7 @@ public class UserTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -688,6 +696,9 @@ public class UserTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -703,7 +714,14 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
-                if (requestPaths[i].getTestCaseName() != "User not found error response") {
+                if (!requestPaths[i].getTestCaseName().equals("Get a non existing user and validate user not found " +
+                        "error response")) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not get the default user from url " + url,
@@ -713,6 +731,12 @@ public class UserTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
@@ -729,11 +753,29 @@ public class UserTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, "Get User");
                     long stopTime = System.currentTimeMillis();
@@ -749,8 +791,15 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Get a non existing user and validate user not " +
+                    "found error response") &&
                     response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -847,12 +896,12 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName() == "Create User") {
+                if (requestPaths[i].getTestCaseName().equals("Create User")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
                     subTests.add("Expected : 201");
-                    subTests.add("Status : Failure");
+                    subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -909,14 +958,15 @@ public class UserTestImpl implements ResourceType {
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
                     subTests.add("Actual : " + locationHeader);
                     subTests.add("Expected : " + location);
-                    subTests.add("Status : Success");
+                    subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
-
                 }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null, null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Response Validation Error",
@@ -929,7 +979,7 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Create User with existing userName" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Create User with existing userName") &&
                     response.getStatusLine().getStatusCode() == 409) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -943,7 +993,7 @@ public class UserTestImpl implements ResourceType {
                                 "Server successfully given the expected error 409(conflict) message",
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Create User without userName" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Create User without userName") &&
                     response.getStatusLine().getStatusCode() == 400) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -1035,7 +1085,7 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath5 = new RequestPath();
-        requestPath5.setTestCaseName("Patch User error validation");
+        requestPath5.setTestCaseName("Patch User - remove attribute without defining a path");
         try {
             requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
                     getPatchSupported());
@@ -1073,6 +1123,7 @@ public class UserTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 // Patch the user.
                 HttpEntity entity = new ByteArrayEntity
@@ -1086,6 +1137,9 @@ public class UserTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -1101,9 +1155,15 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
-                if (requestPaths[i].getTestCaseName() != "Patch User error validation" &&
-                        requestPaths[i].getTestSupported() != false &&
+                if (!requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a path") &&
+                        requestPaths[i].getTestSupported() &&
                         response.getStatusLine().getStatusCode() != 501) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not patch the default user at url " + url,
@@ -1113,13 +1173,18 @@ public class UserTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
-
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
@@ -1130,11 +1195,29 @@ public class UserTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
@@ -1151,8 +1234,15 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Patch User error validation" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a " +
+                    "path") &&
                     response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -1160,7 +1250,13 @@ public class UserTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -1226,6 +1322,7 @@ public class UserTestImpl implements ResourceType {
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
+            String locationHeader = null;
             try {
                 // Update the user.
                 HttpEntity entity = new ByteArrayEntity
@@ -1239,6 +1336,9 @@ public class UserTestImpl implements ResourceType {
                 // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
+                    if (header.getName().equals("Location")) {
+                        locationHeader = header.getValue();
+                    }
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
@@ -1254,15 +1354,28 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, "Update User");
-                long stopTime = System.currentTimeMillis();
-                if (requestPaths[i].getTestCaseName() != "Update user with schema violation") {
+                if (!requestPaths[i].getTestCaseName().equals("Update user with schema violation")) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not update the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
+                    continue;
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
@@ -1277,12 +1390,31 @@ public class UserTestImpl implements ResourceType {
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
+                    continue;
+                }
+                // Assertion to check location header.
+                if (locationHeader != null) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                } else {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                    subTests.add("Actual : " + locationHeader);
+                    subTests.add("Expected : " + url + "/" + id);
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                 }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, "Update User");
                     long stopTime = System.currentTimeMillis();
@@ -1298,8 +1430,14 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Update user with schema violation" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Update user with schema violation") &&
                     response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -1342,7 +1480,11 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setUrl(generateUniqueID());
-        requestPath2.setTestCaseName("User not found error response");
+        requestPath2.setTestCaseName("Delete non existing user and validate user not found error response");
+//
+//        RequestPath requestPath2 = new RequestPath();
+//        requestPath2.setUrl(generateUniqueID());
+//        requestPath2.setTestCaseName("Delete user twice and verify Http status code");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
@@ -1386,8 +1528,15 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, "Delete User");
-                long stopTime = System.currentTimeMillis();
-                if (requestPaths[i].getTestCaseName() != "User not found error response") {
+                if (!requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not found " +
+                        "error response")) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 204");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                    long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
@@ -1395,13 +1544,26 @@ public class UserTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 204) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 204");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "User not found error response" &&
+            } else if (requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not " +
+                    "found error response") &&
                     response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -1439,10 +1601,10 @@ public class UserTestImpl implements ResourceType {
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
-        requestPath1.setTestCaseName("Post user with filter and pagination query parameters");
+        requestPath1.setTestCaseName("Search user with filter and pagination query parameters");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setTestCaseName("Post user and validate error message");
+        requestPath2.setTestCaseName("Search user with invalid filter");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2};
 
@@ -1463,6 +1625,7 @@ public class UserTestImpl implements ResourceType {
             Integer totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
+            Boolean errorOccur = false;
             try {
                 // Create the request.
                 HttpEntity entity = new ByteArrayEntity
@@ -1487,7 +1650,13 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName() != "Post user and validate error message") {
+                if (requestPaths[i].getTestCaseName() != "Search user with invalid filter") {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not create default user at url " + url,
@@ -1496,6 +1665,12 @@ public class UserTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -1516,16 +1691,23 @@ public class UserTestImpl implements ResourceType {
                                     null, null, method,
                                     responseString, headerString.toString(), responseStatus, subTests);
                         } catch (BadRequestException | CharonException e) {
+                            subTests.add("Status : Failed");
+                            subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            continue;
+                            errorOccur = true;
+                            break;
                         }
                     }
                 } catch (JSONException e) {
-//                    throw new ComplianceException(500, "Error in decoding the returned list resource.");
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                    responseStatus, subTests), stopTime - startTime));
                     continue;
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
@@ -1535,15 +1717,32 @@ public class UserTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                subTests.add("Check expected result");
+                subTests.add("Message : Expected 5 users whose userNames starts with login contain in response.");
                 if (totalResults == 5) {
+                    // Assert expected result.
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult
-                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
-                                    StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
-                                    headerString.toString(), responseStatus, subTests), stopTime - startTime));
+                    if (!errorOccur) {
+                        testResults.add(new TestResult
+                                (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                        StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
+                                        headerString.toString(), responseStatus, subTests), stopTime - startTime));
+                    }
+                } else {
+                    // Assert expected result.
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                 }
-            } else if (requestPaths[i].getTestCaseName() == "Post user and validate error message"
+            } else if (requestPaths[i].getTestCaseName().equals("Search user with invalid filter")
                     && response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),

@@ -537,7 +537,13 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false) {
+                if (requestPaths[i].getTestSupported()) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
@@ -547,6 +553,12 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 //run clean up task
                 for (String location : createdResourceLocations) {
                     cleanUp(location, requestPaths[i].getTestCaseName());
@@ -556,7 +568,13 @@ public class BulkTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestSupported() == false) {
+            } else if (!requestPaths[i].getTestSupported()) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -767,7 +785,13 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false) {
+                if (requestPaths[i].getTestSupported()) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
@@ -779,19 +803,37 @@ public class BulkTestImpl implements ResourceType {
             Boolean pass = false;
             for (Integer status : resourceStatusCodes) {
                 if (status == 200) {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
                     pass = true;
                 } else {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     pass = false;
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+            if (response.getStatusLine().getStatusCode() == 200 && pass) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestSupported() == false) {
+            } else if (!requestPaths[i].getTestSupported()) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -1016,7 +1058,13 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false) {
+                if (requestPaths[i].getTestSupported()) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
@@ -1028,19 +1076,37 @@ public class BulkTestImpl implements ResourceType {
             Boolean pass = false;
             for (Integer status : resourceStatusCodes) {
                 if (status == 200) {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
                     pass = true;
                 } else {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     pass = false;
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+            if (response.getStatusLine().getStatusCode() == 200 && pass) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestSupported() == false) {
+            } else if (!requestPaths[i].getTestSupported()) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -1205,6 +1271,12 @@ public class BulkTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 error = true;
                 if (requestPaths[i].getTestSupported() != false) {
+                    // Check for status returned.
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                    subTests.add("Expected : 200");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not perform bulk request at " + url,
@@ -1216,19 +1288,37 @@ public class BulkTestImpl implements ResourceType {
             Boolean pass = false;
             for (Integer status : resourceStatusCodes) {
                 if (status == 204) {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 204");
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
                     pass = true;
                 } else {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 204");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
                     pass = false;
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200 && pass == true) {
+            if (response.getStatusLine().getStatusCode() == 200 && pass) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestSupported() == false) {
+            } else if (!requestPaths[i].getTestSupported()) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Skipped");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
@@ -1245,7 +1335,7 @@ public class BulkTestImpl implements ResourceType {
             }
         }
 
-        if (error == true) {
+        if (error) {
             //Clean up users.
             for (String id : userIDs) {
                 cleanUp(id, "User");

@@ -81,37 +81,37 @@ public class ResponseValidateTests {
         // Check for required attributes.
         if (!subTests.contains(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST);
-            subTests.add("Message  : Test for required attributes in response.");
+            subTests.add("Message : Validate required attributes in response.");
             requiredTest = true;
         }
         validateSCIMObjectForRequiredAttributes(scimObject, schema,
                 method, responseString, headerString, responseStatus, subTests);
         if (requiredTest) {
-            subTests.add("Status  : Success.");
+            subTests.add("Status : Success.");
             subTests.add(StringUtils.EMPTY);
         }
         // Validate schema list.
         if (!subTests.contains(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST);
-            subTests.add("Message  : Test for presence of schema.");
+            subTests.add("Message : Validate schema.");
             schemaTest = true;
         }
         validateSchemaList(scimObject, schema, method, responseString, headerString, responseStatus, subTests);
         if (schemaTest) {
-            subTests.add("Status  : Success.");
+            subTests.add("Status : Success.");
             subTests.add(StringUtils.EMPTY);
         }
         // Validate attribute definitions.
         if (!subTests.contains(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST);
-            subTests.add("Message  : Test for attribute definitions.");
+            subTests.add("Message : Validate attribute definitions.");
             definitionTest = true;
         }
         validateReturnedAttributes((AbstractSCIMObject) scimObject, requestedAttributes,
                 requestedExcludingAttributes, method,
                 responseString, headerString, responseStatus, subTests);
         if (definitionTest) {
-            subTests.add("Status  : Success.");
+            subTests.add("Status : Success.");
             subTests.add(StringUtils.EMPTY);
         }
     }
