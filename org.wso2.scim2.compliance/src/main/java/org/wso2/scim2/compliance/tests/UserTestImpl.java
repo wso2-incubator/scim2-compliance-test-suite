@@ -38,6 +38,7 @@ import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.objects.User;
+import org.wso2.charon3.core.objects.plainobjects.MultiValuedComplexType;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.compliance.entities.TestResult;
@@ -51,6 +52,7 @@ import org.wso2.scim2.compliance.tests.model.RequestPath;
 import org.wso2.scim2.compliance.utils.ComplianceConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -291,9 +293,171 @@ public class UserTestImpl implements ResourceType {
         requestPath9.setUrl("?excludedAttributes=name.givenName,emails");
         requestPath9.setTestCaseName("List users with excluding attributes givenName and emails");
 
+        RequestPath requestPath10 = new RequestPath();
+        requestPath10.setUrl("?startIndex=1");
+        requestPath10.setTestCaseName("List users with only using startIndex");
+
+        RequestPath requestPath11 = new RequestPath();
+        requestPath11.setUrl("?filter=userName+eq+loginUser1&startIndex=1");
+        requestPath11.setTestCaseName("List users by filtering - userName eq with only using startIndex");
+        try {
+            requestPath11.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath11.setTestSupported(true);
+        }
+
+        RequestPath requestPath12 = new RequestPath();
+        requestPath12.setUrl("?filter=userName+eq+loginUser1+and+emails.type+eq+work");
+        requestPath12.setTestCaseName("List users by filtering - userName eq and emails.type");
+        try {
+            requestPath12.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath12.setTestSupported(true);
+        }
+
+        RequestPath requestPath13 = new RequestPath();
+        requestPath13.setUrl("?filter=USERNAME+eq+loginUser1");
+        requestPath13.setTestCaseName("List users by filtering - userName eq to check case insensitivity of attribute");
+        try {
+            requestPath13.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath13.setTestSupported(true);
+        }
+
+        RequestPath requestPath14 = new RequestPath();
+        requestPath14.setUrl("?filter=userName+EQ+loginUser1");
+        requestPath14.setTestCaseName("List users by filtering - userName eq to check case insensitivity of operator");
+        try {
+            requestPath14.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath14.setTestSupported(true);
+        }
+
+        RequestPath requestPath15 = new RequestPath();
+        requestPath15.setUrl("?filter=userName+ne+loginUser1");
+        requestPath15.setTestCaseName("List users by filtering - userName ne");
+        try {
+            requestPath15.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath15.setTestSupported(true);
+        }
+
+        RequestPath requestPath16 = new RequestPath();
+        requestPath16.setUrl("?filter=userName+co+loginUser");
+        requestPath16.setTestCaseName("List users by filtering - userName co");
+        try {
+            requestPath16.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath16.setTestSupported(true);
+        }
+
+        RequestPath requestPath17 = new RequestPath();
+        requestPath17.setUrl("?filter=userName+sw+loginUser");
+        requestPath17.setTestCaseName("List users by filtering - userName sw");
+        try {
+            requestPath17.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath17.setTestSupported(true);
+        }
+
+        RequestPath requestPath18 = new RequestPath();
+        requestPath18.setUrl("?filter=userName+ew+loginUser");
+        requestPath18.setTestCaseName("List users by filtering - userName ew");
+        try {
+            requestPath18.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath18.setTestSupported(true);
+        }
+
+        RequestPath requestPath19 = new RequestPath();
+        requestPath19.setUrl("?filter=userName+pr+loginUser");
+        requestPath19.setTestCaseName("List users by filtering - userName pr");
+        try {
+            requestPath19.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath19.setTestSupported(true);
+        }
+
+        RequestPath requestPath20 = new RequestPath();
+        requestPath20.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+ne+12345");
+        requestPath20.setTestCaseName("List users by filtering - employeeNumber ne");
+        try {
+            requestPath20.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath20.setTestSupported(true);
+        }
+
+        RequestPath requestPath21 = new RequestPath();
+        requestPath21.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+co+12345");
+        requestPath21.setTestCaseName("List users by filtering - employeeNumber co");
+        try {
+            requestPath21.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath21.setTestSupported(true);
+        }
+
+        RequestPath requestPath22 = new RequestPath();
+        requestPath22.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+sw+12345");
+        requestPath22.setTestCaseName("List users by filtering - employeeNumber sw");
+        try {
+            requestPath22.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath22.setTestSupported(true);
+        }
+
+        RequestPath requestPath23 = new RequestPath();
+        requestPath23.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+ew+12345");
+        requestPath23.setTestCaseName("List users by filtering - employeeNumber ew");
+        try {
+            requestPath23.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath23.setTestSupported(true);
+        }
+
+        RequestPath requestPath24 = new RequestPath();
+        requestPath24.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+eq+12345");
+        requestPath24.setTestCaseName("List users by filtering - employeeNumber eq");
+        try {
+            requestPath24.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath24.setTestSupported(true);
+        }
+
+        RequestPath requestPath25 = new RequestPath();
+        requestPath25.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber+pr+12345");
+        requestPath25.setTestCaseName("List users by filtering - employeeNumber pr");
+        try {
+            requestPath25.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath25.setTestSupported(true);
+        }
+
         // This array hold the sub tests details.
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
-                requestPath6, requestPath7, requestPath8, requestPath9};
+                requestPath6, requestPath7, requestPath8, requestPath9, requestPath10, requestPath11, requestPath12,
+                requestPath13, requestPath14, requestPath15, requestPath16, requestPath17, requestPath18, requestPath19,
+                requestPath20, requestPath21, requestPath22, requestPath23, requestPath24, requestPath25};
         return requestPaths;
     }
 
@@ -449,7 +613,10 @@ public class UserTestImpl implements ResourceType {
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq")) {
+                } else if (requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq")
+                        || requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq to " +
+                        "check case insensitivity of attribute") || requestPaths[i].getTestCaseName().equals("List" +
+                        " users by filtering - userName eq to check case insensitivity of operator")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
                     String value = "loginUser1";
                     for (User user1 : userList) {
@@ -650,7 +817,6 @@ public class UserTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -659,24 +825,35 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setUrl("?attributes=userName,name.givenName");
-        requestPath2.setTestCaseName("Get a user with specific attributes");
+        requestPath2.setTestCaseName("Get a user with specific attributes userName and givenName");
 
         RequestPath requestPath3 = new RequestPath();
-        requestPath3.setUrl("?excludedAttributes=name.givenName,emails");
-        requestPath3.setTestCaseName("Get a user with excluding attributes");
+        requestPath3.setUrl("?excludedAttributes=emails");
+        requestPath3.setTestCaseName("Get a user with excluding attribute emails");
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl(generateUniqueID());
         requestPath4.setTestCaseName("Get a non existing user and validate user not found error response");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setUrl("?attributes=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User.employeeNumber" +
+                ",userName");
+        requestPath5.setTestCaseName("Get a enterprise user with specific attribute employeeNumber");
+
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setUrl("?excludedAttributes=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
+                ".employeeNumber");
+        requestPath6.setTestCaseName("Get a enterprise user with excluding attribute employeeNumber");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
             // Create default user.
-            ArrayList<String> userID = null;
-            userID = createTestsUsers("One");
-            String id = userID.get(0);
+            ArrayList<String> userIDs = null;
+            userIDs = createTestsUsers("One");
+            String id = userIDs.get(0);
             User user = null;
             String getUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpGet method = new HttpGet(getUserURL);
@@ -689,6 +866,9 @@ public class UserTestImpl implements ResourceType {
             String responseStatus = StringUtils.EMPTY;
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
+            JSONObject jsonObj = null;
+            String givenName = null;
+            String userName = null;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -741,6 +921,19 @@ public class UserTestImpl implements ResourceType {
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
+
+                try {
+                    jsonObj = new JSONObject(responseString);
+                } catch (JSONException e) {
+                    // Clean the created user.
+                    cleanUpUser(id, "Get User");
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode response from server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests), stopTime - startTime));
+                    continue;
+                }
                 try {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
@@ -773,7 +966,7 @@ public class UserTestImpl implements ResourceType {
                     ResponseValidateTests.runValidateTests(user, schema, null,
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
-                } catch (BadRequestException | CharonException e) {
+                } catch (Exception e) {
                     subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
@@ -784,6 +977,130 @@ public class UserTestImpl implements ResourceType {
                             headerString.toString(), responseStatus, subTests), stopTime - startTime));
                     continue;
                 }
+                if (requestPaths[i].getTestCaseName().equals("Get a user with specific attributes userName and " +
+                        "givenName")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " test");
+                    try {
+                        JSONObject innerJsonObject = jsonObj.getJSONObject("name");
+                        givenName = innerJsonObject.getString("givenName");
+                    } catch (JSONException e) {
+                        subTests.add("Actual : givenName:" + givenName);
+                        subTests.add("Expected : givenName:Kim");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not decode givenName attribute from server response",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+
+                    try {
+                        userName = user.getUserName();
+                    } catch (CharonException e) {
+                        subTests.add("Actual : userName:" + userName + "givenName:" + givenName);
+                        subTests.add("Expected : userName:loginUser,givenName:Kim");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not decode userName attribute from server response",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    if (!userName.equals("loginUser") || !givenName.equals("Kim")) {
+                        subTests.add("Actual : userName:" + userName + "givenName:" + givenName);
+                        subTests.add("Expected : userName:loginUser,givenName:Kim");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not retrieve the expected attributes.",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    subTests.add("Actual : userName:loginUser,givenName:Kim");
+                    subTests.add("Expected : userName:loginUser,givenName:Kim");
+                    subTests.add("Status : Success");
+                } else if (requestPaths[i].getTestCaseName().equals("Get a user with excluding attribute emails")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " test");
+                    List<MultiValuedComplexType> emails = null;
+                    try {
+                        emails = user.getEmails();
+                    } catch (Exception e) {
+                        subTests.add("Actual : emails:" + emails);
+                        subTests.add("Expected : emails:null");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not decode emails complex multivalued attribute from server response",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    if (emails.size() != 0) {
+                        subTests.add("Actual : emails:" + emails);
+                        subTests.add("Expected : emails:null");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Excluded attribute is present in response.",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    subTests.add("Actual : emails:null");
+                    subTests.add("Expected : emails:null");
+                    subTests.add("Status : Failed");
+                } else if (requestPaths[i].getTestCaseName().equals("Get a enterprise user with specific attribute " +
+                        "employeeNumber")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " test");
+                    String employeeNumber = null;
+                    try {
+                        JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:extension" +
+                                ":enterprise:2.0:User");
+                        employeeNumber = innerJsonObject.getString("employeeNumber");
+                    } catch (JSONException e) {
+                        subTests.add("Actual : employeeNumber:" + employeeNumber);
+                        subTests.add("Expected : employeeNumber:1234A");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not decode employeeNumber attribute from server response",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    if (!employeeNumber.equals("1234A")) {
+                        subTests.add("Actual : employeeNumber:" + employeeNumber);
+                        subTests.add("Expected : employeeNumber:1234A");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "Could not retrieve the expected attribute employeeNumber",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    subTests.add("Actual : employeeNumber:1234A");
+                    subTests.add("Expected : employeeNumber:1234A");
+                    subTests.add("Status : Failed");
+                }
+
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
                 long stopTime = System.currentTimeMillis();
@@ -1045,6 +1362,7 @@ public class UserTestImpl implements ResourceType {
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload4);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload5);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload6);
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload6);
 
         RequestPath[] requestPaths;
 
@@ -1102,18 +1420,28 @@ public class UserTestImpl implements ResourceType {
             requestPath6.setTestSupported(true);
         }
 
+        RequestPath requestPath7 = new RequestPath();
+        requestPath7.setTestCaseName("Patch non existing user with array of operations");
+        requestPath7.setUrl(generateUniqueID());
+        try {
+            requestPath7.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath7.setTestSupported(true);
+        }
+
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
-                requestPath6};
+                requestPath6, requestPath7};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
             //create default user;
-            ArrayList<String> userID = null;
-            userID = createTestsUsers("One");
-            String id = userID.get(0);
+            ArrayList<String> userIDs = null;
+            userIDs = createTestsUsers("One");
+            String id = userIDs.get(0);
             User user = null;
             String patchUserURL = null;
-            patchUserURL = url + "/" + id;
+            patchUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPatch method = new HttpPatch(patchUserURL);
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
@@ -1155,9 +1483,9 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
-                if (!requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a path") &&
-                        requestPaths[i].getTestSupported() &&
-                        response.getStatusLine().getStatusCode() != 501) {
+                if (!requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a path")
+                        && !requestPaths[i].getTestCaseName().equals("Patch non existing user with array of operations")
+                        && requestPaths[i].getTestSupported() && response.getStatusLine().getStatusCode() != 501) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -1250,6 +1578,20 @@ public class UserTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
+            } else if (requestPaths[i].getTestCaseName().equals("Patch non existing user with array of operations") &&
+                    response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404 message",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -1294,7 +1636,8 @@ public class UserTestImpl implements ResourceType {
 
         definedUsers.add(ComplianceConstants.DefinedInstances.definedUpdatedUser1);
         definedUsers.add(ComplianceConstants.DefinedInstances.definedUpdatedUser2);
-        ArrayList<String> userIDs = new ArrayList<>();
+        definedUsers.add(ComplianceConstants.DefinedInstances.definedUpdatedUser1);
+
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -1303,17 +1646,21 @@ public class UserTestImpl implements ResourceType {
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setTestCaseName("Update user with schema violation");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Update non existing user and and verify Http status code");
+        requestPath3.setUrl(generateUniqueID());
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
             //create default user;
-            ArrayList<String> userID = null;
-            userID = createTestsUsers("One");
-            String id = userID.get(0);
+            ArrayList<String> userIDs = null;
+            userIDs = createTestsUsers("One");
+            String id = userIDs.get(0);
             User user = null;
             String updateUserURL = null;
-            updateUserURL = url + "/" + id;
+            updateUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPut method = new HttpPut(updateUserURL);
             HttpClient client = HTTPClient.getHttpClient();
             method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -1354,7 +1701,7 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, "Update User");
-                if (!requestPaths[i].getTestCaseName().equals("Update user with schema violation")) {
+                if (requestPaths[i].getTestCaseName().equals("Update User")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -1445,6 +1792,20 @@ public class UserTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
+            } else if ((requestPaths[i].getTestCaseName().equals("Update non existing user and and verify Http " +
+                    "status code")) && response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404 message",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 // Clean the created user.
                 cleanUpUser(id, "Update User");
@@ -1471,7 +1832,11 @@ public class UserTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        ArrayList<String> userIDs = new ArrayList<>();
+        //create default user;
+        ArrayList<String> userIDs = null;
+        userIDs = createTestsUsers("One");
+        String id = userIDs.get(0);
+
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -1479,21 +1844,17 @@ public class UserTestImpl implements ResourceType {
         requestPath1.setTestCaseName("Delete user by ID");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setUrl(generateUniqueID());
-        requestPath2.setTestCaseName("Delete non existing user and validate user not found error response");
-//
-//        RequestPath requestPath2 = new RequestPath();
-//        requestPath2.setUrl(generateUniqueID());
-//        requestPath2.setTestCaseName("Delete user twice and verify Http status code");
+        requestPath2.setUrl(StringUtils.EMPTY);
+        requestPath2.setTestCaseName("Delete user twice and verify Http status code");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setUrl(generateUniqueID());
+        requestPath3.setTestCaseName("Delete non existing user and validate user not found error response");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            //create default user;
-            ArrayList<String> userID = null;
-            userID = createTestsUsers("One");
-            String id = userID.get(0);
             User user = null;
             String deleteUserURL = null;
             deleteUserURL = url + "/" + id + requestPaths[i].getUrl();
@@ -1526,16 +1887,15 @@ public class UserTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                // Clean the created user.
-                cleanUpUser(id, "Delete User");
-                if (!requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not found " +
-                        "error response")) {
+                if (requestPaths[i].getTestCaseName().equals("Delete user by ID")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
                     subTests.add("Expected : 204");
                     subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
+                    // Clean the created user.
+                    cleanUpUser(id, "Delete User");
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default user at url " + url,
@@ -1555,9 +1915,9 @@ public class UserTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not " +
-                    "found error response") &&
-                    response.getStatusLine().getStatusCode() == 404) {
+            } else if ((requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not " +
+                    "found error response") || requestPaths[i].getTestCaseName().equals("Delete user twice and " +
+                    "verify Http status code")) && response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -1596,7 +1956,8 @@ public class UserTestImpl implements ResourceType {
 
         definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload1);
         definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload2);
-        //definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedPatchUserPayload3);
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload3);
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.definedSearchUsersPayload4);
 
         RequestPath[] requestPaths;
 
@@ -1606,7 +1967,13 @@ public class UserTestImpl implements ResourceType {
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setTestCaseName("Search user with invalid filter");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Search user without pagination parameters");
+
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setTestCaseName("Search user with index paging and without count parameter");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -1662,6 +2029,7 @@ public class UserTestImpl implements ResourceType {
                             "Could not create default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
+                    continue;
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200) {

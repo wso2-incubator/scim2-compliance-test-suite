@@ -460,6 +460,12 @@ public class BulkTestImpl implements ResourceType {
                 "     ]\n" +
                 "}");
 
+        definedBulkRequests.add(ComplianceConstants.DefinedInstances.defineBulkRequest3);
+        definedBulkRequests.add(ComplianceConstants.DefinedInstances.defineBulkRequest4);
+        definedBulkRequests.add(ComplianceConstants.DefinedInstances.defineBulkRequest5);
+        definedBulkRequests.add(ComplianceConstants.DefinedInstances.defineBulkRequest6);
+        definedBulkRequests.add(ComplianceConstants.DefinedInstances.defineBulkRequest7);
+
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -498,7 +504,53 @@ public class BulkTestImpl implements ResourceType {
             requestPath4.setTestSupported(true);
         }
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
+        RequestPath requestPath5 = new RequestPath();
+        requestPath5.setTestCaseName("Bulk post operation without bulk Id");
+        try {
+            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath5.setTestSupported(true);
+        }
+
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setTestCaseName("Bulk post operation without path");
+        try {
+            requestPath6.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath6.setTestSupported(true);
+        }
+
+        RequestPath requestPath7 = new RequestPath();
+        requestPath7.setTestCaseName("Bulk post operation without data");
+        try {
+            requestPath7.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath7.setTestSupported(true);
+        }
+
+        RequestPath requestPath8 = new RequestPath();
+        requestPath8.setTestCaseName("Bulk post operation with temporary id");
+        try {
+            requestPath8.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath8.setTestSupported(true);
+        }
+
+        RequestPath requestPath9 = new RequestPath();
+        requestPath9.setTestCaseName("Bulk post operation with fail on errors");
+        try {
+            requestPath9.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig()
+                    .getBulkSupported());
+        } catch (Exception e) {
+            requestPath9.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6, requestPath7, requestPath8, requestPath9};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -537,7 +589,8 @@ public class BulkTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported()) {
+                if (requestPaths[i].getTestSupported() &&
+                        !requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -568,6 +621,20 @@ public class BulkTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
+            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id")) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error \"JSON string could not be " +
+                                        "decoded properly .Required attribute BULK_ID is missing in the request\"",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (!requestPaths[i].getTestSupported()) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);

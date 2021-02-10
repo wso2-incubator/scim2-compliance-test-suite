@@ -18,14 +18,16 @@
 
 package org.wso2.scim2.compliance.tests.model;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Implementation of  URL builder.
  */
 public class RequestPath {
 
-    private String url;
+    private String url = StringUtils.EMPTY;
     private String testCaseName;
-    private boolean supported = true;
+    private boolean supported = false;
 
     /**
      * Get url.

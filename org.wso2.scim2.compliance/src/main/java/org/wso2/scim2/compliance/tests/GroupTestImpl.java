@@ -1629,14 +1629,17 @@ public class GroupTestImpl implements ResourceType {
         // Store test results.
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
+
         // Store userIDS of 5 users.
         ArrayList<String> userIDs = createTestsUsers("Many");
         ArrayList<String> groupIDs = createTestsGroups(userIDs, "One");
+
         // Post bodies of search methods.
         ArrayList<String> definedSearchMethods = new ArrayList<>();
-
         definedSearchMethods.add(ComplianceConstants.DefinedInstances.getDefinedSearchGroupsPayload1);
         definedSearchMethods.add(ComplianceConstants.DefinedInstances.getDefinedSearchGroupsPayload2);
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.getDefinedSearchGroupsPayload3);
+        definedSearchMethods.add(ComplianceConstants.DefinedInstances.getDefinedSearchGroupsPayload4);
 
         RequestPath[] requestPaths;
 
@@ -1644,9 +1647,15 @@ public class GroupTestImpl implements ResourceType {
         requestPath1.setTestCaseName("Search groups with displayName as filter and with pagination query parameters");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setTestCaseName("Search groups with schema violation and validate error message");
+        requestPath2.setTestCaseName("Search group with invalid filter");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Search group without pagination parameters");
+
+        RequestPath requestPath4 = new RequestPath();
+        requestPath4.setTestCaseName("Search group with index paging and without count parameter");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -1694,8 +1703,7 @@ public class GroupTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
 
-                if (!requestPaths[i].getTestCaseName().equals("Search groups with schema violation and validate " +
-                        "error message")) {
+                if (!requestPaths[i].getTestCaseName().equals("Search group with invalid filter")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -1781,8 +1789,8 @@ public class GroupTestImpl implements ResourceType {
                     subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
                 }
-            } else if (requestPaths[i].getTestCaseName().equals("Search groups with schema violation and validate " +
-                    "error message") && response.getStatusLine().getStatusCode() == 400) {
+            } else if (requestPaths[i].getTestCaseName().equals("Search group with invalid filter")
+                    && response.getStatusLine().getStatusCode() == 400) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());

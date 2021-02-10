@@ -223,6 +223,16 @@ public class ComplianceConstants {
                         ".familyName\",\"userName\"],\"filter\":\"userName ssw login\"," +
                         "\"domain\": \"PRIMARY\",\"startIndex\":1,\"count\":10}";
 
+        public static String definedSearchUsersPayload3 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
+                        ".familyName\",\"userName\"],\"filter\":\"userName sw login\"," +
+                        "\"domain\": \"PRIMARY\"}";
+
+        public static String definedSearchUsersPayload4 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"attributes\":[\"name" +
+                        ".familyName\",\"userName\"],\"filter\":\"userName sw login\"," +
+                        "\"domain\": \"PRIMARY\",\"startIndex\":1}";
+
         public static String getDefinedSearchGroupsPayload1 =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
                         "\"count\":10,\"filter\":\"displayName eq XwLtOP23\"}";
@@ -230,6 +240,14 @@ public class ComplianceConstants {
         public static String getDefinedSearchGroupsPayload2 =
                 "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
                         "\"count\":10,\"filter\":\"displayName esq XwLtOP23\"}";
+
+        public static String getDefinedSearchGroupsPayload3 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"]," +
+                        "\"filter\":\"displayName eq XwLtOP23\"}";
+
+        public static String getDefinedSearchGroupsPayload4 =
+                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:SearchRequest\"],\"startIndex\":1," +
+                        "\"filter\":\"displayName eq XwLtOP23\"}";
 
         public static String defineBulkRequest1 = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
@@ -263,5 +281,69 @@ public class ComplianceConstants {
                 "        }\n" +
                 "     ]\n" +
                 "}";
+
+        public static String defineBulkRequest3 = "{\"failOnErrors\":1,\"schemas\":" +
+                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
+                "[{\"method\": \"POST\",\"path\": \"/Users\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"loginUser8\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser9\"," +
+                "\"password\":\"pw13424\"}}]}";
+
+        public static String defineBulkRequest4 = "{\"failOnErrors\":1,\"schemas\":" +
+                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
+                "[{\"method\": \"POST\",\"bulkId\": \"qwerty\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"loginUser10\",\"password\":\"pw12435\"}},{\"method\": \"POST\"," +
+                "\"bulkId\":\"ytrewq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser11\"," +
+                "\"password\":\"pw13424\"}}]}";
+
+        public static String defineBulkRequest5 = "{\"failOnErrors\":1,\"schemas\":" +
+                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
+                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\"},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"bulkId\":\"ytrewq\"}]}";
+
+        public static String defineBulkRequest6 = "   {\n" +
+                "     \"schemas\": [\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\n" +
+                "     \"Operations\": [\n" +
+                "       {\n" +
+                "         \"method\": \"POST\",\n" +
+                "         \"path\": \"/Users\",\n" +
+                "         \"bulkId\": \"qwerty\",\n" +
+                "         \"data\": {\n" +
+                "           \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:User\"],\n" +
+                "           \"userName\": \"loginUser14\"\n" +
+                "         }\n" +
+                "       },\n" +
+                "       {\n" +
+                "         \"method\": \"POST\",\n" +
+                "         \"path\": \"/Groups\",\n" +
+                "         \"bulkId\": \"ytrewq\",\n" +
+                "         \"data\": {\n" +
+                "           \"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\n" +
+                "           \"displayName\": \"Xsdw21324\",\n" +
+                "           \"members\": [\n" +
+                "             {\n" +
+                "               \"type\": \"User\",\n" +
+                "               \"value\": \"bulkId:qwerty\"\n" +
+                "             }\n" +
+                "           ]\n" +
+                "         }\n" +
+                "       }\n" +
+                "     ]\n" +
+                "   }";
+
+        public static String defineBulkRequest7 = "{\"failOnErrors\":1,\"schemas\":" +
+                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
+                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"loginUser15\",\"password\":\"pw12435\"}}, {\"method\": \"POST\",\"path\": \"/Users\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"loginUser15\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"bulkId\":\"ytrewq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser16\"," +
+                "\"password\":\"pw13424\"}}]}";
+
     }
 }
