@@ -453,9 +453,95 @@ public class GroupTestImpl implements ResourceType {
         requestPath9.setUrl("?excludedAttributes=members");
         requestPath9.setTestCaseName("Get groups with excluding members attribute");
 
+        RequestPath requestPath10 = new RequestPath();
+        requestPath10.setUrl("?startIndex=1");
+        requestPath10.setTestCaseName("List groups with only using startIndex");
+
+        RequestPath requestPath11 = new RequestPath();
+        requestPath11.setUrl("?filter=displayName+eq+EYtXcD21&startIndex=1");
+        requestPath11.setTestCaseName("List groups by filtering - displayName eq with only using startIndex");
+        try {
+            requestPath11.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath11.setTestSupported(true);
+        }
+
+        RequestPath requestPath12 = new RequestPath();
+        requestPath12.setUrl("?filter=DISPLAYNAME+eq+EYtXcD21");
+        requestPath12.setTestCaseName("List groups by filtering - displayName eq to check case insensitivity of " +
+                "attribute");
+        try {
+            requestPath12.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath12.setTestSupported(true);
+        }
+
+        RequestPath requestPath13 = new RequestPath();
+        requestPath13.setUrl("?filter=displayName+EQ+EYtXcD21");
+        requestPath13.setTestCaseName("List groups by filtering - displayName eq to check case insensitivity of " +
+                "operator");
+        try {
+            requestPath13.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath13.setTestSupported(true);
+        }
+
+        RequestPath requestPath14 = new RequestPath();
+        requestPath14.setUrl("?filter=displayName+ne+EYtXcD21");
+        requestPath14.setTestCaseName("List groups by filtering - displayName ne");
+        try {
+            requestPath14.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath14.setTestSupported(true);
+        }
+
+        RequestPath requestPath15 = new RequestPath();
+        requestPath15.setUrl("?filter=displayName+co+EYtXcD21");
+        requestPath15.setTestCaseName("List groups by filtering - displayName co");
+        try {
+            requestPath15.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath15.setTestSupported(true);
+        }
+
+        RequestPath requestPath16 = new RequestPath();
+        requestPath16.setUrl("?filter=displayName+sw+EYtXcD21");
+        requestPath16.setTestCaseName("List groups by filtering - displayName sw");
+        try {
+            requestPath16.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath16.setTestSupported(true);
+        }
+
+        RequestPath requestPath17 = new RequestPath();
+        requestPath17.setUrl("?filter=displayName+ew+EYtXcD21");
+        requestPath17.setTestCaseName("List groups by filtering - displayName ew");
+        try {
+            requestPath17.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath17.setTestSupported(true);
+        }
+
+        RequestPath requestPath18 = new RequestPath();
+        requestPath18.setUrl("?filter=displayName+pr+EYtXcD21");
+        requestPath18.setTestCaseName("List groups by filtering - displayName pr");
+        try {
+            requestPath18.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath18.setTestSupported(true);
+        }
+
         // This array hold the sub tests details.
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
-                requestPath6, requestPath7, requestPath8, requestPath9};
+        requestPaths = new RequestPath[]{requestPath10, requestPath11, requestPath12, requestPath13, requestPath14,
+                requestPath15, requestPath16, requestPath17, requestPath18};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -772,7 +858,7 @@ public class GroupTestImpl implements ResourceType {
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl(generateUniqueID());
-        requestPath4.setTestCaseName("Delete group with non existing ID and validate group not found error response");
+        requestPath4.setTestCaseName("Get group with non existing ID and validate group not found error response");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
@@ -817,7 +903,7 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
-                if (!requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate group " +
+                if (!requestPaths[i].getTestCaseName().equals("Get group with non existing ID and validate group " +
                         "not found error response")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -887,7 +973,7 @@ public class GroupTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate " +
+            } else if (requestPaths[i].getTestCaseName().equals("Get group with non existing ID and validate " +
                     "group not found error response") &&
                     response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
@@ -1116,6 +1202,8 @@ public class GroupTestImpl implements ResourceType {
                 ComplianceConstants.TestConstants.USERS_ENDPOINT + "/" + userIDs.get(0) + "\"}]}]}");
         definedPatchedGroup.add("{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
                 "\"Operations\":[{\"op\":\"remove\",\"pah\":\"members\"}]}");
+        definedPatchedGroup.add("{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"]," +
+                "\"Operations\":[{\"op\":\"add\",\"value\":{\"displayName\": \"XwLtOP23-patchNonExistingGroup\"}}]}");
 
         RequestPath[] requestPaths;
 
@@ -1164,7 +1252,18 @@ public class GroupTestImpl implements ResourceType {
             requestPath5.setTestSupported(true);
         }
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5};
+        RequestPath requestPath6 = new RequestPath();
+        requestPath6.setTestCaseName("Patch non existing group");
+        requestPath6.setUrl(generateUniqueID());
+        try {
+            requestPath6.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getPatchSupported());
+        } catch (Exception e) {
+            requestPath6.setTestSupported(true);
+        }
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -1172,7 +1271,7 @@ public class GroupTestImpl implements ResourceType {
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
             String patchGroupURL = null;
-            patchGroupURL = url + "/" + id;
+            patchGroupURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPatch method = new HttpPatch(patchGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
             method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -1208,6 +1307,7 @@ public class GroupTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 cleanUpGroup(id, "Patch Group");
                 if (!requestPaths[i].getTestCaseName().equals("Patch group and validate error response") &&
+                        !requestPaths[i].getTestCaseName().equals("Patch non existing group") &&
                         requestPaths[i].getTestSupported() &&
                         response.getStatusLine().getStatusCode() != 501) {
                     // Check for status returned.
@@ -1282,6 +1382,20 @@ public class GroupTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
 
+            } else if (requestPaths[i].getTestCaseName().equals("Patch non existing group") &&
+                    response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404 message",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
             } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -1297,7 +1411,13 @@ public class GroupTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else {
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Failed");
+                subTests.add(StringUtils.EMPTY);
+                //cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1337,6 +1457,7 @@ public class GroupTestImpl implements ResourceType {
                 "  ]\n" +
                 "}");
         definedGroups.add("{\"displaayName\": \"XwLtOP23-Updated\"}");
+        definedGroups.add("{\"displayName\": \"XwLtOP23-UpdatedWithNonExistingId\"}");
         ArrayList<String> userIDs = new ArrayList<>();
         RequestPath[] requestPaths;
 
@@ -1346,7 +1467,11 @@ public class GroupTestImpl implements ResourceType {
         RequestPath requestPath2 = new RequestPath();
         requestPath2.setTestCaseName("Update group with schema violation to validate error response");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setTestCaseName("Update non existing group and and verify Http status code");
+        requestPath3.setUrl(generateUniqueID());
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -1355,7 +1480,7 @@ public class GroupTestImpl implements ResourceType {
             String id = groupId.get(0);
             Group group = null;
             String updateUserURL = null;
-            updateUserURL = url + "/" + id;
+            updateUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPut method = new HttpPut(updateUserURL);
             HttpClient client = HTTPClient.getHttpClient();
             method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
@@ -1394,8 +1519,7 @@ public class GroupTestImpl implements ResourceType {
                     cleanUpUser(uId, requestPaths[i].getTestCaseName());
                 }
                 cleanUpGroup(id, requestPaths[i].getTestCaseName());
-                if (!requestPaths[i].getTestCaseName().equals("Update group with schema violation to validate error " +
-                        "response")) {
+                if (requestPaths[i].getTestCaseName().equals("Update Group")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -1483,6 +1607,20 @@ public class GroupTestImpl implements ResourceType {
                                         responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
 
+            } else if ((requestPaths[i].getTestCaseName().equals("Update non existing group and and verify Http " +
+                    "status code")) && response.getStatusLine().getStatusCode() == 404) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 404");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Server successfully given the expected error 404 message",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
             } else {
                 // Clean up users.
                 for (String uId : userIDs) {
@@ -1506,6 +1644,10 @@ public class GroupTestImpl implements ResourceType {
         testResults = new ArrayList<>();
 
         ArrayList<String> userIDs = new ArrayList<>();
+        userIDs = createTestsUsers("Many");
+        ArrayList<String> groupId = createTestsGroups(userIDs, "One");
+        String id = groupId.get(0);
+
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -1513,16 +1655,17 @@ public class GroupTestImpl implements ResourceType {
         requestPath1.setTestCaseName("Delete group by ID");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setUrl(generateUniqueID());
-        requestPath2.setTestCaseName("Delete group with non existing ID and validate group not found error response");
+        requestPath2.setUrl(StringUtils.EMPTY);
+        requestPath2.setTestCaseName("Delete group twice and verify Http status code");
 
-        requestPaths = new RequestPath[]{requestPath1, requestPath2};
+        RequestPath requestPath3 = new RequestPath();
+        requestPath3.setUrl(generateUniqueID());
+        requestPath3.setTestCaseName("Delete group with non existing ID and validate group not found error response");
+
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            userIDs = createTestsUsers("Many");
-            ArrayList<String> groupId = createTestsGroups(userIDs, "One");
-            String id = groupId.get(0);
             Group group = null;
             String deleteGroupURL = null;
             deleteGroupURL = url + "/" + id + requestPaths[i].getUrl();
@@ -1555,24 +1698,21 @@ public class GroupTestImpl implements ResourceType {
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                // Clean up users.
-                for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
-                }
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
-                if (!requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate " +
-                        "group not found error response")) {
+                if (requestPaths[i].getTestCaseName().equals("Delete group by ID")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
                     subTests.add("Expected : 204");
                     subTests.add("Status : Failed");
                     subTests.add(StringUtils.EMPTY);
+                    // Clean up group.
+                    cleanUpGroup(id, requestPaths[i].getTestCaseName());
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not delete the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
+                    continue;
                 }
             }
             if (response.getStatusLine().getStatusCode() == 204) {
@@ -1582,17 +1722,14 @@ public class GroupTestImpl implements ResourceType {
                 subTests.add("Expected : 204");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                // Clean up users.
-                for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
-                }
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate " +
-                    "group not found error response") &&
+            } else if ((requestPaths[i].getTestCaseName().equals("Delete group twice and verify Http status code") ||
+                    requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate " +
+                            "group not found error response")) &&
                     response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
@@ -1608,17 +1745,16 @@ public class GroupTestImpl implements ResourceType {
                                         responseStatus, subTests), stopTime - startTime));
 
             } else {
-                // Clean up users.
-                for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
-                }
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }
+        }
+        // Clean up users.
+        for (String uId : userIDs) {
+            cleanUpUser(uId, "Delete groups");
         }
         return testResults;
     }

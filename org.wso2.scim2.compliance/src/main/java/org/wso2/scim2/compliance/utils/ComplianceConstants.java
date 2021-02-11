@@ -334,16 +334,15 @@ public class ComplianceConstants {
                 "     ]\n" +
                 "   }";
 
-        public static String defineBulkRequest7 = "{\"failOnErrors\":1,\"schemas\":" +
-                "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
-                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\",\"data\":" +
-                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
-                "\"loginUser15\",\"password\":\"pw12435\"}}, {\"method\": \"POST\",\"path\": \"/Users\",\"data\":" +
-                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
-                "\"loginUser15\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
-                "\"bulkId\":\"ytrewq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
-                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser16\"," +
-                "\"password\":\"pw13424\"}}]}";
+        public static String defineBulkRequest7 = "{\"failOnErrors\":1,\"schemas\":[\"urn:ietf:params:scim:api" +
+                ":messages:2.0:BulkRequest\"],\"Operations\":[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": " +
+                "\"qwerty\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
+                "\"loginUser21\",\"password\":\"pw12435\"}}, {\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"bulkId\":\"ytrewssq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"]," +
+                "\"userName\": \"loginUser1\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "\"bulkId\":\"ytrewSq\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser21\"," +
+                "\"password\":\"pw1323424\"}}]}";
 
     }
 }

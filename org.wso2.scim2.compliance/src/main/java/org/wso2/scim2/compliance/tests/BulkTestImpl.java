@@ -374,6 +374,7 @@ public class BulkTestImpl implements ResourceType {
 
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
+        ArrayList<Integer> resourceStatusCodes = new ArrayList<>();
         ArrayList<String> createdResourceLocations = new ArrayList<>();
         ArrayList<String> userIDs = new ArrayList<>();
         userIDs = createTestsUsers("Many");
@@ -579,6 +580,8 @@ public class BulkTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
                 //  Get the created user locations.
+                resourceStatusCodes = getStatus(responseString);
+                //  Get the created user locations.
                 createdResourceLocations = getLocations(responseString);
             } catch (Exception e) {
                 // Read the response body.
@@ -590,7 +593,10 @@ public class BulkTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
                 if (requestPaths[i].getTestSupported() &&
-                        !requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id")) {
+                        !requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id") &&
+                        !requestPaths[i].getTestCaseName().equals("Bulk post operation without path") &&
+                        !requestPaths[i].getTestCaseName().equals("Bulk post operation without data") &&
+                        !requestPaths[i].getTestCaseName().equals("Bulk post operation with fail on errors")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -605,7 +611,28 @@ public class BulkTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            Boolean pass = false;
+            for (Integer status : resourceStatusCodes) {
+                if (status == 201) {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 201");
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                    pass = true;
+                } else {
+                    // Check for status returned.
+                    subTests.add("Check each resource status");
+                    subTests.add("Actual : " + status);
+                    subTests.add("Expected : 201");
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                    pass = false;
+                    break;
+                }
+            }
+            if (response.getStatusLine().getStatusCode() == 200 && pass) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -621,7 +648,8 @@ public class BulkTestImpl implements ResourceType {
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id")) {
+            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation without bulk Id") &&
+                    response.getStatusLine().getStatusCode() == 400) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
@@ -635,6 +663,97 @@ public class BulkTestImpl implements ResourceType {
                                         "decoded properly .Required attribute BULK_ID is missing in the request\"",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
+            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation without path") &&
+                    response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error \"JSON string could not be " +
+                                        "decoded properly .Required attribute path is missing in the request\"",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
+            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation without data") &&
+                    response.getStatusLine().getStatusCode() == 400) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 400");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
+                long stopTime = System.currentTimeMillis();
+                testResults.add(new TestResult
+                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                "Service Provider successfully given the expected error \"JSON string could not be " +
+                                        "decoded properly .Required attribute data is missing in the request\"",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                        responseStatus, subTests), stopTime - startTime));
+            } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation with fail on errors") &&
+                    response.getStatusLine().getStatusCode() == 200) {
+                int n = 0;
+                Boolean failOnErrorPass = true;
+                for (Integer status : resourceStatusCodes) {
+                    if (n == 0 && status == 201) {
+                        subTests.add("First resource - loginUser21");
+                        subTests.add("Message : Created the resource hence given 201");
+                        subTests.add("Status : Success");
+                    } else if (n == 1 && status == 409) {
+                        subTests.add("Second resource - loginUser1");
+                        subTests.add("Message : User already exists hence given 409");
+                        subTests.add("Status : Success");
+                    } else {
+                        subTests.add("Third resource");
+                        subTests.add("Message : Fail on errors is not working");
+                        subTests.add("Status : Failed");
+                        failOnErrorPass = false;
+                    }
+                    n++;
+                }
+                String location = null;
+                JSONObject innerJsonObject = null;
+                try {
+                    JSONObject jsonObject = new JSONObject(responseString);
+                    JSONArray jsonarray = jsonObject.optJSONArray("Operations");
+                    innerJsonObject = jsonarray.getJSONObject(0);
+                    location = innerJsonObject.getString("location");
+                } catch (Exception e) {
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            "Could not decode the location from server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests), stopTime - startTime));
+                    continue;
+                }
+                //run clean up task
+                cleanUp(location, requestPaths[i].getTestCaseName());
+                // Check for status returned.
+                subTests.add("Fail on errors test");
+                subTests.add("Message : Out of 3 operations only 2 executed since fail on errors is 1 and 2nd " +
+                        "operation failed.");
+                if (failOnErrorPass) {
+                    subTests.add("Status : Success");
+                    subTests.add(StringUtils.EMPTY);
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult
+                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                                    "",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                } else {
+                    subTests.add("Status : Failed");
+                    subTests.add(StringUtils.EMPTY);
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult
+                            (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                    "Service Provider failed to give the expected result",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                }
             } else if (!requestPaths[i].getTestSupported()) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
