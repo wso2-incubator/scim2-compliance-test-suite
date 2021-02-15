@@ -374,8 +374,8 @@ public class SchemaBuilder {
                 uniquenessDefinition = SCIMDefinitions.Uniqueness.SERVER;
             }
 
-            subTests.add("Schema " + attributeName + " definitions test");
-            subTests.add("Message : Check attributes definition follow SCIM specification.");
+            subTests.add("Validate the attribute definitions of " + attributeName);
+            subTests.add("Test description : Check attribute definition follow SCIM specification.");
             subTests.add("Status : Success");
             subTests.add(StringUtils.EMPTY);
 
@@ -385,8 +385,8 @@ public class SchemaBuilder {
                     null, null, null);
 
         } catch (JSONException e) {
-            subTests.add("Schema " + attributeName + " definitions test");
-            subTests.add("Message : Check attributes definition follow SCIM specification.");
+            subTests.add("Validate the attribute definitions of " + attributeName);
+            subTests.add("Test description : Check attribute definition follow SCIM specification.");
             subTests.add("Status : Failed");
             subTests.add(StringUtils.EMPTY);
             throw new CriticalComplianceException(new TestResult

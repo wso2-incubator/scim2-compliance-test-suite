@@ -301,6 +301,8 @@ public class PDFGenerator {
 
         Color titleColor = new Color(102, 0, 153);
         Color dataColor = new Color(149, 69, 19);
+        Color success = new Color(0, 102, 0);
+        Color skipped = new Color(204, 204, 0);
         contentStream.setFont(PDType1Font.COURIER_BOLD, typeWriterFont);
         contentStream.setNonStrokingColor(titleColor);
         contentStream.showText("Summary : ");
@@ -309,7 +311,7 @@ public class PDFGenerator {
         printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.setNonStrokingColor(success);
         contentStream.showText("Success Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
@@ -318,7 +320,7 @@ public class PDFGenerator {
         printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.setNonStrokingColor(Color.RED);
         contentStream.showText("Failed Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
@@ -327,7 +329,7 @@ public class PDFGenerator {
         printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-        contentStream.setNonStrokingColor(Color.BLACK);
+        contentStream.setNonStrokingColor(skipped);
         contentStream.showText("Skipped Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);

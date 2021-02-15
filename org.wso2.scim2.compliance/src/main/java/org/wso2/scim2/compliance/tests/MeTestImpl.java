@@ -1145,7 +1145,7 @@ public class MeTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add("Expected : 204");
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1172,7 +1172,7 @@ public class MeTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add("Expected : 204");
                 subTests.add("Status : Failed");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();

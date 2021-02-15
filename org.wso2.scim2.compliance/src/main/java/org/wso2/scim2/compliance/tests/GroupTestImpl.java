@@ -540,8 +540,9 @@ public class GroupTestImpl implements ResourceType {
         }
 
         // This array hold the sub tests details.
-        requestPaths = new RequestPath[]{requestPath10, requestPath11, requestPath12, requestPath13, requestPath14,
-                requestPath15, requestPath16, requestPath17, requestPath18};
+        requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
+                requestPath6, requestPath7, requestPath8, requestPath9, requestPath10, requestPath11, requestPath12,
+                requestPath13, requestPath14, requestPath15, requestPath16, requestPath17, requestPath18};
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
@@ -645,7 +646,9 @@ public class GroupTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
-                if (requestPaths[i].getTestCaseName().equals("List groups")) { // check for all created groups
+                if (requestPaths[i].getTestCaseName().equals("List groups") ||
+                        requestPaths[i].getTestCaseName().equals("List groups with only using startIndex")) {
+                    // check for all created groups
                     subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
                     ArrayList<String> returnedGroupIDs = new ArrayList<>();
                     for (Group group : groupList) {
@@ -670,8 +673,16 @@ public class GroupTestImpl implements ResourceType {
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups with displayName as filter")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
+                } else if (requestPaths[i].getTestCaseName().equals("Get groups with displayName as filter") ||
+                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName eq with only" +
+                                " using startIndex") || requestPaths[i].getTestCaseName().equals("List groups by f" +
+                        "iltering - displayName eq to check case insensitivity of attribute") ||
+                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName eq to check " +
+                                "case insensitivity of operator") ||
+                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName co") ||
+                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName sw") ||
+                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName ew")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " test");
                     String value = "EYtXcD21";
                     for (Group group : groupList) {
                         if (!Objects.equals(value, group.getDisplayName())) {

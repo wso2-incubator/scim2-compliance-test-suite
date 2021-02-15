@@ -18,7 +18,7 @@
 
 package org.wso2.scim2.compliance.protocol;
 
-import org.apache.commons.lang.StringUtils;
+//import org.apache.commons.lang.StringUtils;
 import org.wso2.scim2.compliance.entities.Result;
 import org.wso2.scim2.compliance.entities.Statistics;
 import org.wso2.scim2.compliance.entities.TestResult;
@@ -74,7 +74,7 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-           //  User
+            //  User
             ArrayList<TestResult> userGetResult;
             userGetResult = resourceType.getMethodTest();
             for (TestResult testResult : userGetResult) {
@@ -160,7 +160,6 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-
             // Me
             ArrayList<TestResult> meGetResult;
             meGetResult = resourceType6.getMethodTest();
@@ -192,7 +191,6 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-
             // Bulk
             ArrayList<TestResult> bulkPostResult;
             bulkPostResult = resourceType7.postMethodTest();
@@ -217,8 +215,6 @@ public class FactoryMain {
             for (TestResult testResult : bulkDeleteResult) {
                 results.add(testResult);
             }
-
-
 
             Statistics statistics = new Statistics();
             for (TestResult result : results) {

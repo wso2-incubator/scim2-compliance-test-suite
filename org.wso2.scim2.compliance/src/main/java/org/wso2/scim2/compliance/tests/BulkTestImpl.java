@@ -702,14 +702,17 @@ public class BulkTestImpl implements ResourceType {
                         subTests.add("First resource - loginUser21");
                         subTests.add("Message : Created the resource hence given 201");
                         subTests.add("Status : Success");
+                        subTests.add(StringUtils.EMPTY);
                     } else if (n == 1 && status == 409) {
                         subTests.add("Second resource - loginUser1");
                         subTests.add("Message : User already exists hence given 409");
                         subTests.add("Status : Success");
+                        subTests.add(StringUtils.EMPTY);
                     } else {
                         subTests.add("Third resource");
                         subTests.add("Message : Fail on errors is not working");
                         subTests.add("Status : Failed");
+                        subTests.add(StringUtils.EMPTY);
                         failOnErrorPass = false;
                     }
                     n++;
@@ -1008,6 +1011,12 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -1281,6 +1290,12 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
@@ -1493,6 +1508,12 @@ public class BulkTestImpl implements ResourceType {
                 }
             }
             if (response.getStatusLine().getStatusCode() == 200 && pass) {
+                // Check for status returned.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
+                subTests.add("Expected : 200");
+                subTests.add("Status : Success");
+                subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
                         (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),

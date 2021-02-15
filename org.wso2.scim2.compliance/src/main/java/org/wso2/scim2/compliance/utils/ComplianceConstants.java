@@ -62,18 +62,18 @@ public class ComplianceConstants {
         public static final String BULK_ENDPOINT = "/Bulk";
         public static final String SCHEMAS_ENDPOINT = "/Schemas";
 
-        public static final String SCHEMA_LIST_TEST = "Schema List Test";
+        public static final String SCHEMA_TEST = "Schema Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
         public static final String ATTRIBUTE_MUTABILITY_TEST = "Attribute Mutability Test";
-        public static final String STATUS_CODE = "Verify Status code";
+        public static final String STATUS_CODE = "Verify Http response code";
         public static final String LOCATION_HEADER = "Verify Location Header";
         public static final String ALL_GROUPS_IN_TEST = "All Groups In Test";
-        public static final String ALL_USERS_IN_TEST = "All Users In Test";
+        public static final String ALL_USERS_IN_TEST = "Test listing all users";
         public static final String PAGINATION_USER_TEST = "Pagination User Test";
         public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
-        public static final String FILTER_CONTENT_TEST = "Filter Content Test";
+        public static final String FILTER_CONTENT_TEST = "Validate the filter response with the filter search attribute";
         public static final String SORT_USERS_TEST = "Sort Users Test";
-        public static final String FILTER_USER_WITH_PAGINATION = "Filter with pagination Test";
+        public static final String FILTER_USER_WITH_PAGINATION = "Test user filtering with pagination params";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
 
         public static final String EXTENSION_SCHEMA_URI =
@@ -102,7 +102,7 @@ public class ComplianceConstants {
                         "\"value\": \"Samindra@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"Samindra@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"12345A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"12345\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser2 =
                 "{\"name\":{\"givenName\":\"Danny\",\"familyName\":\"Gomez\"},\"password\": \"7019asd84\"," +
@@ -111,7 +111,7 @@ public class ComplianceConstants {
                         "\"value\": \"danny@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"danny@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"123456A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"243\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser3 =
                 "{\"name\":{\"givenName\":\"Jason\",\"familyName\":\"Diesel\"},\"password\": \"7019asd84\"," +
@@ -120,7 +120,7 @@ public class ComplianceConstants {
                         "\"value\": \"json@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"json@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"1234567A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"534\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser4 =
                 "{\"name\":{\"givenName\":\"Tom\",\"familyName\":\"Hardy\"},\"password\": \"7019asd84\",\"userName\":" +
@@ -128,7 +128,7 @@ public class ComplianceConstants {
                         "\"value\": \"tom@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"tom@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"12345678A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"343\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedUser5 =
                 "{\"name\":{\"givenName\":\"Taylor\",\"familyName\":\"Swift\"},\"password\": \"7019asd84\"," +
@@ -137,7 +137,7 @@ public class ComplianceConstants {
                         "\"value\": \"taylorn@example.com\",\"type\": \"work\",\"primary\": true },{" +
                         "\"value\": \"taylor@jensen.org\",\"type\": \"home\"}], " +
                         "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\": {\"employeeNumber\": " +
-                        "\"1234567890A\",\"manager\": {\"value\": \"Taylor\"}}}";
+                        "\"536\",\"manager\": {\"value\": \"Taylor\"}}}";
 
         public static String definedWithoutUserNameUser =
                 "{\"name\":{\"givenName\":\"Samindra\",\"familyName\":\"Perera\"},\"password\": \"7019asd84\"," +

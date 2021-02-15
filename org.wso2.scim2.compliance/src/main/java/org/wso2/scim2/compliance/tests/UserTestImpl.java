@@ -244,22 +244,16 @@ public class UserTestImpl implements ResourceType {
         requestPath1.setTestCaseName("List Users");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setUrl("?filter=userName+eq+loginUser1");
-        requestPath2.setTestCaseName("List users by filtering - userName eq");
-        try {
-            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
-                    getFilterSupported());
-        } catch (Exception e) {
-            requestPath2.setTestSupported(true);
-        }
+        requestPath2.setUrl("?attributes=userName,name.givenName");
+        requestPath2.setTestCaseName("List users with specified resource attributes to return");
 
         RequestPath requestPath3 = new RequestPath();
-        requestPath3.setUrl("?startIndex=1&count=2");
-        requestPath3.setTestCaseName("List users with pagination");
+        requestPath3.setUrl("?excludedAttributes=name.givenName,emails");
+        requestPath3.setTestCaseName("List users excluding attributes givenName and emails");
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
-        requestPath4.setTestCaseName("List users with user id sorting and ascending order");
+        requestPath4.setTestCaseName("Sort users by user id without pagination and filtering params");
         try {
             requestPath4.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
                     getSortSupported());
@@ -268,34 +262,40 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath5 = new RequestPath();
-        requestPath5.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
-        requestPath5.setTestCaseName("List users with userName as filter with pagination");
-        try {
-            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
-                    getFilterSupported());
-        } catch (Exception e) {
-            requestPath5.setTestSupported(true);
-        }
+        requestPath5.setUrl("?startIndex=1&count=2");
+        requestPath5.setTestCaseName("List users with pagination");
 
         RequestPath requestPath6 = new RequestPath();
         requestPath6.setUrl("?startIndex=-1&count=2");
-        requestPath6.setTestCaseName("List users having negative number as index");
+        requestPath6.setTestCaseName("Paginate users with a negative startIndex");
 
         RequestPath requestPath7 = new RequestPath();
         requestPath7.setUrl("?count=2");
-        requestPath7.setTestCaseName("List users without index and only using count");
+        requestPath7.setTestCaseName("Paginate users without startIndex and with positive count param");
 
         RequestPath requestPath8 = new RequestPath();
-        requestPath8.setUrl("?attributes=userName,name.givenName");
-        requestPath8.setTestCaseName("List users with specific attributes username and givenName");
+        requestPath8.setUrl("?startIndex=1");
+        requestPath8.setTestCaseName("Paginate users with positive startIndex and without count param");
 
         RequestPath requestPath9 = new RequestPath();
-        requestPath9.setUrl("?excludedAttributes=name.givenName,emails");
-        requestPath9.setTestCaseName("List users with excluding attributes givenName and emails");
+        requestPath9.setUrl("?filter=userName+eq+loginUser1");
+        requestPath9.setTestCaseName("List users by filtering - userName eq");
+        try {
+            requestPath9.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath9.setTestSupported(true);
+        }
 
         RequestPath requestPath10 = new RequestPath();
-        requestPath10.setUrl("?startIndex=1");
-        requestPath10.setTestCaseName("List users with only using startIndex");
+        requestPath10.setUrl("?filter=userName+eq+loginUser1&startIndex=1&count=1");
+        requestPath10.setTestCaseName("Filter users by username with pagination params");
+        try {
+            requestPath10.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath10.setTestSupported(true);
+        }
 
         RequestPath requestPath11 = new RequestPath();
         requestPath11.setUrl("?filter=userName+eq+loginUser1&startIndex=1");
@@ -348,7 +348,7 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath16 = new RequestPath();
-        requestPath16.setUrl("?filter=userName+co+loginUser");
+        requestPath16.setUrl("?filter=userName+co+loginUser1");
         requestPath16.setTestCaseName("List users by filtering - userName co");
         try {
             requestPath16.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -358,7 +358,7 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath17 = new RequestPath();
-        requestPath17.setUrl("?filter=userName+sw+loginUser");
+        requestPath17.setUrl("?filter=userName+sw+loginUser1");
         requestPath17.setTestCaseName("List users by filtering - userName sw");
         try {
             requestPath17.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -368,7 +368,7 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath18 = new RequestPath();
-        requestPath18.setUrl("?filter=userName+ew+loginUser");
+        requestPath18.setUrl("?filter=userName+ew+loginUser1");
         requestPath18.setTestCaseName("List users by filtering - userName ew");
         try {
             requestPath18.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -378,7 +378,7 @@ public class UserTestImpl implements ResourceType {
         }
 
         RequestPath requestPath19 = new RequestPath();
-        requestPath19.setUrl("?filter=userName+pr+loginUser");
+        requestPath19.setUrl("?filter=userName+pr+loginUser1");
         requestPath19.setTestCaseName("List users by filtering - userName pr");
         try {
             requestPath19.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -389,7 +389,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath20 = new RequestPath();
         requestPath20.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+ne+12345");
+                ":employeeNumber+ne+12345");
         requestPath20.setTestCaseName("List users by filtering - employeeNumber ne");
         try {
             requestPath20.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -400,7 +400,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath21 = new RequestPath();
         requestPath21.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+co+12345");
+                ":employeeNumber+co+12345");
         requestPath21.setTestCaseName("List users by filtering - employeeNumber co");
         try {
             requestPath21.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -411,7 +411,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath22 = new RequestPath();
         requestPath22.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+sw+12345");
+                ":employeeNumber+sw+12345");
         requestPath22.setTestCaseName("List users by filtering - employeeNumber sw");
         try {
             requestPath22.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -422,7 +422,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath23 = new RequestPath();
         requestPath23.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+ew+12345");
+                ":employeeNumber+ew+12345");
         requestPath23.setTestCaseName("List users by filtering - employeeNumber ew");
         try {
             requestPath23.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -433,7 +433,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath24 = new RequestPath();
         requestPath24.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+eq+12345");
+                ":employeeNumber+eq+12345");
         requestPath24.setTestCaseName("List users by filtering - employeeNumber eq");
         try {
             requestPath24.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -444,7 +444,7 @@ public class UserTestImpl implements ResourceType {
 
         RequestPath requestPath25 = new RequestPath();
         requestPath25.setUrl("?filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber+pr+12345");
+                ":employeeNumber+pr+12345");
         requestPath25.setTestCaseName("List users by filtering - employeeNumber pr");
         try {
             requestPath25.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
@@ -616,7 +616,10 @@ public class UserTestImpl implements ResourceType {
                 } else if (requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq")
                         || requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq to " +
                         "check case insensitivity of attribute") || requestPaths[i].getTestCaseName().equals("List" +
-                        " users by filtering - userName eq to check case insensitivity of operator")) {
+                        " users by filtering - userName eq to check case insensitivity of operator") ||
+                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName co") ||
+                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName sw") ||
+                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName ew")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
                     String value = "loginUser1";
                     for (User user1 : userList) {
@@ -653,8 +656,12 @@ public class UserTestImpl implements ResourceType {
                         subTests.add(StringUtils.EMPTY);
                     }
                 } else if (requestPaths[i].getTestCaseName().equals("List users with pagination") ||
-                        requestPaths[i].getTestCaseName().equals("List users having negative number as index")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " Test");
+                        requestPaths[i].getTestCaseName().equals("Paginate users with a negative startIndex")) {
+                    if (requestPaths[i].getTestCaseName().equals("List users with pagination")) {
+                        subTests.add("Validate paginated users response");
+                    } else if (requestPaths[i].getTestCaseName().equals("Paginate users with a negative startIndex")) {
+                        subTests.add("Test user pagination when startIndex is not specified");
+                    }
                     if (userList.size() != 2) {
                         subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
                         subTests.add("Expected : startIndex:1,totalResults:2");
@@ -671,8 +678,8 @@ public class UserTestImpl implements ResourceType {
                     subTests.add("Expected : startIndex:1,totalResults:2");
                     subTests.add("Status : Success");
                     subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("List users with user id sorting and ascending " +
-                        "order")) {
+                } else if (requestPaths[i].getTestCaseName().equals("Sort users by user id without pagination and " +
+                        "filtering params")) {
                     subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
                     try {
                         if (isUserListSorted(userList)) {
@@ -697,8 +704,8 @@ public class UserTestImpl implements ResourceType {
                     }
                     subTests.add("Status : Success");
                     subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("List users with userName as filter with " +
-                        "pagination")) {
+                } else if (requestPaths[i].getTestCaseName().equals("Filter users by username with pagination " +
+                        "params")) {
                     subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
                     if (userList.size() != 1) {
                         subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
@@ -747,8 +754,9 @@ public class UserTestImpl implements ResourceType {
                         subTests.add("Status : Success");
                         subTests.add(StringUtils.EMPTY);
                     }
-                } else if (requestPaths[i].getTestCaseName().equals("List users without index and only using count")) {
-                    subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
+                } else if (requestPaths[i].getTestCaseName().equals("Paginate users without startIndex and with " +
+                        "positive count param")) {
+                    subTests.add("Test user pagination when startIndex is not specified");
                     if (startIndex != 1 && count != 2) {
                         subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
                         subTests.add("Expected : startIndex:1,totalResults:2");
@@ -836,13 +844,13 @@ public class UserTestImpl implements ResourceType {
         requestPath4.setTestCaseName("Get a non existing user and validate user not found error response");
 
         RequestPath requestPath5 = new RequestPath();
-        requestPath5.setUrl("?attributes=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User.employeeNumber" +
+        requestPath5.setUrl("?attributes=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber" +
                 ",userName");
         requestPath5.setTestCaseName("Get a enterprise user with specific attribute employeeNumber");
 
         RequestPath requestPath6 = new RequestPath();
         requestPath6.setUrl("?excludedAttributes=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" +
-                ".employeeNumber");
+                ":employeeNumber");
         requestPath6.setTestCaseName("Get a enterprise user with excluding attribute employeeNumber");
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
@@ -1061,7 +1069,7 @@ public class UserTestImpl implements ResourceType {
                     }
                     subTests.add("Actual : emails:null");
                     subTests.add("Expected : emails:null");
-                    subTests.add("Status : Failed");
+                    subTests.add("Status : Success");
                 } else if (requestPaths[i].getTestCaseName().equals("Get a enterprise user with specific attribute " +
                         "employeeNumber")) {
                     subTests.add(requestPaths[i].getTestCaseName() + " test");
@@ -1098,9 +1106,35 @@ public class UserTestImpl implements ResourceType {
                     }
                     subTests.add("Actual : employeeNumber:1234A");
                     subTests.add("Expected : employeeNumber:1234A");
-                    subTests.add("Status : Failed");
-                }
+                    subTests.add("Status : Success");
+                } else if (requestPaths[i].getTestCaseName().equals("Get a enterprise user with excluding attribute " +
+                        "employeeNumber")) {
+                    subTests.add(requestPaths[i].getTestCaseName() + " test");
+                    String employeeNumber = null;
+                    try {
+                        JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:extension" +
+                                ":enterprise:2.0:User");
+                        employeeNumber = innerJsonObject.getString("employeeNumber");
+                    } catch (JSONException e) {
 
+                    }
+                    if (!employeeNumber.equals(null)) {
+                        subTests.add("Actual : employeeNumber:" + employeeNumber);
+                        subTests.add("Expected : employeeNumber:null");
+                        subTests.add("Status : Failed");
+                        // Clean the created user.
+                        cleanUpUser(id, "Get User");
+                        long stopTime = System.currentTimeMillis();
+                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                "EmployeeNumber attribute from server response is not excluded as expected",
+                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                        subTests), stopTime - startTime));
+                        continue;
+                    }
+                    subTests.add("Actual : employeeNumber:null");
+                    subTests.add("Expected : employeeNumber:null");
+                    subTests.add("Status : Success");
+                }
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
                 long stopTime = System.currentTimeMillis();

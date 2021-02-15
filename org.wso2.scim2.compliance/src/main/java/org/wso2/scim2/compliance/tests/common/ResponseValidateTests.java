@@ -81,37 +81,37 @@ public class ResponseValidateTests {
         // Check for required attributes.
         if (!subTests.contains(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.REQUIRED_ATTRIBUTE_TEST);
-            subTests.add("Message : Validate required attributes in response.");
+            subTests.add("Test description : Validate required attributes presence in the response.");
             requiredTest = true;
         }
         validateSCIMObjectForRequiredAttributes(scimObject, schema,
                 method, responseString, headerString, responseStatus, subTests);
         if (requiredTest) {
-            subTests.add("Status : Success.");
+            subTests.add("Status : Success");
             subTests.add(StringUtils.EMPTY);
         }
         // Validate schema list.
-        if (!subTests.contains(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST)) {
-            subTests.add(ComplianceConstants.TestConstants.SCHEMA_LIST_TEST);
-            subTests.add("Message : Validate schema.");
+        if (!subTests.contains(ComplianceConstants.TestConstants.SCHEMA_TEST)) {
+            subTests.add(ComplianceConstants.TestConstants.SCHEMA_TEST);
+            subTests.add("Test description : Validate response against the schema.");
             schemaTest = true;
         }
         validateSchemaList(scimObject, schema, method, responseString, headerString, responseStatus, subTests);
         if (schemaTest) {
-            subTests.add("Status : Success.");
+            subTests.add("Status : Success");
             subTests.add(StringUtils.EMPTY);
         }
         // Validate attribute definitions.
         if (!subTests.contains(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST)) {
             subTests.add(ComplianceConstants.TestConstants.ATTRIBUTE_MUTABILITY_TEST);
-            subTests.add("Message : Validate attribute definitions.");
+            subTests.add("Test description : Validate the mutability of the SCIM attributes.");
             definitionTest = true;
         }
         validateReturnedAttributes((AbstractSCIMObject) scimObject, requestedAttributes,
                 requestedExcludingAttributes, method,
                 responseString, headerString, responseStatus, subTests);
         if (definitionTest) {
-            subTests.add("Status : Success.");
+            subTests.add("Status : Success");
             subTests.add(StringUtils.EMPTY);
         }
     }
