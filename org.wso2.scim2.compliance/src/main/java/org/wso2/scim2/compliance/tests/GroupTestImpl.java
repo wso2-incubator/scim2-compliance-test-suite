@@ -404,18 +404,12 @@ public class GroupTestImpl implements ResourceType {
         requestPath1.setTestCaseName("List groups");
 
         RequestPath requestPath2 = new RequestPath();
-        requestPath2.setUrl("?filter=displayName+eq+EYtXcD21");
-        requestPath2.setTestCaseName("Get groups with displayName as filter");
-        try {
-            requestPath2.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
-                    getFilterSupported());
-        } catch (Exception e) {
-            requestPath2.setTestSupported(true);
-        }
+        requestPath2.setUrl("?attributes=displayName,members.value");
+        requestPath2.setTestCaseName("Get groups with displayName and member.value attributes");
 
         RequestPath requestPath3 = new RequestPath();
-        requestPath3.setUrl("?startIndex=1&count=2");
-        requestPath3.setTestCaseName("Get groups with index pagination and count");
+        requestPath3.setUrl("?excludedAttributes=members");
+        requestPath3.setTestCaseName("Get groups with excluding members attribute");
 
         RequestPath requestPath4 = new RequestPath();
         requestPath4.setUrl("?sortBy=id&sortOrder=ascending");
@@ -428,14 +422,8 @@ public class GroupTestImpl implements ResourceType {
         }
 
         RequestPath requestPath5 = new RequestPath();
-        requestPath5.setUrl("?filter=displayName+eq+EYtXcD21&startIndex=1&count=1");
-        requestPath5.setTestCaseName("Get groups with displayName as filter and with pagination");
-        try {
-            requestPath5.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
-                    getFilterSupported());
-        } catch (Exception e) {
-            requestPath5.setTestSupported(true);
-        }
+        requestPath5.setUrl("?startIndex=1&count=2");
+        requestPath5.setTestCaseName("Get groups with index pagination and count");
 
         RequestPath requestPath6 = new RequestPath();
         requestPath6.setUrl("?startIndex=-1&count=2");
@@ -446,16 +434,28 @@ public class GroupTestImpl implements ResourceType {
         requestPath7.setTestCaseName("Get groups without index and only using count");
 
         RequestPath requestPath8 = new RequestPath();
-        requestPath8.setUrl("?attributes=displayName,members.value");
-        requestPath8.setTestCaseName("Get groups with displayName and member.value attributes");
+        requestPath8.setUrl("?startIndex=1");
+        requestPath8.setTestCaseName("List groups with only using startIndex");
 
         RequestPath requestPath9 = new RequestPath();
-        requestPath9.setUrl("?excludedAttributes=members");
-        requestPath9.setTestCaseName("Get groups with excluding members attribute");
+        requestPath9.setUrl("?filter=displayName+eq+EYtXcD21&startIndex=1&count=1");
+        requestPath9.setTestCaseName("Get groups with displayName as filter and with pagination");
+        try {
+            requestPath9.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath9.setTestSupported(true);
+        }
 
         RequestPath requestPath10 = new RequestPath();
-        requestPath10.setUrl("?startIndex=1");
-        requestPath10.setTestCaseName("List groups with only using startIndex");
+        requestPath10.setUrl("?filter=displayName+eq+EYtXcD21");
+        requestPath10.setTestCaseName("Get groups with displayName as filter");
+        try {
+            requestPath10.setTestSupported(complianceTestMetaDataHolder.getScimServiceProviderConfig().
+                    getFilterSupported());
+        } catch (Exception e) {
+            requestPath10.setTestSupported(true);
+        }
 
         RequestPath requestPath11 = new RequestPath();
         requestPath11.setUrl("?filter=displayName+eq+EYtXcD21&startIndex=1");
