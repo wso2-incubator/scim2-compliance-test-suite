@@ -1,0 +1,14 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<servlet>
+		<servlet-name>Compliance</servlet-name>
+		<servlet-class>org.wso2.scim2.compliance.protocol</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Compliance</servlet-name>
+		<url-pattern>/compliance</url-pattern>
+	</servlet-mapping>
+</web-app>
