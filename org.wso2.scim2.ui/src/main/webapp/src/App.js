@@ -1,5 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
+import { toast } from 'react-toastify';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 // Material-ui
 import {
   createMuiTheme,
@@ -14,9 +17,12 @@ import Home from './screens/Home';
 
 const theme = createMuiTheme(themeObject);
 
+toast.configure();
+
 function App() {
   return (
     <MuiThemeProvider theme={theme}>
+      <CssBaseline />
       <Home />
     </MuiThemeProvider>
   );

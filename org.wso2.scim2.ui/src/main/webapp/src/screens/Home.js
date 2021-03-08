@@ -4,8 +4,17 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
 import Drawer from '@material-ui/core/Drawer';
 import Settings from '@material-ui/icons/Settings';
+import Play from '@material-ui/icons/PlayArrow';
+import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 // List
 import Checkbox from '@material-ui/core/Checkbox';
@@ -21,10 +30,24 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
+// Dialog
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+
 // Components.
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import TestList from '../components/TestList';
+import Summary from '../components/Summary';
+import TestResult from '../components/TestResult';
+import Result from '../components/Result';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
     textAlign: 'center',
+    fontWeight: 600,
   },
   paper: {
     height: 500,
@@ -51,13 +75,42 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(15),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    // justifyContent: 'space-between',
+    paddingTop: theme.spacing(15),
   },
   rightIcons: {
     marginRight: '-12px',
   },
   nested: {
     paddingLeft: theme.spacing(9),
+  },
+  authStyle: {
+    //  paddingTop: 15,
+    // paddingLeft: 9,
+    // paddingBottom: 15,
+    padding: 5,
+    display: 'flex',
+    width: '97%',
+    justifyContent: 'space-between',
+  },
+  button: {
+    margin: theme.spacing(1),
+    width: 200,
+    textTransform: 'none',
+  },
+  centerCol: {
+    flex: 1,
+    overflowY: 'scroll',
+    height: 550,
+  },
+  dialogPaper: {
+    minHeight: '50vh',
+    maxHeight: '50vh',
+    minWidth: '60vh',
+    maxWidth: '60vh',
   },
 }));
 
@@ -73,75 +126,100 @@ const testCases = [
 ];
 
 const serviceProviderConfigSubTests = [
-  { name: 'Get ServiceProviderConfig', stateName: 'serviceProviderConfigGet' },
+  { name: 'GET /ServiceProviderConfig', stateName: 'serviceProviderConfigGet' },
 ];
 
-const schemasSubTests = [{ name: 'Get Schemas', stateName: 'schemasGet' }];
+const schemasSubTests = [{ name: 'GET /Schemas', stateName: 'schemasGet' }];
 
 const resourceTypesSubTests = [
-  { name: 'Get ResourceTypes', stateName: 'resourceTypesGet' },
+  { name: 'GET /ResourceTypes', stateName: 'resourceTypesGet' },
 ];
 
 const userSubTests = [
-  { name: 'Get User', stateName: 'userGet' },
-  { name: 'Get User By Id', stateName: 'userGetById' },
-  { name: 'Post User', stateName: 'userPost' },
-  { name: 'Update User', stateName: 'userPut' },
-  { name: 'Patch User', stateName: 'userPatch' },
-  { name: 'Delete User', stateName: 'userDelete' },
-  { name: 'Search User', stateName: 'userSearch' },
+  { name: 'GET /Users', stateName: 'userGet' },
+  { name: 'GET /Users/{id}', stateName: 'userGetById' },
+  { name: 'POST /Users', stateName: 'userPost' },
+  { name: 'PUT /Users', stateName: 'userPut' },
+  { name: 'PATCH /Users', stateName: 'userPatch' },
+  { name: 'DELETE /Users', stateName: 'userDelete' },
+  { name: 'POST /Users/.search', stateName: 'userSearch' },
 ];
 
 const groupSubTests = [
-  { name: 'Get Group', stateName: 'groupGet' },
-  { name: 'Post Group', stateName: 'groupPost' },
+  { name: 'GET /Groups', stateName: 'groupGet' },
+  { name: 'GET /Groups/{id}', stateName: 'groupGetById' },
+  { name: 'POST /Groups', stateName: 'groupPost' },
+  { name: 'PUT /Groups', stateName: 'groupPut' },
+  { name: 'PATCH /Groups', stateName: 'groupPatch' },
+  { name: 'DELETE /Groups', stateName: 'groupDelete' },
+  { name: 'POST /Groups/.search', stateName: 'groupSearch' },
 ];
 
-const RolesSubTests = [
-  { name: 'Get Group', stateName: 'groupGet' },
-  { name: 'Post Group', stateName: 'groupPost' },
+const meSubTests = [
+  { name: 'GET /Me', stateName: 'meGet' },
+  { name: 'POST /Me', stateName: 'mePost' },
+  { name: 'PUT /Me', stateName: 'mePut' },
+  { name: 'PATCH /Me', stateName: 'mePatch' },
+  { name: 'DELETE /Me', stateName: 'meDelete' },
+];
+
+const bulkSubTests = [
+  { name: 'POST /Bulk', stateName: 'bulkPost' },
+  { name: 'PUT /Bulk', stateName: 'bulkPut' },
+  { name: 'PATCH /Bulk', stateName: 'bulkPatch' },
+  { name: 'DELETE /Bulk', stateName: 'bulkDelete' },
+];
+
+const rolesSubTests = [
+  { name: 'GET /Roles', stateName: 'rolesGet' },
+  { name: 'GET /Roles/{id}', stateName: 'rolesGetById' },
+  { name: 'POST /Roles', stateName: 'rolesPost' },
+  { name: 'PUT /Roles', stateName: 'rolesPut' },
+  { name: 'PATCH /Roles', stateName: 'rolesPatch' },
+  { name: 'DELETE /Roles', stateName: 'rolesDelete' },
+  { name: 'POST /Roles/.search', stateName: 'rolesSearch' },
 ];
 
 const tests = [
   {
     id: 1,
-    name: 'ServiceProvider Config',
+    name: '/ServiceProviderConfig',
     sub: serviceProviderConfigSubTests,
   },
   {
     id: 2,
-    name: 'Schemas',
+    name: '/Schemas',
     sub: schemasSubTests,
   },
   {
     id: 3,
-    name: 'ResourceTypes',
+    name: '/ResourceTypes',
     sub: resourceTypesSubTests,
   },
   {
     id: 4,
-    name: 'User Endpoint',
+    name: '/Users',
     sub: userSubTests,
   },
   {
     id: 5,
-    name: 'Group Endpoint',
+    name: '/Groups',
     sub: groupSubTests,
   },
   {
     id: 6,
-    name: 'Me Endpoint',
-    sub: groupSubTests,
+    name: '/Me',
+    sub: meSubTests,
   },
   {
     id: 7,
-    name: 'Bulk Endpoint',
-    sub: groupSubTests,
+    name: '/Bulk',
+    sub: bulkSubTests,
   },
   {
     id: 8,
-    name: 'Roles Endpoint',
-    sub: groupSubTests,
+    name: '/Roles',
+    sub: rolesSubTests,
   },
 ];
 
@@ -149,6 +227,26 @@ export default function Home() {
   const classes = useStyles();
   const [testCases, setTestcases] = React.useState(tests);
   const [open, setOpen] = React.useState(false);
+  const [select, setSelect] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    endpoint: 'https://localhost:9443/scim2',
+    userName: '',
+    password: '',
+    token: '',
+  });
+  const [type, setType] = React.useState(1);
+  const [errors, setErrors] = React.useState({
+    endpoint: '',
+    userName: '',
+    password: '',
+    token: '',
+    general: '',
+  });
+  const [statistics, setStatistics] = React.useState();
+  const [results, setResults] = React.useState();
+  const [resultData, setResultData] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
   const [state, setState] = React.useState({
     userGet: false,
     userGetById: false,
@@ -158,6 +256,91 @@ export default function Home() {
     userSearch: false,
     userDelete: false,
   });
+
+  const notify = (message) => {
+    toast(message, {
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      type: 'Error',
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleTypeChange = (event) => {
+    setType(Number(event.target.value));
+    console.log(type);
+  };
+
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleSubmit = () => {
+    console.log(formData);
+    if (formData.endpoint == '') {
+      setErrors({
+        ...errors,
+        endpoint: 'Fill endpoint details',
+      });
+      return;
+    }
+
+    if (type == 1 && (formData.userName == '' || formData.password == '')) {
+      if (formData.password == '' && formData.userName == '') {
+        setErrors({
+          ...errors,
+          userName: 'Fill userName',
+          password: 'Fill password',
+        });
+      } else if (formData.password == '') {
+        setErrors({
+          ...errors,
+          password: 'Fill endpoint details',
+        });
+      } else if (formData.userName == '') {
+        setErrors({
+          ...errors,
+          userName: 'Fill userName',
+        });
+      } else {
+        setErrors({
+          ...errors,
+          userName: '',
+          password: '',
+        });
+      }
+      return;
+    } else if (type == 2 && formData.token == '') {
+      setErrors({
+        ...errors,
+        token: 'Fill token details',
+      });
+      return;
+    }
+    setErrors({
+      ...errors,
+      userName: '',
+      password: '',
+      endpoint: '',
+      token: '',
+    });
+
+    handleClose();
+  };
 
   const handleCheckbox = (parentId, parentIndex, childId, childIndex) => {
     const tests = testCases;
@@ -351,26 +534,26 @@ export default function Home() {
   //   }
   // };
 
-  const handlePrimaryChange = (id, index) => {
-    const test = testCases[index];
-    const { subTests } = test.sub;
+  // const handlePrimaryChange = (id, index) => {
+  //   const test = testCases[index];
+  //   const { subTests } = test.sub;
 
-    var t = {
-      ...testCases.filter((test) => test.id == id)[0],
-      Checked: !testCases.filter((test) => test.id == id)[0].Checked,
-      expanded: !testCases.filter((test) => test.id == id)[0].expanded,
-    };
-    if (t.checked == true) {
-      t.sub.map((s) => (s.checked = true));
-    } else {
-      t.sub.map((s) => (s.checked = false));
-    }
-    const tests = testCases;
-    tests[index] = t;
+  //   var t = {
+  //     ...testCases.filter((test) => test.id == id)[0],
+  //     Checked: !testCases.filter((test) => test.id == id)[0].Checked,
+  //     expanded: !testCases.filter((test) => test.id == id)[0].expanded,
+  //   };
+  //   if (t.checked == true) {
+  //     t.sub.map((s) => (s.checked = true));
+  //   } else {
+  //     t.sub.map((s) => (s.checked = false));
+  //   }
+  //   const tests = testCases;
+  //   tests[index] = t;
 
-    setTestcases(tests);
-    console.log(testCases);
-  };
+  //   setTestcases(tests);
+  //   console.log(testCases);
+  // };
 
   const handleClick = (id, index) => {
     console.log(testCases);
@@ -384,13 +567,64 @@ export default function Home() {
     tests[index] = t;
 
     setTestcases([...tests]);
-
-    //setOpen(!open);
   };
 
-  const handleSecondaryChange = (event) => {
-    console.log(state);
-    setState({ ...state, [event.target.name]: event.target.checked });
+  // const handleSecondaryChange = (event) => {
+  //   console.log(state);
+  //   setState({ ...state, [event.target.name]: event.target.checked });
+  // };
+
+  const selectAllTests = () => {
+    var i;
+    for (i = 0; i < testCases.length; i++) {
+      handleCheckbox(i + 1, i);
+    }
+    setSelect(!select);
+  };
+
+  const runAllTests = () => {
+    if (
+      formData.endpoint == '' ||
+      formData.userName == '' ||
+      formData.password == ''
+    ) {
+      toast.error('Please fill all authentication details!', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      return;
+    }
+    var checkedCount = 0;
+    testCases.map((t) => {
+      if (t.checked == true) checkedCount++;
+    });
+
+    if (checkedCount == 0) {
+      console.log(checkedCount);
+      toast.error('Please check at least one test case to proceed!', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      return;
+    }
+
+    const data = {
+      endpoint: formData.endpoint,
+      userName: formData.userName,
+      password: formData.password,
+      testCases: testCases,
+    };
+
+    console.log(data);
+    setLoading(true);
+    axios
+      .post('https://localhost:9443/moi-captcha/CaptchaServlet', data)
+      .then((res) => {
+        console.log(res);
+        setStatistics(res.data.statistics);
+        setResults(res.data.results);
+        setResultData(true);
+        setLoading(false);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -402,84 +636,218 @@ export default function Home() {
         classes={{ paper: classes.drawerPaper }}
       >
         <div>
-          <Typography variant="h6" className={classes.title}>
-            Test Cases
-          </Typography>
-          <Settings />
-        </div>
-        <List component="nav">
-          {testCases.map((t, parentIndex) => (
-            <div>
-              <ListItem dense key={parentIndex}>
-                <ListItemIcon>
-                  <Checkbox
-                    disableRipple
-                    edge="start"
-                    checked={!!t.checked}
-                    onChange={() => handleCheckbox(t.id, parentIndex)}
-                    name={t.name}
-                  />
-                </ListItemIcon>
-                <ListItemIcon>
-                  <Button
-                    disableFocusRipple
-                    disableRipple
-                    classes={{ outlined: classes.button }}
-                    variant="outlined"
-                    size="small"
-                  >
-                    {t.name}
-                  </Button>
-                </ListItemIcon>
-                <ListItemSecondaryAction>
-                  <IconButton
-                    className={classes.rightIcons}
-                    onClick={() => {
-                      handleClick(t.id, parentIndex);
-                    }}
-                    name={t.name}
-                  >
-                    {console.log(t.expanded)}
-                    {t.expanded ? <ExpandLess /> : <ExpandMore />}
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Collapse unmountOnExit in={t.expanded || false} timeout="auto">
-                {t.sub.map((s, childIndex) => (
-                  <div>
-                    <List component="div" disablePadding>
-                      <ListItem
-                        dense
-                        className={classes.nested}
-                        key={childIndex}
-                      >
-                        <ListItemIcon>
-                          <Checkbox
-                            // disableRipple
-                            edge="start"
-                            checked={!!s.checked}
-                            tabIndex={-1}
-                            onChange={() => {
-                              handleCheckbox(
-                                t.id,
-                                parentIndex,
-                                t.id,
-                                childIndex
-                              );
-                            }}
-                            name="userGet"
-                          />
-                        </ListItemIcon>
-                        <ListItemText primary={s.name} />
-                      </ListItem>
-                    </List>
-                  </div>
-                ))}
-              </Collapse>
-            </div>
-          ))}
+          <div className={classes.authStyle}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600 }}>
+              Authentication
+            </Typography>
+            <Settings onClick={handleClickOpen} />
 
-          {/* <ListItem dense key={2}>
+            <Dialog
+              classes={{ paper: classes.dialogPaper }}
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogTitle id="form-dialog-title">Authentication</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  To Execute tests please provide below details.
+                </DialogContentText>
+                <TextField
+                  //autoFocus
+                  name="endpoint"
+                  margin="dense"
+                  id="endpoint"
+                  label="Endpoint"
+                  type="url"
+                  variant="outlined"
+                  placeholder="https://localhost:9443/scim2"
+                  fullWidth
+                  onChange={handleChange}
+                  value={formData.endpoint}
+                  error={errors.endpoint ? true : false}
+                  helperText={errors.endpoint}
+                />
+                <div style={{ paddingTop: 5 }}>
+                  <FormControl
+                    variant="outlined"
+                    className={classes.formControl}
+                  >
+                    <InputLabel htmlFor="outlined-age-native-simple">
+                      Type
+                    </InputLabel>
+                    <Select
+                      native
+                      value={type}
+                      onChange={handleTypeChange}
+                      label="Type"
+                    >
+                      <option value={1}>Basic Auth</option>
+                      <option value={2}>Bearer Token</option>
+                    </Select>
+                  </FormControl>
+                </div>
+                {type === 1 ? (
+                  <div>
+                    {' '}
+                    <TextField
+                      name="userName"
+                      margin="dense"
+                      id="userName"
+                      label="Username"
+                      type="text"
+                      variant="outlined"
+                      placeholder="enter your username"
+                      fullWidth
+                      onChange={handleChange}
+                      value={formData.userName}
+                      error={errors.userName ? true : false}
+                      helperText={errors.userName}
+                    />
+                    <TextField
+                      name="password"
+                      margin="dense"
+                      id="password"
+                      label="Password"
+                      type="password"
+                      variant="outlined"
+                      placeholder="enter your password"
+                      fullWidth
+                      onChange={handleChange}
+                      value={formData.password}
+                      error={errors.password ? true : false}
+                      helperText={errors.password}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    {' '}
+                    <TextField
+                      name="token"
+                      margin="dense"
+                      id="token"
+                      label="Token"
+                      type="text"
+                      variant="outlined"
+                      placeholder="enter your token"
+                      fullWidth
+                      onChange={handleChange}
+                      value={formData.token}
+                      error={errors.token ? true : false}
+                      helperText={errors.token}
+                    />
+                  </div>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmit} color="primary">
+                  Submit
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+          <Divider />
+          <div style={{ padding: 5 }}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600 }}>
+              Test Cases
+            </Typography>
+          </div>
+          <Divider />
+          <div className={classes.centerCol}>
+            <List component="nav">
+              <Checkbox
+                disableRipple
+                //edge="start"
+                checked={select}
+                onChange={selectAllTests}
+                style={{
+                  marginLeft: 4,
+                }}
+              />
+              {testCases.map((t, parentIndex) => (
+                <div>
+                  <Divider />
+                  <ListItem dense key={t.id}>
+                    <ListItemIcon>
+                      <Checkbox
+                        disableRipple
+                        edge="start"
+                        checked={!!t.checked}
+                        onChange={() => handleCheckbox(t.id, parentIndex)}
+                        name={t.name}
+                      />
+                    </ListItemIcon>
+                    <ListItemIcon>
+                      <Button
+                        disableFocusRipple
+                        disableRipple
+                        classes={{ outlined: classes.button }}
+                        variant="outlined"
+                        //  size="small"
+                      >
+                        <Typography
+                          variant="button"
+                          style={{ fontWeight: 'bold' }}
+                        >
+                          {t.name}
+                        </Typography>
+                      </Button>
+                    </ListItemIcon>
+                    <ListItemSecondaryAction>
+                      <IconButton
+                        className={classes.rightIcons}
+                        onClick={() => {
+                          handleClick(t.id, parentIndex);
+                        }}
+                        name={t.name}
+                      >
+                        {t.expanded ? <ExpandLess /> : <ExpandMore />}
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <Collapse
+                    unmountOnExit
+                    in={t.expanded || false}
+                    timeout="auto"
+                  >
+                    {t.sub.map((s, childIndex) => (
+                      <div>
+                        <List component="div" disablePadding>
+                          <ListItem
+                            dense
+                            className={classes.nested}
+                            key={childIndex}
+                          >
+                            <ListItemIcon>
+                              <Checkbox
+                                // disableRipple
+                                edge="start"
+                                checked={!!s.checked}
+                                tabIndex={-1}
+                                onChange={() => {
+                                  handleCheckbox(
+                                    t.id,
+                                    parentIndex,
+                                    t.id,
+                                    childIndex
+                                  );
+                                }}
+                                name="userGet"
+                              />
+                            </ListItemIcon>
+                            <ListItemText primary={s.name} />
+                          </ListItem>
+                        </List>
+                      </div>
+                    ))}
+                  </Collapse>
+                </div>
+              ))}
+
+              {/* <ListItem dense key={2}>
             <ListItemIcon>
               <Checkbox
                 disableRipple
@@ -535,69 +903,59 @@ export default function Home() {
               </ListItem>
             </List>
           </Collapse> */}
-        </List>
+            </List>
+          </div>
+
+          <Box flexDirection="row" marginLeft={2}>
+            <Divider />
+            <Button
+              style={{
+                marginTop: 10,
+                borderRadius: 10,
+                marginLeft: 230,
+                backgroundColor: '#33691e',
+                textTransform: 'none',
+              }}
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={runAllTests}
+              disabled={loading}
+            >
+              Run
+              <Play />
+            </Button>
+            {/* <Button
+              style={{
+                borderRadius: 35,
+                marginLeft: 10,
+              }}
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={selectAllTests}
+            >
+              Select All{' '}
+            </Button> */}
+          </Box>
+        </div>
       </Drawer>
 
       <main className={classes.content}>
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
-          dolor purus non enim praesent elementum facilisis leo vel. Risus at
-          ultrices mi tempus imperdiet. Semper risus in hendrerit gravida rutrum
-          quisque non tellus. Convallis convallis tellus id interdum velit
-          laoreet id donec ultrices. Odio morbi quis commodo odio aenean sed
-          adipiscing. Amet nisl suscipit adipiscing bibendum est ultricies
-          integer quis. Cursus euismod quis viverra nibh cras. Metus vulputate
-          eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo
-          quis imperdiet massa tincidunt. Cras tincidunt lobortis feugiat
-          vivamus at augue. At augue eget arcu dictum varius duis at consectetur
-          lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa sapien
-          faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-          ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-          elementum integer enim neque volutpat ac tincidunt. Ornare suspendisse
-          sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-          mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-          risus sed vulputate odio. Morbi tincidunt ornare massa eget egestas
-          purus viverra accumsan in. In hendrerit gravida rutrum quisque non
-          tellus orci ac. Pellentesque nec nam aliquam sem et tortor. Habitant
-          morbi tristique senectus et. Adipiscing elit duis tristique
-          sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-          ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-          elementum integer enim neque volutpat ac tincidunt. Ornare suspendisse
-          sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-          mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-          risus sed vulputate odio. Morbi tincidunt ornare massa eget egestas
-          purus viverra accumsan in. In hendrerit gravida rutrum quisque non
-          tellus orci ac. Pellentesque nec nam aliquam sem et tortor. Habitant
-          morbi tristique senectus et. Adipiscing elit duis tristique
-          sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-          ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-          elementum integer enim neque volutpat ac tincidunt. Ornare suspendisse
-          sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-          mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-          risus sed vulputate odio. Morbi tincidunt ornare massa eget egestas
-          purus viverra accumsan in. In hendrerit gravida rutrum quisque non
-          tellus orci ac. Pellentesque nec nam aliquam sem et tortor. Habitant
-          morbi tristique senectus et. Adipiscing elit duis tristique
-          sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
+        {loading ? <CircularProgress color="secondary" /> : null}
+
+        {results
+          ? results.map((r, index) => {
+              {
+                console.log(r);
+              }
+              return <Result result={r} />;
+            })
+          : null}
+
+        {statistics ? <Summary statistics={statistics} /> : null}
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

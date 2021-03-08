@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Wire {
 
-    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>","<empty>");
+    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>", "<empty>");
 
     @XmlElement(name = "to_server")
     String toServer = "";

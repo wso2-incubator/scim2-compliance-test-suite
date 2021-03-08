@@ -246,14 +246,13 @@ public class FactoryMain {
                 //TODO : Change this on server
                 finalResults.setReportLink("file://" + reportURL);
             } catch (IOException pdf) {
-                System.out.println("Pdf error ");
+
             }
 
-            System.out.println("Success");
+
 
         } catch (Exception ee) {
-            System.out.println("error ");
-            System.out.println(ee);
+
         }
     }
 }
