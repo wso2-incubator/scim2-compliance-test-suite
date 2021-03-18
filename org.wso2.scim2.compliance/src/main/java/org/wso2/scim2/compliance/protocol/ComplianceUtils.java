@@ -15,13 +15,13 @@
  */
 package org.wso2.scim2.compliance.protocol;
 
-import org.wso2.scim2.compliance.entities.Wire;
-import org.wso2.scim2.compliance.exception.ComplianceException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.wso2.scim2.compliance.entities.Wire;
+import org.wso2.scim2.compliance.exception.ComplianceException;
 
 import java.util.ArrayList;
 
@@ -48,18 +48,26 @@ public class ComplianceUtils {
         StringBuffer toServer = new StringBuffer();
         StringBuffer fromServer = new StringBuffer();
         StringBuffer subTestsPerformed = new StringBuffer();
+        StringBuffer requestUri = new StringBuffer();
+        StringBuffer requestType = new StringBuffer();
+        StringBuffer requestHeaders = new StringBuffer();
+        StringBuffer requestBody = new StringBuffer();
 
         toServer.append(method.getRequestLine().getMethod()).append(" ");
+        requestType.append(method.getRequestLine().getMethod());
         toServer.append(method.getRequestLine().getUri() + "\n");
+        requestUri.append(method.getRequestLine().getUri());
         toServer.append(method.getRequestLine().getProtocolVersion().getProtocol());
         for (org.apache.http.Header header : method.getAllHeaders()) {
             toServer.append(header.getName()).append(": ").append(header.getValue()).append("\n");
+            requestHeaders.append(header.getName()).append(": ").append(header.getValue()).append("\n");
         }
         toServer.append("\n");
         if (method.getMethod() != "GET" && method.getMethod() != "DELETE") {
             try {
                 HttpEntity entity = ((HttpEntityEnclosingRequest) method).getEntity();
                 toServer.append(EntityUtils.toString(entity));
+                requestBody.append(EntityUtils.toString(entity));
             } catch (Exception e) {
                 throw new ComplianceException(500, "Error in getting the request payload");
             }
@@ -72,11 +80,13 @@ public class ComplianceUtils {
         for (String subTest : subTests) {
             subTestsPerformed.append(subTest).append("\n");
         }
-        return new Wire(toServer.toString(), fromServer.toString(), subTestsPerformed.toString(), responseBody);
+        return new Wire(toServer.toString(), fromServer.toString(), subTestsPerformed.toString(), responseBody,
+                headerString, responseStatus, requestType.toString(), requestUri.toString(), requestBody.toString(),
+                requestHeaders.toString());
     }
 
     public static Wire getWire(Throwable e) {
 
-        return new Wire(ExceptionUtils.getFullStackTrace(e), "", "", "");
+        return new Wire(ExceptionUtils.getFullStackTrace(e), "", "", "", "", "", "", "", "", "");
     }
 }

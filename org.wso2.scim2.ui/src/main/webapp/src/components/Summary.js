@@ -7,14 +7,18 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, defaults } from 'react-chartjs-2';
+import { CardHeader } from '@material-ui/core';
+
+defaults.global.animation.duration = 4000;
 
 const useStyles = makeStyles({
   root: {
     width: '90%',
-    height: 600,
-    borderRadius: 25,
+    // height: 650,
+    borderRadius: 10,
     margin: 10,
+    flex: 1,
   },
   media: {
     height: 140,
@@ -25,19 +29,10 @@ var options = {
   legend: {
     position: 'bottom',
     labels: {
-      boxWidth: 10,
+      boxWidth: 15,
     },
   },
-};
-
-const pieData = {
-  labels: ['Green', 'Red', 'Yellow'],
-  datasets: [
-    {
-      data: [300, 50, 100],
-      backgroundColor: ['#00D100', '#FF0000', '#ffeb3b'],
-    },
-  ],
+  maintainAspectRatio: false,
 };
 
 export default function Summary(props) {
@@ -51,18 +46,24 @@ export default function Summary(props) {
           props.statistics.failed,
           props.statistics.skipped,
         ],
-        backgroundColor: ['#00D100', '#FF0000', '#FFCE56'],
+        backgroundColor: ['#32CD32', '#bb3f3f', '#FFCE56'],
       },
     ],
   });
 
   return (
-    <Card className={classes.root} elevation={8}>
+    // <Card style={{ height: 600, width: '90%' }}>
+    //   <CardMedia>
+    //     <Doughnut data={data} width={500} />
+    //   </CardMedia>
+    // </Card>
+    <Card className={classes.root} elevation={2}>
+      <CardHeader title="Summary" style={{ fontWeight: 1000 }} />
+      <CardMedia>
+        <Doughnut data={data} options={options} width={300} height={350} />
+      </CardMedia>
+
       <CardContent>
-        <Typography variant="h6" style={{ fontWeight: 1000 }}>
-          Summary :
-        </Typography>
-        <Doughnut data={data} options={options} />
         <div
           style={{
             display: 'flex',

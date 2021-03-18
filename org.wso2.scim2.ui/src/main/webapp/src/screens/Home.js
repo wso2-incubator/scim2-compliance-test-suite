@@ -48,6 +48,7 @@ import TestList from '../components/TestList';
 import Summary from '../components/Summary';
 import TestResult from '../components/TestResult';
 import Result from '../components/Result';
+import { red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     // justifyContent: 'space-between',
-    paddingTop: theme.spacing(15),
+    paddingTop: theme.spacing(10),
   },
   rightIcons: {
     marginRight: '-12px',
@@ -242,6 +243,7 @@ export default function Home() {
     token: '',
     general: '',
   });
+  const [authError, setAuthError] = React.useState(true);
   const [statistics, setStatistics] = React.useState();
   const [results, setResults] = React.useState();
   const [resultData, setResultData] = React.useState(false);
@@ -291,6 +293,7 @@ export default function Home() {
 
   const handleSubmit = () => {
     console.log(formData);
+    setAuthError(true);
     if (formData.endpoint == '') {
       setErrors({
         ...errors,
@@ -338,7 +341,7 @@ export default function Home() {
       endpoint: '',
       token: '',
     });
-
+    setAuthError(false);
     handleClose();
   };
 
@@ -606,15 +609,77 @@ export default function Home() {
       return;
     }
 
-    const data = {
+    // var data = new FormData();
+
+    // data.append('endpoint', formData.endpoint);
+    // data.append('userName', formData.userName);
+    // data.append('password', formData.password);
+    // data.append('token', formData.token);
+    // data.append('GetServiceProviderConfig', testCases[0].checked);
+    // data.append('GetSchemas', testCases[1].checked);
+    // data.append('GetResourceTypes', testCases[2].checked);
+    // data.append('GetUsers', testCases[3].sub[0].checked);
+    // data.append('GetUserById', testCases[3].sub[1].checked);
+    // data.append('PostUser', testCases[3].sub[2].checked);
+    // data.append('PutUser', testCases[3].sub[3].checked);
+    // data.append('PatchUser', testCases[3].sub[4].checked);
+    // data.append('DeleteUser', testCases[3].sub[5].checked);
+    // data.append('SearchUser', testCases[3].sub[6].checked);
+    // data.append('GetGroups', testCases[4].sub[0].checked);
+    // data.append('GetGroupById', testCases[4].sub[1].checked);
+    // data.append('PostGroup', testCases[4].sub[2].checked);
+    // data.append('PutGroup', testCases[4].sub[3].checked);
+    // data.append('PatchGroup', testCases[4].sub[4].checked);
+    // data.append('DeleteGroup', testCases[4].sub[5].checked);
+    // data.append('SearchGroup', testCases[4].sub[6].checked);
+    // data.append('GetMe', testCases[5].sub[0].checked);
+    // data.append('PostMe', testCases[5].sub[1].checked);
+    // data.append('PutMe', testCases[5].sub[2].checked);
+    // data.append('PatchMe', testCases[5].sub[3].checked);
+    // data.append('DeleteMe', testCases[5].sub[4].checked);
+    // data.append('PostBulk', testCases[6].sub[0].checked);
+    // data.append('PutBulk', testCases[6].sub[1].checked);
+    // data.append('PatchBulk', testCases[6].sub[2].checked);
+    // data.append('DeleteBulk', testCases[6].sub[3].checked);
+
+    var data = {
       endpoint: formData.endpoint,
       userName: formData.userName,
       password: formData.password,
-      testCases: testCases,
+      token: formData.token,
+      //testCases: testCases,
+      GetServiceProviderConfig: testCases[0].checked || false,
+      GetSchemas: testCases[1].checked || false,
+      GetResourceTypes: testCases[2].checked || false,
+      GetUsers: testCases[3].sub[0].checked || false,
+      GetUserById: testCases[3].sub[1].checked || false,
+      PostUser: testCases[3].sub[2].checked || false,
+      PutUser: testCases[3].sub[3].checked || false,
+      PatchUser: testCases[3].sub[4].checked || false,
+      DeleteUser: testCases[3].sub[5].checked || false,
+      SearchUser: testCases[3].sub[6].checked || false,
+      GetGroups: testCases[4].sub[0].checked || false,
+      GetGroupById: testCases[4].sub[1].checked || false,
+      PostGroup: testCases[4].sub[2].checked || false,
+      PutGroup: testCases[4].sub[3].checked || false,
+      PatchGroup: testCases[4].sub[4].checked || false,
+      DeleteGroup: testCases[4].sub[5].checked || false,
+      SearchGroup: testCases[4].sub[6].checked || false,
+      GetMe: testCases[5].sub[0].checked || false,
+      PostMe: testCases[5].sub[1].checked || false,
+      PutMe: testCases[5].sub[2].checked || false,
+      PatchMe: testCases[5].sub[3].checked || false,
+      DeleteMe: testCases[5].sub[4].checked || false,
+      PostBulk: testCases[6].sub[0].checked || false,
+      PutBulk: testCases[6].sub[1].checked || false,
+      PatchBulk: testCases[6].sub[2].checked || false,
+      DeleteBulk: testCases[6].sub[3].checked || false,
     };
 
     console.log(data);
     setLoading(true);
+    setStatistics();
+    setResults();
     axios
       .post('https://localhost:9443/moi-captcha/CaptchaServlet', data)
       .then((res) => {
@@ -624,7 +689,13 @@ export default function Home() {
         setResultData(true);
         setLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error(err.toString(), {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
+        setLoading(false);
+      });
   };
 
   return (
@@ -637,10 +708,20 @@ export default function Home() {
       >
         <div>
           <div className={classes.authStyle}>
-            <Typography variant="subtitle1" style={{ fontWeight: 600 }}>
+            <Typography
+              variant="subtitle1"
+              style={{ fontWeight: 600, padding: 5 }}
+            >
               Authentication
             </Typography>
-            <Settings onClick={handleClickOpen} />
+            {authError ? (
+              <Settings
+                style={{ color: '#D50000', marginTop: 8 }}
+                onClick={handleClickOpen}
+              />
+            ) : (
+              <Settings onClick={handleClickOpen} style={{ marginTop: 8 }} />
+            )}
 
             <Dialog
               classes={{ paper: classes.dialogPaper }}
@@ -751,7 +832,10 @@ export default function Home() {
           </div>
           <Divider />
           <div style={{ padding: 5 }}>
-            <Typography variant="subtitle1" style={{ fontWeight: 600 }}>
+            <Typography
+              variant="subtitle1"
+              style={{ fontWeight: 600, padding: 5 }}
+            >
               Test Cases
             </Typography>
           </div>
@@ -915,6 +999,7 @@ export default function Home() {
                 marginLeft: 230,
                 backgroundColor: '#33691e',
                 textTransform: 'none',
+                padding: 5,
               }}
               variant="contained"
               color="primary"
@@ -942,18 +1027,20 @@ export default function Home() {
       </Drawer>
 
       <main className={classes.content}>
-        {loading ? <CircularProgress color="secondary" /> : null}
+        {loading ? (
+          <CircularProgress
+            color="secondary"
+            style={{ left: '60%', position: 'absolute', top: '44vh' }}
+            size="6rem"
+          />
+        ) : null}
+        {statistics ? <Summary statistics={statistics} /> : null}
 
         {results
           ? results.map((r, index) => {
-              {
-                console.log(r);
-              }
               return <Result result={r} />;
             })
           : null}
-
-        {statistics ? <Summary statistics={statistics} /> : null}
       </main>
       {/* <Footer /> */}
     </div>

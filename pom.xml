@@ -93,11 +93,11 @@
 	</pluginRepositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>info.simplecloud</groupId>
-			<artifactId>scimcore</artifactId>
-			<version>0.1</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>info.simplecloud</groupId>-->
+<!--			<artifactId>scimcore</artifactId>-->
+<!--			<version>0.1</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>

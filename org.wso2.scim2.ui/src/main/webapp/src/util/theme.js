@@ -1,7 +1,7 @@
 export default {
   palette: {
     background: {
-      default: '#fafafa',
+      default: '#eeeeee',
     },
     primary: {
       light: '#FFFFFF',

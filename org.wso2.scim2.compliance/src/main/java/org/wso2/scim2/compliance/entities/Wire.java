@@ -23,7 +23,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Wire {
 
-    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>", "<empty>");
+    public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>", "<empty>", "<empty>", "<empty>",
+            "<empty>", "<empty>", "<empty>", "<empty>");
 
     @XmlElement(name = "to_server")
     String toServer = "";
@@ -37,16 +38,42 @@ public class Wire {
     @XmlElement(name = "responseBody")
     String responseBody = "";
 
+    @XmlElement(name = "responseHeaders")
+    String responseHeaders = "";
+
+    @XmlElement(name = "responseStatus")
+    String responseStatus = "";
+
+    @XmlElement(name = "requestType")
+    String requestType = "";
+
+    @XmlElement(name = "requestUri")
+    String requestUri = "";
+
+    @XmlElement(name = "requestBody")
+    String requestBody = "";
+
+    @XmlElement(name = "requestHeaders")
+    String requestHeaders = "";
+
     public Wire() {
 
     }
 
-    public Wire(String toServer, String fromServer, String tests, String responseBody) {
+    public Wire(String toServer, String fromServer, String tests, String responseBody, String responseHeaders,
+                String responseStatus, String requestType, String requestUri, String requestBody,
+                String requestHeaders) {
 
         this.toServer = toServer;
         this.fromServer = fromServer;
         this.tests = tests;
         this.responseBody = responseBody;
+        this.responseHeaders = responseHeaders;
+        this.responseStatus = responseStatus;
+        this.requestType = requestType;
+        this.requestUri = requestUri;
+        this.requestBody = requestBody;
+        this.requestHeaders = requestHeaders;
     }
 
     public String getToServer() {
@@ -67,5 +94,35 @@ public class Wire {
     public String getResponseBody() {
 
         return responseBody;
+    }
+
+    public String getResponseHeaders() {
+
+        return responseHeaders;
+    }
+
+    public String getResponseStatus() {
+
+        return responseStatus;
+    }
+
+    public String getRequestType() {
+
+        return requestType;
+    }
+
+    public String getRequestUri() {
+
+        return requestUri;
+    }
+
+    public String getRequestBody() {
+
+        return requestBody;
+    }
+
+    public String getRequestHeaders() {
+
+        return requestHeaders;
     }
 }

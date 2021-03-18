@@ -8,7 +8,14 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Container from '@material-ui/core/Container';
 import Tab from './TabPanel';
 import Badge from '@material-ui/core/Badge';
+import TimelapseIcon from '@material-ui/icons/Timelapse';
 import theme from '../util/theme';
+import { Box, Button } from '@material-ui/core';
+import purple from '@material-ui/core/colors/purple';
+import red from '@material-ui/core/colors/red';
+import Assertion from './Assertion';
+import JSONPretty from 'react-json-pretty';
+//import jsonTheme2 from 'react-json-pretty/themes/adventure_time.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,12 +32,17 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.secondary,
   },
   column: {
-    flexBasis: '98%',
+    flexBasis: '100%',
+  },
+  column2: {
+    flexBasis: '15%',
   },
 }));
 
 export default function SimpleAccordion(props) {
   const classes = useStyles();
+  const [assertionData, setAssertionData] = React.useState();
+  var arrOfObjects = [];
 
   const statusColor = (status) => {
     if (status == 0) {
@@ -75,6 +87,77 @@ export default function SimpleAccordion(props) {
     />
   );
 
+  const assertion = () => {
+    var assertionName = [];
+    var assertionContent = [];
+    var assertionStatus = [];
+    var content = props.result.wire.tests.split('\n');
+    var object = {
+      name: '',
+      content: { status: '', actual: '', expected: '', message: '' },
+    };
+
+    content.map((t) => {
+      if (t.includes(':') && !t.includes('Status')) {
+        assertionContent.push(t);
+      }
+    });
+
+    assertionContent.push('');
+    assertionContent.push('');
+    content.map((t) => {
+      if (t.includes('Status')) {
+        assertionStatus.push(t);
+      }
+    });
+
+    content.map((t) => {
+      if (!t.includes(':')) {
+        if (t.length === 0) {
+          //console.log(t);
+        } else {
+          assertionName.push(t);
+        }
+      }
+    });
+
+    for (var i = 0; i < assertionName.length; i++) {
+      arrOfObjects.push(object);
+    }
+
+    var j = 0;
+    assertionName.map((n, i) => {
+      var messagePresent = false;
+      var a = {
+        name: n,
+        content: {
+          status: assertionStatus[i].split(' ')[2],
+          actual: assertionContent[j].includes('Actual')
+            ? assertionContent[j].split(' ')[2]
+            : '',
+          expected: assertionContent[j + 1].includes('Expected')
+            ? assertionContent[j + 1].split(' ')[2]
+            : '',
+          message: assertionContent[j].includes('Test')
+            ? assertionContent[j]
+            : '',
+        },
+      };
+      if (assertionContent[j].includes('Actual')) {
+        j = j + 2;
+      } else {
+        j++;
+      }
+      const assertions = arrOfObjects;
+      assertions[i] = a;
+
+      arrOfObjects = assertions;
+    });
+
+    setAssertionData([...arrOfObjects]);
+    console.log(assertionData);
+  };
+
   return (
     <div className={classes.root}>
       <Accordion>
@@ -83,6 +166,7 @@ export default function SimpleAccordion(props) {
           aria-controls="panel1a-content"
           id="panel1a-header"
           style={{ flexDirection: 'row-reverse' }}
+          onClick={assertion}
         >
           {props.result.status === 1 ? (
             <Badge>{rectangle1}</Badge>
@@ -96,35 +180,121 @@ export default function SimpleAccordion(props) {
               {props.result.name}
             </Typography>
           </div>
-          <div className={classes.column}>
+          <div className={classes.column2}>
             <Typography className={classes.secondaryHeading}>
-              Time : {props.result.elapsedTime}ms
+              Status : {props.result.wire.responseStatus}
+            </Typography>
+          </div>
+          <div className={classes.column2}>
+            <Typography className={classes.secondaryHeading}>
+              {/* <TimelapseIcon style={{ paddingTop: 7 }} /> */}
+              Time : {props.result.elapsedTime} ms
             </Typography>
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-          <Tab />
+          <div
+            style={{
+              backgroundColor: 'rgba(65,68,78,1)',
+              width: '60%',
+              height: 48,
+              flex: 1,
+              display: 'inline-flex',
+              //flexDirection: 'row',
+              //  justifyContent: 'space-between',
+              padding: 10,
+              marginLeft: 35,
+            }}
+          >
+            <Button
+              disableFocusRipple
+              disableRipple
+              style={{ backgroundColor: purple[500] }}
+            >
+              {' '}
+              <Typography style={{ color: '#FFFFFF' }}>
+                {props.result.wire.requestType}
+              </Typography>
+            </Button>
+            <Typography style={{ color: '#FFFFFF', marginLeft: 15 }}>
+              {props.result.wire.requestUri}
+            </Typography>
+          </div>
         </AccordionDetails>
+        {props.result.message != '' ? (
+          <Accordion elevation={0}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel2a-content"
+              id="panel2a-header"
+              style={{ flexDirection: 'row-reverse', marginLeft: 20 }}
+            >
+              <Typography className={classes.heading}> Caused By </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <div style={{ marginLeft: 35 }}>
+                <Typography style={{ color: red[500] }}>
+                  {props.result.message}
+                </Typography>
+              </div>
+            </AccordionDetails>
+          </Accordion>
+        ) : null}
+        <Accordion elevation={0}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            style={{ flexDirection: 'row-reverse', marginLeft: 20 }}
+          >
+            <Typography className={classes.heading}> Request </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Tab
+              Headers={props.result.wire.requestHeaders}
+              Body={props.result.wire.requestBody}
+            />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion elevation={0}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            style={{ flexDirection: 'row-reverse', marginLeft: 20 }}
+          >
+            <Typography className={classes.heading}> Response </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Tab
+              Headers={props.result.wire.responseHeaders}
+              Body={props.result.wire.responseBody}
+            />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion elevation={0}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+            style={{ flexDirection: 'row-reverse', marginLeft: 20 }}
+          >
+            <Typography className={classes.heading}> Assertions </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div style={{ flex: 1 }}>
+              {assertionData
+                ? assertionData.map((assertion) => {
+                    {
+                      console.log(assertion.name);
+                    }
+                    return <Assertion assertion={assertion} />;
+                  })
+                : null}
+            </div>
+          </AccordionDetails>
+        </Accordion>
       </Accordion>
-      {/* <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography className={classes.heading}>Accordion 2</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion> */}
     </div>
   );
 }

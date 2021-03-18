@@ -23,7 +23,11 @@ export default function Header() {
     <div className={classes.root}>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
+          <Typography
+            variant="h6"
+            className={classes.title}
+            style={{ fontWeight: 600 }}
+          >
             SCIM2 Compliance Test Suite
           </Typography>
         </Toolbar>
