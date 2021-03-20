@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { Doughnut, defaults } from 'react-chartjs-2';
 import { CardHeader } from '@material-ui/core';
 
-defaults.global.animation.duration = 4000;
+defaults.global.animation.duration = 40000;
 
 const useStyles = makeStyles({
   root: {
@@ -33,12 +33,13 @@ var options = {
     },
   },
   maintainAspectRatio: false,
+  cutoutPercentage: 65,
 };
 
 export default function Summary(props) {
   const classes = useStyles();
   const [data, setData] = React.useState({
-    labels: ['Success', 'Failed', 'skipped'],
+    labels: ['Passed', 'Failed', 'skipped'],
     datasets: [
       {
         data: [
@@ -69,17 +70,18 @@ export default function Summary(props) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            alignSelf: 'flex-start',
           }}
         >
           <Typography
-            variant="subtitle1"
-            style={{ fontWeight: 700, align: 'center' }}
+            variant="body1"
+            style={{ fontWeight: 400, align: 'center' }}
           >
             Total Results : {props.statistics.total}
           </Typography>
           <Typography
-            variant="subtitle1"
-            style={{ fontWeight: 700, align: 'right' }}
+            variant="body1"
+            style={{ fontWeight: 400, align: 'center' }}
           >
             Time(s) : {props.statistics.time / 1000}
           </Typography>

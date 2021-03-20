@@ -8,14 +8,23 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Container from '@material-ui/core/Container';
 import Tab from './TabPanel';
 import Badge from '@material-ui/core/Badge';
-import TimelapseIcon from '@material-ui/icons/Timelapse';
 import theme from '../util/theme';
+import Tooltip from '@material-ui/core/Tooltip';
 import { Box, Button } from '@material-ui/core';
+
+// colors
 import purple from '@material-ui/core/colors/purple';
 import red from '@material-ui/core/colors/red';
+
+// Icons
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
+import ErrorIcon from '@material-ui/icons/Error';
+import WarningIcon from '@material-ui/icons/Warning';
+import TimelapseIcon from '@material-ui/icons/Timelapse';
+
+// Components
 import Assertion from './Assertion';
-import JSONPretty from 'react-json-pretty';
-//import jsonTheme2 from 'react-json-pretty/themes/adventure_time.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +34,10 @@ const useStyles = makeStyles((theme) => ({
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
-    fontWeight: 550,
+    fontWeight: 501,
+    color: 'rgba(0, 0, 0, 0.54)',
+    lineHeight: 1.6,
+    letterSpacing: '0.0075em',
   },
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
@@ -138,9 +150,11 @@ export default function SimpleAccordion(props) {
           expected: assertionContent[j + 1].includes('Expected')
             ? assertionContent[j + 1].split(' ')[2]
             : '',
-          message: assertionContent[j].includes('Test')
-            ? assertionContent[j]
-            : '',
+          message:
+            assertionContent[j].includes('Test') ||
+            assertionContent[j].includes('Message')
+              ? assertionContent[j]
+              : '',
         },
       };
       if (assertionContent[j].includes('Actual')) {
@@ -160,7 +174,7 @@ export default function SimpleAccordion(props) {
 
   return (
     <div className={classes.root}>
-      <Accordion>
+      <Accordion style={{ borderRadius: 10 }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
@@ -169,26 +183,40 @@ export default function SimpleAccordion(props) {
           onClick={assertion}
         >
           {props.result.status === 1 ? (
-            <Badge>{rectangle1}</Badge>
-          ) : props.result.status === 2 ? (
-            <Badge>{rectangle2}</Badge>
+            <CheckCircleIcon
+              style={{ color: '#32CD32', marginRight: 3, paddingBottom: 5 }}
+            />
+          ) : // <Badge>{rectangle1}</Badge>
+          props.result.status === 2 ? (
+            // <Badge>{rectangle2}</Badge>
+            <WarningIcon
+              style={{ color: '#FFCE56', marginRight: 3, paddingBottom: 5 }}
+            />
           ) : (
-            <Badge>{rectangle}</Badge>
+            <ErrorIcon
+              style={{ color: '#bb3f3f', marginRight: 3, paddingBottom: 5 }}
+            />
+            // <Badge>{rectangle}</Badge>
           )}
           <div className={classes.column}>
-            <Typography className={classes.heading}>
+            <Typography className={classes.heading} variant="h6">
               {props.result.name}
             </Typography>
           </div>
           <div className={classes.column2}>
             <Typography className={classes.secondaryHeading}>
-              Status : {props.result.wire.responseStatus}
+              {props.result.wire.responseStatus}
             </Typography>
           </div>
+          <Tooltip title="Elapsed Time" arrow placement="bottom">
+            <TimelapseIcon
+              style={{ color: '#FF7300', marginRight: 3, paddingBottom: 4.5 }}
+            />
+          </Tooltip>
           <div className={classes.column2}>
             <Typography className={classes.secondaryHeading}>
               {/* <TimelapseIcon style={{ paddingTop: 7 }} /> */}
-              Time : {props.result.elapsedTime} ms
+              {props.result.elapsedTime} ms
             </Typography>
           </div>
         </AccordionSummary>
@@ -232,7 +260,21 @@ export default function SimpleAccordion(props) {
               <Typography className={classes.heading}> Caused By </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <div style={{ marginLeft: 35 }}>
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderStyle: 'solid',
+                  borderColor: 'rgba(65,68,78,1)',
+                  width: '60%',
+                  height: 48,
+                  flex: 1,
+                  display: 'inline-flex',
+                  //flexDirection: 'row',
+                  //  justifyContent: 'space-between',
+                  padding: 10,
+                  marginLeft: 35,
+                }}
+              >
                 <Typography style={{ color: red[500] }}>
                   {props.result.message}
                 </Typography>
@@ -272,7 +314,7 @@ export default function SimpleAccordion(props) {
             />
           </AccordionDetails>
         </Accordion>
-        <Accordion elevation={0}>
+        <Accordion elevation={0} style={{ borderRadius: 10 }}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel2a-content"

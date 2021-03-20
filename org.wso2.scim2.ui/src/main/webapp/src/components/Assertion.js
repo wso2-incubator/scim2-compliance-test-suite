@@ -7,18 +7,15 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Container from '@material-ui/core/Container';
-import Tab from './TabPanel';
-import Badge from '@material-ui/core/Badge';
-import theme from '../util/theme';
-import { Box, Button } from '@material-ui/core';
-import purple from '@material-ui/core/colors/purple';
-import red from '@material-ui/core/colors/red';
-import Header from './Header';
-import JSONPretty from 'react-json-pretty';
-//import jsonTheme2 from 'react-json-pretty/themes/adventure_time.css';
+
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import { Divider } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,13 +64,45 @@ export default function Assertion(props) {
         <AccordionDetails>
           <List component="nav">
             {props.assertion.content.actual ? (
-              <ListItem>Actual : {props.assertion.content.actual}</ListItem>
+              <TableContainer
+                component={Paper}
+                style={{ marginLeft: 64, width: '96%' }}
+              >
+                <Table
+                  className={classes.table}
+                  aria-label="simple table"
+                  stickyHeader
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Actual</TableCell>
+                      <Divider orientation="vertical" />
+                      <TableCell align="left">Expected</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody style={{ backgroundColor: '#e3f2fd' }}>
+                    <TableRow key={1}>
+                      <TableCell align="left">
+                        {props.assertion.content.actual}
+                      </TableCell>
+                      <Divider orientation="vertical" />
+                      <Divider orientation="vertical" />
+                      <Divider orientation="vertical" />
+                      <TableCell align="left">
+                        {props.assertion.content.expected}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             ) : null}
-            {props.assertion.content.expected ? (
+            {/* {props.assertion.content.expected ? (
               <ListItem>Expected : {props.assertion.content.expected}</ListItem>
-            ) : null}
+            ) : null} */}
             {props.assertion.content.message ? (
-              <ListItem>{props.assertion.content.message}</ListItem>
+              <ListItem style={{ marginLeft: 44 }}>
+                {props.assertion.content.message}
+              </ListItem>
             ) : null}
           </List>
         </AccordionDetails>

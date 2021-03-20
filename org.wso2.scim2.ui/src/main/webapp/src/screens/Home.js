@@ -8,6 +8,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import Drawer from '@material-ui/core/Drawer';
 import Settings from '@material-ui/icons/Settings';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import Play from '@material-ui/icons/PlayArrow';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
@@ -15,6 +16,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // List
 import Checkbox from '@material-ui/core/Checkbox';
@@ -44,7 +46,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 // Components.
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import TestList from '../components/TestList';
+import Progress from '../components/Progress';
 import Summary from '../components/Summary';
 import TestResult from '../components/TestResult';
 import Result from '../components/Result';
@@ -105,7 +107,7 @@ const useStyles = makeStyles((theme) => ({
   centerCol: {
     flex: 1,
     overflowY: 'scroll',
-    height: 550,
+    height: 468,
   },
   dialogPaper: {
     minHeight: '50vh',
@@ -248,6 +250,7 @@ export default function Home() {
   const [results, setResults] = React.useState();
   const [resultData, setResultData] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [progress, setProgess] = React.useState(0);
 
   const [state, setState] = React.useState({
     userGet: false,
@@ -676,13 +679,25 @@ export default function Home() {
       DeleteBulk: testCases[6].sub[3].checked || false,
     };
 
+    const config = {
+      onDownloadProgress: function (progressEvent) {
+        var percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        setProgess(percentCompleted);
+        console.log(progressEvent);
+      },
+    };
+
     console.log(data);
     setLoading(true);
     setStatistics();
     setResults();
+    setProgess(checkedCount);
     axios
       .post('https://localhost:9443/moi-captcha/CaptchaServlet', data)
       .then((res) => {
+        //setProgess(100);
         console.log(res);
         setStatistics(res.data.statistics);
         setResults(res.data.results);
@@ -710,17 +725,25 @@ export default function Home() {
           <div className={classes.authStyle}>
             <Typography
               variant="subtitle1"
-              style={{ fontWeight: 600, padding: 5 }}
+              style={{ fontWeight: 250, padding: 5, fontFamily: 'initial' }}
             >
               Authentication
             </Typography>
             {authError ? (
-              <Settings
-                style={{ color: '#D50000', marginTop: 8 }}
-                onClick={handleClickOpen}
-              />
+              <Tooltip title="Authentication" arrow placement="right">
+                <VpnKeyIcon
+                  style={{ color: '#D50000', marginTop: 8 }}
+                  onClick={handleClickOpen}
+                  tooltip="Authentication"
+                />
+              </Tooltip>
             ) : (
-              <Settings onClick={handleClickOpen} style={{ marginTop: 8 }} />
+              <Tooltip title="Authentication" arrow placement="right">
+                <VpnKeyIcon
+                  onClick={handleClickOpen}
+                  style={{ marginTop: 8 }}
+                />
+              </Tooltip>
             )}
 
             <Dialog
@@ -834,7 +857,7 @@ export default function Home() {
           <div style={{ padding: 5 }}>
             <Typography
               variant="subtitle1"
-              style={{ fontWeight: 600, padding: 5 }}
+              style={{ fontWeight: 250, padding: 5, fontFamily: 'initial' }}
             >
               Test Cases
             </Typography>
@@ -865,20 +888,20 @@ export default function Home() {
                       />
                     </ListItemIcon>
                     <ListItemIcon>
-                      <Button
+                      {/* <Button
                         disableFocusRipple
                         disableRipple
                         classes={{ outlined: classes.button }}
                         variant="outlined"
                         //  size="small"
+                      > */}
+                      <Typography
+                        variant="button"
+                        style={{ fontWeight: 'bold' }}
                       >
-                        <Typography
-                          variant="button"
-                          style={{ fontWeight: 'bold' }}
-                        >
-                          {t.name}
-                        </Typography>
-                      </Button>
+                        {t.name}
+                      </Typography>
+                      {/* </Button> */}
                     </ListItemIcon>
                     <ListItemSecondaryAction>
                       <IconButton
@@ -922,7 +945,20 @@ export default function Home() {
                                 name="userGet"
                               />
                             </ListItemIcon>
-                            <ListItemText primary={s.name} />
+                            {/* <ListItemText
+                              primary={s.name}
+                              style={{ fontWeight: 300, color: 'rgb(0,0,54)' }}
+                            /> */}
+                            <Typography
+                              variant="caption"
+                              style={{
+                                fontWeight: 'bold',
+                                color: 'rgba(0, 0, 0, 0.54)',
+                              }}
+                            >
+                              {' '}
+                              {s.name}
+                            </Typography>
                           </ListItem>
                         </List>
                       </div>
@@ -930,63 +966,6 @@ export default function Home() {
                   </Collapse>
                 </div>
               ))}
-
-              {/* <ListItem dense key={2}>
-            <ListItemIcon>
-              <Checkbox
-                disableRipple
-                edge="start"
-                onChange={handlePrimaryChange}
-                name="user"
-              />
-            </ListItemIcon>
-            <ListItemIcon>
-              <Button
-                disableFocusRipple
-                disableRipple
-                classes={{ outlined: classes.button }}
-                variant="outlined"
-                size="small"
-              >
-                User Endpoint
-              </Button>
-            </ListItemIcon>
-            <ListItemSecondaryAction>
-              <IconButton className={classes.rightIcons} onClick={handleClick}>
-                {open ? <ExpandLess /> : <ExpandMore />}
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-          <Collapse unmountOnExit in={open} timeout="auto">
-            <List component="div" disablePadding>
-              <ListItem dense className={classes.nested}>
-                <ListItemIcon>
-                  <Checkbox
-                    disableRipple
-                    edge="start"
-                    checked={state.userGet}
-                    tabIndex={-1}
-                    onChange={handleSecondaryChange}
-                    name="userGet"
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Get Method" />
-              </ListItem>
-              <ListItem dense className={classes.nested}>
-                <ListItemIcon>
-                  <Checkbox
-                    disableRipple
-                    edge="start"
-                    checked={state.userGetById}
-                    tabIndex={-1}
-                    onChange={handleSecondaryChange}
-                    name="userGetById"
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Get by id" />
-              </ListItem>
-            </List>
-          </Collapse> */}
             </List>
           </div>
 
@@ -996,8 +975,8 @@ export default function Home() {
               style={{
                 marginTop: 10,
                 borderRadius: 10,
-                marginLeft: 230,
-                backgroundColor: '#33691e',
+                marginLeft: 250,
+                backgroundColor: '#808000',
                 textTransform: 'none',
                 padding: 5,
               }}
@@ -1010,30 +989,12 @@ export default function Home() {
               Run
               <Play />
             </Button>
-            {/* <Button
-              style={{
-                borderRadius: 35,
-                marginLeft: 10,
-              }}
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={selectAllTests}
-            >
-              Select All{' '}
-            </Button> */}
           </Box>
         </div>
       </Drawer>
 
       <main className={classes.content}>
-        {loading ? (
-          <CircularProgress
-            color="secondary"
-            style={{ left: '60%', position: 'absolute', top: '44vh' }}
-            size="6rem"
-          />
-        ) : null}
+        {loading ? <Progress value={progress} /> : null}
         {statistics ? <Summary statistics={statistics} /> : null}
 
         {results

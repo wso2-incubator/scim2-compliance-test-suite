@@ -73,8 +73,8 @@ export default function SimpleTabs({ Headers, Body }) {
           indicatorColor="primary"
           textColor="primary"
         >
-          <Tab label="Headers" {...a11yProps(0)} style={{ fontWeight: 300 }} />
-          <Tab label="Body" {...a11yProps(1)} />
+          <Tab label="Headers" {...a11yProps(0)} style={{ fontWeight: 600 }} />
+          <Tab label="Body" {...a11yProps(1)} style={{ fontWeight: 600 }} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
