@@ -3,7 +3,7 @@
 <suite name="Failed suite [My Test Suite]">
   <test name="My Test" preserve-order="false">
     <classes>
-      <class name="org.wso2.scim2.compliance.tests.SchemaTestImpl"/>
+      <class name="SchemaTestImpl"/>
     </classes>
   </test> <!-- My Test -->
 </suite> <!-- Failed suite [My Test Suite] -->
