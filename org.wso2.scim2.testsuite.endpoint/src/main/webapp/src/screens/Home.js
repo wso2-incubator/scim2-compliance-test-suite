@@ -695,7 +695,10 @@ export default function Home() {
     setResults();
     setProgess(checkedCount);
     axios
-      .post('https://localhost:9443/moi-captcha/CaptchaServlet', data)
+      .post(
+        'http://127.0.0.1:8080/org.wso2.scim2.testsuite.endpoint/ComplianceTestSuite',
+        data
+      )
       .then((res) => {
         //setProgess(100);
         console.log(res);
@@ -897,7 +900,7 @@ export default function Home() {
                       > */}
                       <Typography
                         variant="button"
-                        style={{ fontWeight: 'bold' }}
+                        style={{ fontWeight: 'bold', textTransform: 'none' }}
                       >
                         {t.name}
                       </Typography>
@@ -976,7 +979,7 @@ export default function Home() {
                 marginTop: 10,
                 borderRadius: 10,
                 marginLeft: 250,
-                backgroundColor: '#808000',
+                backgroundColor: '#43a047',
                 textTransform: 'none',
                 padding: 5,
               }}

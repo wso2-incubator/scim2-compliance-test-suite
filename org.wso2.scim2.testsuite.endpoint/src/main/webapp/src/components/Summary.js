@@ -29,7 +29,8 @@ var options = {
   legend: {
     position: 'bottom',
     labels: {
-      boxWidth: 15,
+      boxWidth: 10,
+      usePointStyle: true,
     },
   },
   maintainAspectRatio: false,
@@ -70,7 +71,9 @@ export default function Summary(props) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            alignSelf: 'flex-start',
+            // alignSelf: 'flex-start',
+            //justifyContent: 'center',
+            //alignContent: 'flex-start',
           }}
         >
           <Typography
@@ -83,7 +86,7 @@ export default function Summary(props) {
             variant="body1"
             style={{ fontWeight: 400, align: 'center' }}
           >
-            Time(s) : {props.statistics.time / 1000}
+            Time : {props.statistics.time / 1000} s
           </Typography>
         </div>
       </CardContent>

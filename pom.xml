@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.scim2.testsuite</groupId>
-    <artifactId>scim2-compliance-testsuite</artifactId>
+    <artifactId>scim2-compliance-test-suite</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>

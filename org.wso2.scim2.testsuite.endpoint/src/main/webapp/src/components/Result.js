@@ -21,7 +21,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ErrorIcon from '@material-ui/icons/Error';
 import WarningIcon from '@material-ui/icons/Warning';
-import TimelapseIcon from '@material-ui/icons/Timelapse';
+import ScheduleIcon from '@material-ui/icons/Schedule';
+import LensIcon from '@material-ui/icons/Lens';
 
 // Components
 import Assertion from './Assertion';
@@ -193,7 +194,7 @@ export default function SimpleAccordion(props) {
               style={{ color: '#FFCE56', marginRight: 3, paddingBottom: 5 }}
             />
           ) : (
-            <ErrorIcon
+            <CancelIcon
               style={{ color: '#bb3f3f', marginRight: 3, paddingBottom: 5 }}
             />
             // <Badge>{rectangle}</Badge>
@@ -203,14 +204,19 @@ export default function SimpleAccordion(props) {
               {props.result.name}
             </Typography>
           </div>
+          <Tooltip title="Status Code" arrow placement="bottom">
+            <LensIcon
+              style={{ color: '#9e9e9e', marginRight: 3, paddingBottom: 4.5 }}
+            />
+          </Tooltip>
           <div className={classes.column2}>
             <Typography className={classes.secondaryHeading}>
               {props.result.wire.responseStatus}
             </Typography>
           </div>
           <Tooltip title="Elapsed Time" arrow placement="bottom">
-            <TimelapseIcon
-              style={{ color: '#FF7300', marginRight: 3, paddingBottom: 4.5 }}
+            <ScheduleIcon
+              style={{ color: '#9e9e9e', marginRight: 3, paddingBottom: 4.5 }}
             />
           </Tooltip>
           <div className={classes.column2}>

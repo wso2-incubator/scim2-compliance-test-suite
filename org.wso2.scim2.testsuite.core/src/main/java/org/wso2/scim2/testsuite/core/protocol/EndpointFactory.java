@@ -28,18 +28,38 @@ import org.wso2.scim2.testsuite.core.tests.RolesTestImpl;
 import org.wso2.scim2.testsuite.core.tests.SchemaTestImpl;
 import org.wso2.scim2.testsuite.core.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.testsuite.core.tests.UserTestImpl;
+import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
 /**
  * Method for calling factory.
  */
 public class EndpointFactory {
 
+    private String url;
+    private String userName;
+    private String password;
+    private String token;
+
+    /**
+     * Initialize.
+     *
+     * @param url,userName,password,token
+     */
+    public EndpointFactory(String url,String userName,String password,String token) {
+
+        this.url = url;
+        this.userName=userName;
+        this.password=password;
+        this.token=token;
+    }
+
+
     public ResourceType getInstance(String str) {
 
         ComplianceTestMetaDataHolder complianceTestMetaDataHolder = new ComplianceTestMetaDataHolder();
-        complianceTestMetaDataHolder.setUrl("https://localhost:9443/scim2");
-        complianceTestMetaDataHolder.setUsername("admin");
-        complianceTestMetaDataHolder.setPassword("admin");
+        complianceTestMetaDataHolder.setUrl(url);
+        complianceTestMetaDataHolder.setUsername(userName);
+        complianceTestMetaDataHolder.setPassword(password);
 //        complianceTestMetaDataHolder.setAuthorization_server(authorizationServer);
 //        complianceTestMetaDataHolder.setAuthorization_header(authorizationHeader);
 //        complianceTestMetaDataHolder.setAuthorization_method(authMethod);
