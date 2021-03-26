@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import JSONPretty from 'react-json-pretty';
 import jsonTheme from 'react-json-pretty/themes/monikai.css';
-import blue from '@material-ui/core/colors/blue';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -48,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     backgroundColor: '#272822',
     marginLeft: 35,
+    width: '90%',
   },
 }));
 

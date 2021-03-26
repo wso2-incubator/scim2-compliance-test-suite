@@ -1,11 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Doughnut, defaults } from 'react-chartjs-2';
 import { CardHeader } from '@material-ui/core';
@@ -15,7 +12,6 @@ defaults.global.animation.duration = 40000;
 const useStyles = makeStyles({
   root: {
     width: '90%',
-    // height: 650,
     borderRadius: 10,
     margin: 10,
     flex: 1,
@@ -54,11 +50,6 @@ export default function Summary(props) {
   });
 
   return (
-    // <Card style={{ height: 600, width: '90%' }}>
-    //   <CardMedia>
-    //     <Doughnut data={data} width={500} />
-    //   </CardMedia>
-    // </Card>
     <Card className={classes.root} elevation={2}>
       <CardHeader title="Summary" style={{ fontWeight: 1000 }} />
       <CardMedia>
@@ -71,9 +62,6 @@ export default function Summary(props) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            // alignSelf: 'flex-start',
-            //justifyContent: 'center',
-            //alignContent: 'flex-start',
           }}
         >
           <Typography

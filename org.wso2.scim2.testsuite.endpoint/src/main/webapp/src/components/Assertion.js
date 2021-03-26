@@ -96,9 +96,6 @@ export default function Assertion(props) {
                 </Table>
               </TableContainer>
             ) : null}
-            {/* {props.assertion.content.expected ? (
-              <ListItem>Expected : {props.assertion.content.expected}</ListItem>
-            ) : null} */}
             {props.assertion.content.message ? (
               <ListItem style={{ marginLeft: 44 }}>
                 {props.assertion.content.message}

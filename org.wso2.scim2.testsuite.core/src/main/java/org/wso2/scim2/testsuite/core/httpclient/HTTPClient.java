@@ -88,6 +88,10 @@ public class HTTPClient {
             String authHeader = "Basic " + new String(encodedAuth);
             method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         }
+        if(!complianceTestMetaDataHolder.getAuthorization_header().equals("")){
+            String authHeader = "Bearer " + complianceTestMetaDataHolder.getAuthorization_header();
+            method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        }
         return method;
     }
 

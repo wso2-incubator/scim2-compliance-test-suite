@@ -44,9 +44,6 @@ export default function Progress(props) {
   const [progress, setProgress] = React.useState(10);
 
   React.useEffect(() => {
-    {
-      console.log(props.value);
-    }
     const timer = setInterval(() => {
       setProgress((prevProgress) =>
         prevProgress >= 90 ? 98 : prevProgress + 10

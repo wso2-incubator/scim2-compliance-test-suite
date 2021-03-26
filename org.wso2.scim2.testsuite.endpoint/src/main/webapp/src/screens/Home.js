@@ -1,13 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Card from '@material-ui/core/Card';
-import Grid from '@material-ui/core/Grid';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
 import Drawer from '@material-ui/core/Drawer';
-import Settings from '@material-ui/icons/Settings';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import Play from '@material-ui/icons/PlayArrow';
 import Box from '@material-ui/core/Box';
@@ -48,9 +42,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Progress from '../components/Progress';
 import Summary from '../components/Summary';
-import TestResult from '../components/TestResult';
 import Result from '../components/Result';
-import { red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -107,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
   centerCol: {
     flex: 1,
     overflowY: 'scroll',
-    height: 468,
+    height: 410,
   },
   dialogPaper: {
     minHeight: '50vh',
@@ -219,11 +211,11 @@ const tests = [
     name: '/Bulk',
     sub: bulkSubTests,
   },
-  {
-    id: 8,
-    name: '/Roles',
-    sub: rolesSubTests,
-  },
+  // {
+  //   id: 8,
+  //   name: '/Roles',
+  //   sub: rolesSubTests,
+  // },
 ];
 
 export default function Home() {
@@ -528,39 +520,6 @@ export default function Home() {
     }
   };
 
-  // const handlePrimaryChange = (event) => {
-  //   console.log(event.target.name);
-  //   if (event.target.name == 'User Endpoint') {
-  //     //handleClick();
-  //     setState({
-  //       ...state,
-  //       userGet: event.target.checked,
-  //       userGetById: event.target.checked,
-  //     });
-  //   }
-  // };
-
-  // const handlePrimaryChange = (id, index) => {
-  //   const test = testCases[index];
-  //   const { subTests } = test.sub;
-
-  //   var t = {
-  //     ...testCases.filter((test) => test.id == id)[0],
-  //     Checked: !testCases.filter((test) => test.id == id)[0].Checked,
-  //     expanded: !testCases.filter((test) => test.id == id)[0].expanded,
-  //   };
-  //   if (t.checked == true) {
-  //     t.sub.map((s) => (s.checked = true));
-  //   } else {
-  //     t.sub.map((s) => (s.checked = false));
-  //   }
-  //   const tests = testCases;
-  //   tests[index] = t;
-
-  //   setTestcases(tests);
-  //   console.log(testCases);
-  // };
-
   const handleClick = (id, index) => {
     console.log(testCases);
     var x = Array.from(testCases).filter((test) => test.id == id)[0];
@@ -575,11 +534,6 @@ export default function Home() {
     setTestcases([...tests]);
   };
 
-  // const handleSecondaryChange = (event) => {
-  //   console.log(state);
-  //   setState({ ...state, [event.target.name]: event.target.checked });
-  // };
-
   const selectAllTests = () => {
     var i;
     for (i = 0; i < testCases.length; i++) {
@@ -589,16 +543,50 @@ export default function Home() {
   };
 
   const runAllTests = () => {
+    if (formData.endpoint == '') {
+      toast.error('Please fill the endpoint details!', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      return;
+    }
+
     if (
-      formData.endpoint == '' ||
-      formData.userName == '' ||
-      formData.password == ''
+      formData.userName == '' &&
+      formData.password == '' &&
+      formData.token == ''
     ) {
       toast.error('Please fill all authentication details!', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       return;
     }
+
+    if (
+      (formData.userName != '' || formData.password != '') &&
+      formData.token != ''
+    ) {
+      toast.error(
+        'Please fill either token or basic auth details only!Not both',
+        {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        }
+      );
+      return;
+    }
+
+    if (
+      (type === 1 &&
+        (formData.endpoint == '' ||
+          formData.userName == '' ||
+          formData.password == '')) ||
+      (type === 2 && (formData.endpoint == '' || formData.token == ''))
+    ) {
+      toast.error('Please fill all authentication details!', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      return;
+    }
+
     var checkedCount = 0;
     testCases.map((t) => {
       if (t.checked == true) checkedCount++;
@@ -612,45 +600,11 @@ export default function Home() {
       return;
     }
 
-    // var data = new FormData();
-
-    // data.append('endpoint', formData.endpoint);
-    // data.append('userName', formData.userName);
-    // data.append('password', formData.password);
-    // data.append('token', formData.token);
-    // data.append('GetServiceProviderConfig', testCases[0].checked);
-    // data.append('GetSchemas', testCases[1].checked);
-    // data.append('GetResourceTypes', testCases[2].checked);
-    // data.append('GetUsers', testCases[3].sub[0].checked);
-    // data.append('GetUserById', testCases[3].sub[1].checked);
-    // data.append('PostUser', testCases[3].sub[2].checked);
-    // data.append('PutUser', testCases[3].sub[3].checked);
-    // data.append('PatchUser', testCases[3].sub[4].checked);
-    // data.append('DeleteUser', testCases[3].sub[5].checked);
-    // data.append('SearchUser', testCases[3].sub[6].checked);
-    // data.append('GetGroups', testCases[4].sub[0].checked);
-    // data.append('GetGroupById', testCases[4].sub[1].checked);
-    // data.append('PostGroup', testCases[4].sub[2].checked);
-    // data.append('PutGroup', testCases[4].sub[3].checked);
-    // data.append('PatchGroup', testCases[4].sub[4].checked);
-    // data.append('DeleteGroup', testCases[4].sub[5].checked);
-    // data.append('SearchGroup', testCases[4].sub[6].checked);
-    // data.append('GetMe', testCases[5].sub[0].checked);
-    // data.append('PostMe', testCases[5].sub[1].checked);
-    // data.append('PutMe', testCases[5].sub[2].checked);
-    // data.append('PatchMe', testCases[5].sub[3].checked);
-    // data.append('DeleteMe', testCases[5].sub[4].checked);
-    // data.append('PostBulk', testCases[6].sub[0].checked);
-    // data.append('PutBulk', testCases[6].sub[1].checked);
-    // data.append('PatchBulk', testCases[6].sub[2].checked);
-    // data.append('DeleteBulk', testCases[6].sub[3].checked);
-
     var data = {
       endpoint: formData.endpoint,
       userName: formData.userName,
       password: formData.password,
       token: formData.token,
-      //testCases: testCases,
       GetServiceProviderConfig: testCases[0].checked || false,
       GetSchemas: testCases[1].checked || false,
       GetResourceTypes: testCases[2].checked || false,
@@ -775,7 +729,7 @@ export default function Home() {
                   error={errors.endpoint ? true : false}
                   helperText={errors.endpoint}
                 />
-                <div style={{ paddingTop: 5 }}>
+                <div style={{ paddingTop: 10, paddingBottom: 5 }}>
                   <FormControl
                     variant="outlined"
                     className={classes.formControl}
@@ -891,20 +845,12 @@ export default function Home() {
                       />
                     </ListItemIcon>
                     <ListItemIcon>
-                      {/* <Button
-                        disableFocusRipple
-                        disableRipple
-                        classes={{ outlined: classes.button }}
-                        variant="outlined"
-                        //  size="small"
-                      > */}
                       <Typography
                         variant="button"
                         style={{ fontWeight: 'bold', textTransform: 'none' }}
                       >
                         {t.name}
                       </Typography>
-                      {/* </Button> */}
                     </ListItemIcon>
                     <ListItemSecondaryAction>
                       <IconButton
@@ -948,10 +894,6 @@ export default function Home() {
                                 name="userGet"
                               />
                             </ListItemIcon>
-                            {/* <ListItemText
-                              primary={s.name}
-                              style={{ fontWeight: 300, color: 'rgb(0,0,54)' }}
-                            /> */}
                             <Typography
                               variant="caption"
                               style={{

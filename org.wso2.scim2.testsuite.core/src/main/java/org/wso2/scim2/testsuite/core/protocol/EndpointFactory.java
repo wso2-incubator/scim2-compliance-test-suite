@@ -61,7 +61,7 @@ public class EndpointFactory {
         complianceTestMetaDataHolder.setUsername(userName);
         complianceTestMetaDataHolder.setPassword(password);
 //        complianceTestMetaDataHolder.setAuthorization_server(authorizationServer);
-//        complianceTestMetaDataHolder.setAuthorization_header(authorizationHeader);
+        complianceTestMetaDataHolder.setAuthorization_header(token);
 //        complianceTestMetaDataHolder.setAuthorization_method(authMethod);
 //        complianceTestMetaDataHolder.setClient_id(clientId);
 //        complianceTestMetaDataHolder.setClient_secret(clientSecret);

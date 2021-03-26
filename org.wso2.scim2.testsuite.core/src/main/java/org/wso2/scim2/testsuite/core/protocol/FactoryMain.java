@@ -41,7 +41,7 @@ public class FactoryMain {
 
     public static void main(String a[]) {
 
-        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","admin","admin","");
+        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","","","c27438fc-67ac-30c3-994f-fac85353cc8f");
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");

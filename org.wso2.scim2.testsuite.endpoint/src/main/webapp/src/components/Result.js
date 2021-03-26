@@ -5,7 +5,6 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Container from '@material-ui/core/Container';
 import Tab from './TabPanel';
 import Badge from '@material-ui/core/Badge';
 import theme from '../util/theme';
@@ -170,7 +169,6 @@ export default function SimpleAccordion(props) {
     });
 
     setAssertionData([...arrOfObjects]);
-    console.log(assertionData);
   };
 
   return (
@@ -221,7 +219,6 @@ export default function SimpleAccordion(props) {
           </Tooltip>
           <div className={classes.column2}>
             <Typography className={classes.secondaryHeading}>
-              {/* <TimelapseIcon style={{ paddingTop: 7 }} /> */}
               {props.result.elapsedTime} ms
             </Typography>
           </div>
@@ -231,11 +228,9 @@ export default function SimpleAccordion(props) {
             style={{
               backgroundColor: 'rgba(65,68,78,1)',
               width: '60%',
-              height: 48,
+              height: 58,
               flex: 1,
               display: 'inline-flex',
-              //flexDirection: 'row',
-              //  justifyContent: 'space-between',
               padding: 10,
               marginLeft: 35,
             }}
@@ -250,7 +245,9 @@ export default function SimpleAccordion(props) {
                 {props.result.wire.requestType}
               </Typography>
             </Button>
-            <Typography style={{ color: '#FFFFFF', marginLeft: 15 }}>
+            <Typography
+              style={{ color: '#FFFFFF', marginLeft: 15, marginTop: 6 }}
+            >
               {props.result.wire.requestUri}
             </Typography>
           </div>
@@ -275,8 +272,6 @@ export default function SimpleAccordion(props) {
                   height: 48,
                   flex: 1,
                   display: 'inline-flex',
-                  //flexDirection: 'row',
-                  //  justifyContent: 'space-between',
                   padding: 10,
                   marginLeft: 35,
                 }}
@@ -333,9 +328,6 @@ export default function SimpleAccordion(props) {
             <div style={{ flex: 1 }}>
               {assertionData
                 ? assertionData.map((assertion) => {
-                    {
-                      console.log(assertion.name);
-                    }
                     return <Assertion assertion={assertion} />;
                   })
                 : null}
