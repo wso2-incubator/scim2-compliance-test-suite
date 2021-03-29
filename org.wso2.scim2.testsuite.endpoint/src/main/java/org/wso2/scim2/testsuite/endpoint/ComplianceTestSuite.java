@@ -25,13 +25,12 @@ import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONException;
 
-import org.wso2.scim2.compliance.entities.Result;
-import org.wso2.scim2.compliance.entities.Statistics;
-import org.wso2.scim2.compliance.entities.TestResult;
-import org.wso2.scim2.compliance.pdf.PDFGenerator;
-import org.wso2.scim2.compliance.tests.ResourceType;
-import org.wso2.scim2.compliance.protocol.EndpointFactory;
-
+import org.wso2.scim2.testsuite.core.entities.Result;
+import org.wso2.scim2.testsuite.core.entities.Statistics;
+import org.wso2.scim2.testsuite.core.entities.TestResult;
+import org.wso2.scim2.testsuite.core.pdf.PDFGenerator;
+import org.wso2.scim2.testsuite.core.tests.ResourceType;
+import org.wso2.scim2.testsuite.core.protocol.EndpointFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -147,7 +146,7 @@ public class ComplianceTestSuite extends HttpServlet {
             throw new IOException("Error parsing JSON request string");
         }
 
-        EndpointFactory endFactory = new EndpointFactory();
+        EndpointFactory endFactory = new EndpointFactory(endpoint,userName,password,token);
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");

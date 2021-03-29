@@ -244,28 +244,6 @@ export default function Home() {
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgess] = React.useState(0);
 
-  const [state, setState] = React.useState({
-    userGet: false,
-    userGetById: false,
-    userPut: false,
-    userPost: false,
-    userPatch: false,
-    userSearch: false,
-    userDelete: false,
-  });
-
-  const notify = (message) => {
-    toast(message, {
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      type: 'Error',
-      position: toast.POSITION.BOTTOM_RIGHT,
-    });
-  };
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -276,7 +254,6 @@ export default function Home() {
 
   const handleTypeChange = (event) => {
     setType(Number(event.target.value));
-    console.log(type);
   };
 
   const handleChange = (event) => {
@@ -287,7 +264,6 @@ export default function Home() {
   };
 
   const handleSubmit = () => {
-    console.log(formData);
     setAuthError(true);
     if (formData.endpoint == '') {
       setErrors({
@@ -345,11 +321,10 @@ export default function Home() {
     const test = tests[parentIndex];
     const features = test.sub;
     const allChildrenSelected = test || false;
-    console.log(features);
 
     if (typeof childIndex !== 'undefined' || typeof childId !== 'undefined') {
       // [SCENARIO] - a child checkbox was selected.
-      console.log('child clicked: ', childIndex);
+      //console.log('child clicked: ', childIndex);
 
       // get total of checked sub checkboxes in existing array
       let checkedCount = 0;
@@ -357,7 +332,7 @@ export default function Home() {
 
       if (!features[childIndex].checked) {
         // [SCENARIO] - previous state of child was 'FALSE'
-        console.log('in child function, previous state is false');
+        //console.log('in child function, previous state is false');
         // [TASK] - set the child to selected
         const modifiedFeature = {
           ...features[childIndex],
@@ -394,7 +369,7 @@ export default function Home() {
         }
       } else {
         // [SCENARIO] - previous state of child was 'TRUE'
-        console.log('in child function, previous state is true');
+        //console.log('in child function, previous state is true');
         // [TASK] - deselect the child checkbox
         const modifiedFeature = {
           ...features[childIndex],
@@ -420,7 +395,6 @@ export default function Home() {
 
           setTestcases([...modifiedtests]);
         } else {
-          console.log('in here');
           // [SCENARIO] - just deselecting a non-first child checkbox
           const modifiedtest = {
             ...test,
@@ -436,7 +410,7 @@ export default function Home() {
       }
     } else {
       // [SCENARIO] - a parent checkbox was selected.
-      console.log('parent clicked: ', parentIndex);
+      //console.log('parent clicked: ', parentIndex);
       if (!test.checked) {
         // [SCENARIO] - previous state of parent was 'FALSE'
 
@@ -467,7 +441,7 @@ export default function Home() {
 
         if (allChildrenSelected) {
           // [SCENARIO] - all children checkboxs selected. deselect and close expansion
-          console.log('all children are currently selected');
+          //console.log('all children are currently selected');
           // [TASK] - deselect all features
           const modifiedFeatures = features.map((feature) => ({
             ...feature,
@@ -521,7 +495,6 @@ export default function Home() {
   };
 
   const handleClick = (id, index) => {
-    console.log(testCases);
     var x = Array.from(testCases).filter((test) => test.id == id)[0];
 
     var t = {
@@ -593,7 +566,6 @@ export default function Home() {
     });
 
     if (checkedCount == 0) {
-      console.log(checkedCount);
       toast.error('Please check at least one test case to proceed!', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
@@ -639,11 +611,9 @@ export default function Home() {
           (progressEvent.loaded * 100) / progressEvent.total
         );
         setProgess(percentCompleted);
-        console.log(progressEvent);
       },
     };
 
-    console.log(data);
     setLoading(true);
     setStatistics();
     setResults();
@@ -654,18 +624,18 @@ export default function Home() {
         data
       )
       .then((res) => {
-        //setProgess(100);
-        console.log(res);
         setStatistics(res.data.statistics);
         setResults(res.data.results);
         setResultData(true);
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        toast.error(err.toString(), {
-          position: toast.POSITION.BOTTOM_RIGHT,
-        });
+        toast.error(
+          'Please provide correct Authentication details and ensure service provider is up and running!',
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
         setLoading(false);
       });
   };
