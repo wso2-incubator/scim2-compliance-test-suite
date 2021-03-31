@@ -19,6 +19,7 @@
 package org.wso2.scim2.testsuite.core.protocol;
 
 //import org.apache.commons.lang.StringUtils;
+
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
@@ -41,7 +42,7 @@ public class FactoryMain {
 
     public static void main(String a[]) {
 
-        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","admin","admin","");
+        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2", "admin", "admin", "");
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");
@@ -239,17 +240,17 @@ public class FactoryMain {
 
             Result finalResults = new Result(statistics, results);
             // Get absolute path of root directory.
-            String pathTemp=System.getProperty("user.dir");
+            String pathTemp = System.getProperty("user.dir");
             // Generate pdf results sheet.
             try {
-                String fullPath = pathTemp+"/org.wso2.scim2.testsuite.core/target/SCIM2";
+                String fullPath = pathTemp + "/org.wso2.scim2.testsuite.core/target/SCIM2";
                 String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
                 finalResults.setReportLink("file://" + reportURL);
             } catch (IOException pdf) {
 
             }
 
-            System.out.println(pathTemp+"/org.wso2.scim2.testsuite.core/target");
+            System.out.println(pathTemp + "/org.wso2.scim2.testsuite.core/target");
         } catch (Exception ee) {
             System.out.println("Error");
         }
