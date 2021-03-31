@@ -41,7 +41,7 @@ public class FactoryMain {
 
     public static void main(String a[]) {
 
-        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","","","c27438fc-67ac-30c3-994f-fac85353cc8f");
+        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","admin","admin","");
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");
@@ -238,19 +238,18 @@ public class FactoryMain {
             statistics.setTime(time);
 
             Result finalResults = new Result(statistics, results);
-
-            //generate pdf results sheet
+            // Get absolute path of root directory.
+            String pathTemp=System.getProperty("user.dir");
+            // Generate pdf results sheet.
             try {
-                String fullPath = "/home/anjanap/Desktop/SCIM2\n";
+                String fullPath = pathTemp+"/org.wso2.scim2.testsuite.core/target/SCIM2";
                 String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
-                //TODO : Change this on server
                 finalResults.setReportLink("file://" + reportURL);
             } catch (IOException pdf) {
 
             }
 
-
-            System.out.println("Success");
+            System.out.println(pathTemp+"/org.wso2.scim2.testsuite.core/target");
         } catch (Exception ee) {
             System.out.println("Error");
         }
