@@ -66,7 +66,7 @@ public class UserTestImpl implements ResourceType {
     /**
      * Initialize.
      *
-     * @param complianceTestMetaDataHolder
+     * @param complianceTestMetaDataHolder Stores data required to run tests
      */
     public UserTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -76,9 +76,10 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Create test users.
+     * Create test users for test cases.
      *
-     * @return
+     * @param noOfUsers Specify the number of users needs to create
+     * @return userIDS of created users
      * @throws ComplianceException
      * @throws GeneralComplianceException
      */
@@ -154,10 +155,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * This method cleans up the created used with the given id.
+     * Delete a user after test execution.
      *
-     * @param id
-     * @return
+     * @param id       User Id to delete a user
+     * @param testName Respective test case
+     * @return true or false
      * @throws GeneralComplianceException
      * @throws ComplianceException
      */
@@ -187,8 +189,10 @@ public class UserTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-            // Read the response body.
-            // Get all headers.
+            /*
+            Read the response body.
+            Get all headers.
+             */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -215,8 +219,8 @@ public class UserTestImpl implements ResourceType {
     /**
      * Method check whether return users are sorted or not.
      *
-     * @param userList
-     * @return
+     * @param userList Array of users to get checked whether they are sorted or not
+     * @return true or false
      * @throws CharonException
      */
     private boolean isUserListSorted(ArrayList<User> userList) throws CharonException {
@@ -230,11 +234,23 @@ public class UserTestImpl implements ResourceType {
         return sorted;
     }
 
+    /**
+     * Generating unique numbers.
+     *
+     * @return unique number
+     */
     private static String generateUniqueID() {
 
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * Initiate test data needed for user get test case.
+     *
+     * @return array of initialize data
+     * @throws ComplianceException
+     * @throws GeneralComplianceException
+     */
     private RequestPath[] initiateData() throws ComplianceException, GeneralComplianceException {
 
         RequestPath[] requestPaths;
@@ -507,8 +523,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                 Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -588,7 +606,7 @@ public class UserTestImpl implements ResourceType {
                 }
                 // Check for all created groups.
                 if (requestPaths[i].getTestCaseName().equals("List Users")) {
-                    //check for list of users returned
+                    // Check for list of users returned.
                     subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
                     ArrayList<String> returnedUserIDs = new ArrayList<>();
                     for (User u : userList) {
@@ -892,8 +910,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1207,7 +1227,7 @@ public class UserTestImpl implements ResourceType {
             long startTime = System.currentTimeMillis();
             User user = null;
             HttpPost method = new HttpPost(url);
-            //create user test
+            // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
             method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
@@ -1240,7 +1260,7 @@ public class UserTestImpl implements ResourceType {
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 // Read the response body.
-                // Get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1469,7 +1489,7 @@ public class UserTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            //create default user;
+            // Create default user.
             ArrayList<String> userIDs = null;
             userIDs = createTestsUsers("One");
             String id = userIDs.get(0);
@@ -1507,8 +1527,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1688,7 +1710,7 @@ public class UserTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            //create default user;
+            // Create default user.
             ArrayList<String> userIDs = null;
             userIDs = createTestsUsers("One");
             String id = userIDs.get(0);
@@ -1725,8 +1747,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1764,7 +1788,7 @@ public class UserTestImpl implements ResourceType {
                 try {
                     user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    //clean the created user
+                    // Clean the created user.
                     cleanUpUser(id, "Update User");
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1866,7 +1890,7 @@ public class UserTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        //create default user;
+        // Create default user.
         ArrayList<String> userIDs = null;
         userIDs = createTestsUsers("One");
         String id = userIDs.get(0);
@@ -1913,8 +1937,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));

@@ -18,8 +18,8 @@
 
 package org.wso2.scim2.testsuite.core.protocol;
 
-//import org.apache.commons.lang.StringUtils;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
@@ -28,17 +28,13 @@ import org.wso2.scim2.testsuite.core.tests.ResourceType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 
 /**
  * Method for calling factory.
  */
 public class FactoryMain {
 
-    @Context
-    static
-    ServletContext context;
+    private static Log logger = LogFactory.getLog(FactoryMain.class);
 
     public static void main(String a[]) {
 
@@ -52,30 +48,30 @@ public class FactoryMain {
         ResourceType resourceType7 = endFactory.getInstance("bulk");
         ResourceType resourceType8 = endFactory.getInstance("role");
         try {
-            ArrayList<TestResult> results = new ArrayList<TestResult>();
+            ArrayList<TestResult> results = new ArrayList<>();
 
-            // ServiceProviderConfig
+            // Invoke ServiceProviderConfig test.
             ArrayList<TestResult> serviceProviderResult;
             serviceProviderResult = resourceType3.getMethodTest();
             for (TestResult testResult : serviceProviderResult) {
                 results.add(testResult);
             }
 
-            // resourceType
+            // Invoke ResourceTypes test.
             ArrayList<TestResult> resourceTypeResult;
             resourceTypeResult = resourceType4.getMethodTest();
             for (TestResult testResult : resourceTypeResult) {
                 results.add(testResult);
             }
 
-            // schemaTest
+            // Invoke schemas test.
             ArrayList<TestResult> schemaTestResult;
             schemaTestResult = resourceType5.getMethodTest();
             for (TestResult testResult : schemaTestResult) {
                 results.add(testResult);
             }
 
-            //  User
+            //  Invoke user related tests.
             ArrayList<TestResult> userGetResult;
             userGetResult = resourceType.getMethodTest();
             for (TestResult testResult : userGetResult) {
@@ -118,7 +114,7 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-            // Group
+            // Invoke group related tests.
             ArrayList<TestResult> groupGetResult;
             groupGetResult = resourceType2.getMethodTest();
             for (TestResult testResult : groupGetResult) {
@@ -161,7 +157,7 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-            // Me
+            // Invoke Me related tests.
             ArrayList<TestResult> meGetResult;
             meGetResult = resourceType6.getMethodTest();
             for (TestResult testResult : meGetResult) {
@@ -192,7 +188,7 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
-            // Bulk
+            // Invoke Bulk related tests.
             ArrayList<TestResult> bulkPostResult;
             bulkPostResult = resourceType7.postMethodTest();
             for (TestResult testResult : bulkPostResult) {
@@ -217,6 +213,7 @@ public class FactoryMain {
                 results.add(testResult);
             }
 
+            // Calculate test statistics.
             Statistics statistics = new Statistics();
             for (TestResult result : results) {
 
@@ -247,11 +244,10 @@ public class FactoryMain {
                 String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
                 finalResults.setReportLink("file://" + reportURL);
             } catch (IOException pdf) {
-
+                logger.error("PDF generation failed with error : ", pdf);
             }
-
-        } catch (Exception ee) {
-
+        } catch (Exception e) {
+            logger.error("Test execution failed with error : ", e);
         }
     }
 }

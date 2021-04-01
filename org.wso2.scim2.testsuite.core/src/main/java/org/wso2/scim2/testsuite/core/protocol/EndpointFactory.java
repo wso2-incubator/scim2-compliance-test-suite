@@ -28,7 +28,6 @@ import org.wso2.scim2.testsuite.core.tests.RolesTestImpl;
 import org.wso2.scim2.testsuite.core.tests.SchemaTestImpl;
 import org.wso2.scim2.testsuite.core.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.testsuite.core.tests.UserTestImpl;
-import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
 /**
  * Method for calling factory.
@@ -45,14 +44,13 @@ public class EndpointFactory {
      *
      * @param url,userName,password,token
      */
-    public EndpointFactory(String url,String userName,String password,String token) {
+    public EndpointFactory(String url, String userName, String password, String token) {
 
         this.url = url;
-        this.userName=userName;
-        this.password=password;
-        this.token=token;
+        this.userName = userName;
+        this.password = password;
+        this.token = token;
     }
-
 
     public ResourceType getInstance(String str) {
 

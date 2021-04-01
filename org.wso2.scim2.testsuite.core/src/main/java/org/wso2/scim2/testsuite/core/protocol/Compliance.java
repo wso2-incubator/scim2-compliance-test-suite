@@ -50,7 +50,7 @@ public class Compliance extends HttpServlet {
     @Produces(MediaType.APPLICATION_JSON)
     public Result runTests(String a[]) {
 
-        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2","admin","admin","");
+        EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2", "admin", "admin", "");
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");

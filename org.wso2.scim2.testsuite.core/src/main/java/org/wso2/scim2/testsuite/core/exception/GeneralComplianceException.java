@@ -24,21 +24,23 @@ import org.wso2.scim2.testsuite.core.entities.TestResult;
  */
 public class GeneralComplianceException extends Exception {
 
-	private TestResult result = null;
+    private TestResult result = null;
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
+    public GeneralComplianceException(TestResult result) {
 
-	public GeneralComplianceException(TestResult result) {
-		this.result = result;
-	}
+        this.result = result;
+    }
 
-	public void setResult(TestResult result) {
-		this.result = result;
-	}
+    public void setResult(TestResult result) {
 
-	public TestResult getResult() {
-		return result;
-	}
-	
+        this.result = result;
+    }
+
+    public TestResult getResult() {
+
+        return result;
+    }
+
 }

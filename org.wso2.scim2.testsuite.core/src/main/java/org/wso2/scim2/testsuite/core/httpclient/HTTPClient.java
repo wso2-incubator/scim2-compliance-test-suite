@@ -17,8 +17,6 @@
  */
 package org.wso2.scim2.testsuite.core.httpclient;
 
-import org.wso2.scim2.testsuite.core.exception.ComplianceException;
-import org.wso2.scim2.testsuite.core.protocol.ComplianceTestMetaDataHolder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.HttpClient;
@@ -28,6 +26,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
+import org.wso2.scim2.testsuite.core.exception.ComplianceException;
+import org.wso2.scim2.testsuite.core.protocol.ComplianceTestMetaDataHolder;
 
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
@@ -88,7 +88,7 @@ public class HTTPClient {
             String authHeader = "Basic " + new String(encodedAuth);
             method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         }
-        if(!complianceTestMetaDataHolder.getAuthorization_header().equals("")){
+        if (!complianceTestMetaDataHolder.getAuthorization_header().equals("")) {
             String authHeader = "Bearer " + complianceTestMetaDataHolder.getAuthorization_header();
             method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         }
