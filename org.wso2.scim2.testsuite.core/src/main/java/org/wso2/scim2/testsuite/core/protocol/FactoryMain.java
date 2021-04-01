@@ -250,9 +250,8 @@ public class FactoryMain {
 
             }
 
-            System.out.println(pathTemp + "/org.wso2.scim2.testsuite.core/target");
         } catch (Exception ee) {
-            System.out.println("Error");
+
         }
     }
 }
