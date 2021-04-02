@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implementation of  for User test cases.
+ * Implementation of User test cases.
  */
 public class UserTestImpl implements ResourceType {
 
@@ -66,7 +66,7 @@ public class UserTestImpl implements ResourceType {
     /**
      * Initialize.
      *
-     * @param complianceTestMetaDataHolder Stores data required to run tests
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
      */
     public UserTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -78,10 +78,10 @@ public class UserTestImpl implements ResourceType {
     /**
      * Create test users for test cases.
      *
-     * @param noOfUsers Specify the number of users needs to create
-     * @return userIDS of created users
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param noOfUsers Specify the number of users needs to create.
+     * @return userIDS of created users.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
             GeneralComplianceException {
@@ -157,11 +157,11 @@ public class UserTestImpl implements ResourceType {
     /**
      * Delete a user after test execution.
      *
-     * @param id       User Id to delete a user
-     * @param testName Respective test case
-     * @return true or false
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @param id       User id to delete a user.
+     * @param testName Respective test case.
+     * @return true or false.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
@@ -219,9 +219,9 @@ public class UserTestImpl implements ResourceType {
     /**
      * Method check whether return users are sorted or not.
      *
-     * @param userList Array of users to get checked whether they are sorted or not
-     * @return true or false
-     * @throws CharonException
+     * @param userList Array of users to get checked whether they are sorted or not.
+     * @return true or false.
+     * @throws CharonException Exception by charon library.
      */
     private boolean isUserListSorted(ArrayList<User> userList) throws CharonException {
 
@@ -237,7 +237,7 @@ public class UserTestImpl implements ResourceType {
     /**
      * Generating unique numbers.
      *
-     * @return unique number
+     * @return unique number.
      */
     private static String generateUniqueID() {
 
@@ -247,11 +247,9 @@ public class UserTestImpl implements ResourceType {
     /**
      * Initiate test data needed for user get test case.
      *
-     * @return array of initialize data
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @return requestPaths Array of initialize data.
      */
-    private RequestPath[] initiateData() throws ComplianceException, GeneralComplianceException {
+    private RequestPath[] initiateData() {
 
         RequestPath[] requestPaths;
         // Creating objects to store sub test information.
@@ -478,11 +476,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Get user test.
+     * Get user tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -525,7 +523,7 @@ public class UserTestImpl implements ResourceType {
             } catch (Exception e) {
                 /*
                  Read the response body.
-                Get all headers.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -831,11 +829,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * get user by Id test.
+     * Get user by id tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -1191,11 +1189,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Post user test.
+     * Post user tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -1259,8 +1257,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1396,11 +1396,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Patch user test.
+     * Patch user tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -1676,11 +1676,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Put user test.
+     * Put user tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -1878,11 +1878,11 @@ public class UserTestImpl implements ResourceType {
     }
 
     /**
-     * Delete user test.
+     * Delete user tests.
      *
-     * @return array of TestResult
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -2001,6 +2001,13 @@ public class UserTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Search user tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -2069,8 +2076,10 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));

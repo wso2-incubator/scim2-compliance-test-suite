@@ -61,7 +61,7 @@ public class BulkTestImpl implements ResourceType {
     /**
      * Initializer.
      *
-     * @param complianceTestMetaDataHolder
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
      */
     public BulkTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -74,9 +74,9 @@ public class BulkTestImpl implements ResourceType {
     /**
      * Extract created user/group locations from the bulk response.
      *
-     * @param response
-     * @return
-     * @throws JSONException
+     * @param response Json response from service provider.
+     * @return userLocations Array of resource locations.
+     * @throws JSONException Json exception if response not contain location attribute.
      */
     public ArrayList<String> getLocations(String response) throws JSONException {
 
@@ -94,9 +94,9 @@ public class BulkTestImpl implements ResourceType {
     /**
      * Extract created status from the bulk response.
      *
-     * @param response
-     * @return
-     * @throws JSONException
+     * @param response Json response from service provider.
+     * @return statusCodes Array of status codes of resources.
+     * @throws JSONException Json exception if response not contain expected attributes.
      */
     public ArrayList<Integer> getStatus(String response) throws JSONException {
 
@@ -113,11 +113,12 @@ public class BulkTestImpl implements ResourceType {
     }
 
     /**
-     * Create test users.
+     * Create test users for test cases.
      *
-     * @return
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param noOfUsers Specify the number of users needs to create.
+     * @return userIDS of created users.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
             GeneralComplianceException {
@@ -194,11 +195,13 @@ public class BulkTestImpl implements ResourceType {
     }
 
     /**
-     * Create test groups.
+     * Create test groups for test cases.
      *
-     * @return groupIds
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param userIDs    Array of user ids to use as members in groups.
+     * @param noOfGroups Specify the number of groups needs to create.
+     * @return groupIDs of created groups.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsGroups(ArrayList<String> userIDs, String noOfGroups) throws
             ComplianceException, GeneralComplianceException {
@@ -231,7 +234,7 @@ public class BulkTestImpl implements ResourceType {
         }
 
         HttpPost method = new HttpPost(url);
-        //create groups
+        // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -288,10 +291,11 @@ public class BulkTestImpl implements ResourceType {
     /**
      * This method cleans up resources.
      *
-     * @param location
-     * @return
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @param location Resource location.
+     * @param testName Related test case name.
+     * @return true or false.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private boolean cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
 
@@ -332,8 +336,10 @@ public class BulkTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-            // Read the response body.
-            // Get all headers.
+            /*
+            Read the response body.
+            Get all headers.
+             */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -357,18 +363,41 @@ public class BulkTestImpl implements ResourceType {
         }
     }
 
+    /**
+     * Get bulk tests. This method is not valid for bulk according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-3.7
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Get bulk by id tests. This method is not valid for bulk according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-3.7
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Post bulk tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -572,7 +601,7 @@ public class BulkTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -584,8 +613,10 @@ public class BulkTestImpl implements ResourceType {
                 //  Get the created user locations.
                 createdResourceLocations = getLocations(responseString);
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -639,7 +670,7 @@ public class BulkTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                //run clean up task
+                // Run clean up task.
                 for (String location : createdResourceLocations) {
                     cleanUp(location, requestPaths[i].getTestCaseName());
                 }
@@ -732,7 +763,7 @@ public class BulkTestImpl implements ResourceType {
                                     subTests), stopTime - startTime));
                     continue;
                 }
-                //run clean up task
+                // Run clean up task.
                 cleanUp(location, requestPaths[i].getTestCaseName());
                 // Check for status returned.
                 subTests.add("Fail on errors test");
@@ -786,6 +817,13 @@ public class BulkTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Patch bulk tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -956,7 +994,7 @@ public class BulkTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -966,8 +1004,10 @@ public class BulkTestImpl implements ResourceType {
                 //  Get the created user locations.
                 resourceStatusCodes = getStatus(responseString);
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1044,17 +1084,24 @@ public class BulkTestImpl implements ResourceType {
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
-        //Clean up users.
+        // Clean up users.
         for (String id : userIDs) {
             cleanUp(id, "User");
         }
-        //Clean up groups.
+        // Clean up groups.
         for (String id : groupIDs) {
             cleanUp(id, "Group");
         }
         return testResults;
     }
 
+    /**
+     * Put bulk tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -1235,7 +1282,7 @@ public class BulkTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                //  Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1245,8 +1292,10 @@ public class BulkTestImpl implements ResourceType {
                 //  Get the created user locations.
                 resourceStatusCodes = getStatus(responseString);
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1323,17 +1372,24 @@ public class BulkTestImpl implements ResourceType {
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
         }
-        //Clean up users.
+        // Clean up users.
         for (String id : userIDs) {
             cleanUp(id, "User");
         }
-        //Clean up groups.
+        // Clean up groups.
         for (String id : groupIDs) {
             cleanUp(id, "Group");
         }
         return testResults;
     }
 
+    /**
+     * Delete bulk tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException  Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -1452,7 +1508,7 @@ public class BulkTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1462,8 +1518,10 @@ public class BulkTestImpl implements ResourceType {
                 //  Get the created user locations.
                 resourceStatusCodes = getStatus(responseString);
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1543,11 +1601,11 @@ public class BulkTestImpl implements ResourceType {
         }
 
         if (error) {
-            //Clean up users.
+            // Clean up users.
             for (String id : userIDs) {
                 cleanUp(id, "User");
             }
-            //Clean up groups.
+            // Clean up groups.
             for (String id : groupIDs) {
                 cleanUp(id, "Group");
             }
@@ -1555,6 +1613,14 @@ public class BulkTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Search bulk tests. This method is not valid for bulk according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-3.7
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 

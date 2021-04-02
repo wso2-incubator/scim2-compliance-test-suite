@@ -56,11 +56,11 @@ public class ResourceTypeTestImpl implements ResourceType {
     }
 
     /**
-     * Test case for get ResourceType.
+     * Get ResourceType tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -183,36 +183,84 @@ public class ResourceTypeTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Get ResourceType by id tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Post ResourceType tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Patch ResourceType tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Put ResourceType tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Delete ResourceType tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Search ResourceType tests. This method is not valid for ResourceType according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 

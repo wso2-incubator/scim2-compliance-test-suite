@@ -48,7 +48,7 @@ public class SchemaTestImpl implements ResourceType {
     /**
      * Initializer.
      *
-     * @param complianceTestMetaDataHolder
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
      */
     public SchemaTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -56,11 +56,11 @@ public class SchemaTestImpl implements ResourceType {
     }
 
     /**
-     * Method to get the schemas.
+     * Get schema tests.
      *
-     * @return
-     * @throws
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -153,36 +153,84 @@ public class SchemaTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Get schema by id tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Post schema tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Patch schema tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Put schema tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Delete schema tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Search schema tests. This method is not valid for schema according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 

@@ -60,7 +60,7 @@ public class MeTestImpl implements ResourceType {
     /**
      * Initialize.
      *
-     * @param complianceTestMetaDataHolder
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
      */
     public MeTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -70,11 +70,12 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Create test users.
+     * Create test users for test cases.
      *
-     * @return array of userIds
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param noOfUsers Specify the number of users needs to create.
+     * @return userIDS of created users.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
             GeneralComplianceException {
@@ -151,12 +152,13 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * This method cleans up the created used with the given id.
+     * Delete a user after test execution.
      *
-     * @param id of a user and testcase name
-     * @return boolean
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @param id       User id to delete a user.
+     * @param testName Respective test case.
+     * @return true or false.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
@@ -186,8 +188,10 @@ public class MeTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-            // Read the response body.
-            // Get all headers.
+             /*
+            Read the response body.
+            Get all headers.
+             */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -212,11 +216,11 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Get me test case.
+     * Get me tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -274,8 +278,10 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -305,8 +311,10 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                // Obtain the schema corresponding to user.
-                // Unless configured returns core-user schema or else returns extended user schema).
+               /*
+                Obtain the schema corresponding to user.
+                Unless configured returns core-user schema or else returns extended user schema.
+                 */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
@@ -394,6 +402,14 @@ public class MeTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Get me by id tests. This method is not valid for me endpoint according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-3.11
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -401,11 +417,11 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Post me test case.
+     * Post me tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -424,12 +440,6 @@ public class MeTestImpl implements ResourceType {
 
         RequestPath requestPath1 = new RequestPath();
         requestPath1.setTestCaseName("Create Me");
-
-//        RequestPath requestPath2 = new RequestPath();
-//        requestPath2.setTestCaseName("Post Me with same userName");
-//
-//        RequestPath requestPath3 = new RequestPath();
-//        requestPath3.setTestCaseName("Post Me without userName");
 
         requestPaths = new RequestPath[]{requestPath1};
 
@@ -468,8 +478,10 @@ public class MeTestImpl implements ResourceType {
                         response.getStatusLine().getReasonPhrase();
 
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -498,8 +510,10 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                // Obtain the schema corresponding to user.
-                // Unless configured returns core-user schema or else returns extended user schema.
+                /*
+                Obtain the schema corresponding to user.
+                Unless configured returns core-user schema or else returns extended user schema.
+                 */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
@@ -611,11 +625,11 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Patch me test case.
+     * Patch me tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -653,7 +667,7 @@ public class MeTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            //create default user;
+            // Create default user.
             ArrayList<String> userID;
             userID = createTestsUsers("One");
             String id = userID.get(0);
@@ -693,8 +707,10 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -727,8 +743,10 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                // Obtain the schema corresponding to user.
-                // Unless configured returns core-user schema or else returns extended user schema).
+                 /*
+                Obtain the schema corresponding to user.
+                Unless configured returns core-user schema or else returns extended user schema.
+                 */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
@@ -839,11 +857,11 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Put me test case.
+     * Put me tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -886,7 +904,7 @@ public class MeTestImpl implements ResourceType {
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
             try {
-                //update the user
+                // Update the user.
                 HttpEntity entity = new ByteArrayEntity
                         (definedUsers.get(i).getBytes("UTF-8"));
                 method.setEntity(entity);
@@ -895,7 +913,7 @@ public class MeTestImpl implements ResourceType {
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
-                //get all headers
+                // Get all headers.
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     if (header.getName().equals("Location")) {
@@ -906,8 +924,10 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                //get all headers
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -938,8 +958,10 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                //obtain the schema corresponding to user
-                // unless configured returns core-user schema or else returns extended user schema)
+                /*
+                Obtain the schema corresponding to user.
+                Unless configured returns core-user schema or else returns extended user schema.
+                 */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
@@ -1047,11 +1069,11 @@ public class MeTestImpl implements ResourceType {
     }
 
     /**
-     * Delete me test case.
+     * Delete me tests.
      *
-     * @return array of test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -1065,10 +1087,6 @@ public class MeTestImpl implements ResourceType {
         RequestPath requestPath1 = new RequestPath();
         requestPath1.setUrl(StringUtils.EMPTY);
         requestPath1.setTestCaseName("Delete user by ID");
-
-//        RequestPath requestPath2 = new RequestPath();
-//        requestPath2.setUrl(generateUniqueID());
-//        requestPath2.setTestCaseName("User not found error response");
 
         requestPaths = new RequestPath[]{requestPath1};
 
@@ -1103,8 +1121,10 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                  /*
+                Read the response body.
+                Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1193,6 +1213,14 @@ public class MeTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Search me tests. This method is not valid for me endpoint according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-3.11
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 

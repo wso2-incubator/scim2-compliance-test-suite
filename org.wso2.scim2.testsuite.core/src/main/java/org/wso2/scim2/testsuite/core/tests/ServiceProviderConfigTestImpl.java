@@ -31,10 +31,8 @@ import org.wso2.charon3.core.exceptions.InternalErrorException;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
 import org.wso2.scim2.testsuite.core.exception.ComplianceException;
-//import org.wso2.scim2.compliance.exception.CriticalComplianceException;
 import org.wso2.scim2.testsuite.core.exception.GeneralComplianceException;
 import org.wso2.scim2.testsuite.core.httpclient.HTTPClient;
-//import org.wso2.scim2.compliance.objects.SCIMSchema;
 import org.wso2.scim2.testsuite.core.objects.SCIMServiceProviderConfig;
 import org.wso2.scim2.testsuite.core.protocol.ComplianceTestMetaDataHolder;
 import org.wso2.scim2.testsuite.core.protocol.ComplianceUtils;
@@ -54,7 +52,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
     /**
      * Initializer.
      *
-     * @param complianceTestMetaDataHolder
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
      */
     public ServiceProviderConfigTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
@@ -62,11 +60,11 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
     }
 
     /**
-     * Method to get the service provider configs.
+     * Get serviceProviderConfig tests.
      *
-     * @return arrays pf test results
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
@@ -183,36 +181,84 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Get serviceProviderConfig by id tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Post serviceProviderConfig tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Patch serviceProviderConfig tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Put serviceProviderConfig tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Delete serviceProviderConfig tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Search serviceProviderConfig tests. This method is not valid for serviceProviderConfig according to the
+     * RFC-7644 https://tools.ietf.org/html/rfc7644#section-4
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 

@@ -32,7 +32,7 @@ public class RequestPath {
     /**
      * Get url.
      *
-     * @return url
+     * @return url Target url to invoke tests.
      */
     public String getUrl() {
 
@@ -42,7 +42,7 @@ public class RequestPath {
     /**
      * Set url.
      *
-     * @param url to Function setUrl
+     * @param url Target url to invoke tests.
      */
     public void setUrl(String url) {
 
@@ -52,7 +52,7 @@ public class RequestPath {
     /**
      * Get testCaseName.
      *
-     * @return testCaseName
+     * @return testCaseName Current testcase name..
      */
     public String getTestCaseName() {
 
@@ -62,7 +62,7 @@ public class RequestPath {
     /**
      * Set testCaseName.
      *
-     * @param testCaseName to Function set testCaseName
+     * @param testCaseName Current testcase name.
      */
     public void setTestCaseName(String testCaseName) {
 
@@ -72,7 +72,7 @@ public class RequestPath {
     /**
      * Get supported value.
      *
-     * @return supported value.
+     * @return supported Indicate whether testcase is supported by service provider.
      */
     public boolean getTestSupported() {
 
@@ -80,9 +80,9 @@ public class RequestPath {
     }
 
     /**
-     * Set supported value..
+     * Set supported value.
      *
-     * @param supported value to Function setTestSupported
+     * @param supported Indicate whether testcase is supported by service provider.
      */
     public void setTestSupported(boolean supported) {
 

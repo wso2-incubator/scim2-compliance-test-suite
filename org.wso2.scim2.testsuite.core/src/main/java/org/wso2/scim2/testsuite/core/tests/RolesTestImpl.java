@@ -63,6 +63,11 @@ public class RolesTestImpl implements ResourceType {
     private final ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     private final String url;
 
+    /**
+     * Initialize.
+     *
+     * @param complianceTestMetaDataHolder Stores data required to run tests.
+     */
     public RolesTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
 
         this.complianceTestMetaDataHolder = complianceTestMetaDataHolder;
@@ -72,11 +77,12 @@ public class RolesTestImpl implements ResourceType {
     }
 
     /**
-     * Create test users.
+     * Create test users for test cases.
      *
-     * @return
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param noOfUsers Specify the number of users needs to create.
+     * @return userIDS of created users.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsUsers(String noOfUsers) throws ComplianceException,
             GeneralComplianceException {
@@ -153,11 +159,13 @@ public class RolesTestImpl implements ResourceType {
     }
 
     /**
-     * Create test groups.
+     * Create test groups for test cases.
      *
-     * @return groupIds
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param userIDs    Array of user ids to use as members in groups.
+     * @param noOfGroups Specify the number of groups needs to create.
+     * @return groupIDs of created groups.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsGroups(ArrayList<String> userIDs, String noOfGroups) throws
             ComplianceException, GeneralComplianceException {
@@ -190,7 +198,7 @@ public class RolesTestImpl implements ResourceType {
         }
 
         HttpPost method = new HttpPost(url);
-        //create groups
+        // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -245,11 +253,14 @@ public class RolesTestImpl implements ResourceType {
     }
 
     /**
-     * Create test roles.
+     * Create test roles for test cases.
      *
-     * @return roleIds
-     * @throws ComplianceException
-     * @throws GeneralComplianceException
+     * @param userIDs   Array of user ids to use as members in groups.
+     * @param groupIDs  Array of group ids to use as in roles.
+     * @param noOfRoles Specify the number of roles needs to create.
+     * @return roleIDs of created roles.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     * @throws GeneralComplianceException General exceptions.
      */
     private ArrayList<String> createTestsRoles(ArrayList<String> userIDs, ArrayList<String> groupIDs,
                                                String noOfRoles) throws
@@ -304,7 +315,7 @@ public class RolesTestImpl implements ResourceType {
         }
 
         HttpPost method = new HttpPost(url);
-        //create groups
+        // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
         method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
@@ -361,10 +372,11 @@ public class RolesTestImpl implements ResourceType {
     /**
      * This method cleans up resources.
      *
-     * @param location
-     * @return
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @param location Resource location.
+     * @param testName Related test case name.
+     * @return true or false.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private boolean cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
 
@@ -408,8 +420,10 @@ public class RolesTestImpl implements ResourceType {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
         } catch (Exception e) {
-            // Read the response body.
-            // Get all headers.
+            /*
+            Read the response body.
+            Get all headers.
+             */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -436,9 +450,9 @@ public class RolesTestImpl implements ResourceType {
     /**
      * This checks whether the given array list of roles are in sorted order with respect to role id.
      *
-     * @param returnedRoles
-     * @return
-     * @throws CharonException
+     * @param returnedRoles Array of roles to get checked whether they are sorted or not.
+     * @return true or false.
+     * @throws CharonException Exception by charon library.
      */
     private boolean isRoleListSorted(ArrayList<Role> returnedRoles) throws CharonException {
 
@@ -451,11 +465,23 @@ public class RolesTestImpl implements ResourceType {
         return sorted;
     }
 
+    /**
+     * Generating unique numbers.
+     *
+     * @return unique number.
+     */
     private static String generateUniqueID() {
 
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * Get role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
@@ -552,8 +578,10 @@ public class RolesTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                // Read the response body.
-                // Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
+                 */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -741,6 +769,13 @@ public class RolesTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Get role by id tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> getByIdMethodTest() throws GeneralComplianceException, ComplianceException {
 
