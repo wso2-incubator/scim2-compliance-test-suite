@@ -29,8 +29,8 @@ import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
 import org.wso2.scim2.testsuite.core.pdf.PDFGenerator;
-import org.wso2.scim2.testsuite.core.tests.ResourceType;
 import org.wso2.scim2.testsuite.core.protocol.EndpointFactory;
+import org.wso2.scim2.testsuite.core.tests.ResourceType;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,7 +60,7 @@ public class ComplianceTestSuite extends HttpServlet {
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        out.println("<h3>Hello Anjana!</h3>");
+        out.println("<h3>SCIM2 Compliance Test Suite</h3>");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -90,16 +90,16 @@ public class ComplianceTestSuite extends HttpServlet {
         Boolean DeleteGroup = false;
         Boolean SearchGroup = false;
 
-        Boolean GetMe= false;;
-        Boolean PostMe= false;;
-        Boolean PutMe= false;;
-        Boolean PatchMe= false;;
-        Boolean DeleteMe= false;;
+        Boolean GetMe = false;
+        Boolean PostMe = false;
+        Boolean PutMe = false;
+        Boolean PatchMe = false;
+        Boolean DeleteMe = false;
 
-        Boolean PostBulk= false;;
-        Boolean PutBulk= false;;
-        Boolean PatchBulk= false;;
-        Boolean DeleteBulk= false;;
+        Boolean PostBulk = false;
+        Boolean PutBulk = false;
+        Boolean PatchBulk = false;
+        Boolean DeleteBulk = false;
 
         try {
             ObjectMapper requestMapper = new ObjectMapper();
@@ -146,7 +146,7 @@ public class ComplianceTestSuite extends HttpServlet {
             throw new IOException("Error parsing JSON request string");
         }
 
-        EndpointFactory endFactory = new EndpointFactory(endpoint,userName,password,token);
+        EndpointFactory endFactory = new EndpointFactory(endpoint, userName, password, token);
         ResourceType resourceType = endFactory.getInstance("user");
         ResourceType resourceType2 = endFactory.getInstance("group");
         ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");
@@ -161,7 +161,7 @@ public class ComplianceTestSuite extends HttpServlet {
         try {
             ArrayList<TestResult> results = new ArrayList<TestResult>();
 
-            // ServiceProviderConfig
+            // Invoke ServiceProviderConfig test.
             if (GetServiceProviderConfig) {
                 ArrayList<TestResult> serviceProviderResult;
                 serviceProviderResult = resourceType3.getMethodTest();
@@ -170,7 +170,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            // resourceType
+            // Invoke ResourceTypes test.
             if (GetResourceTypes) {
                 ArrayList<TestResult> resourceTypeResult;
                 resourceTypeResult = resourceType4.getMethodTest();
@@ -179,7 +179,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            // schemaTest
+            // Invoke schemas test.
             if (GetSchemas) {
                 ArrayList<TestResult> schemaTestResult;
                 schemaTestResult = resourceType5.getMethodTest();
@@ -188,7 +188,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            //  User
+            //  Invoke user related tests.
             if (GetUsers) {
                 ArrayList<TestResult> userGetResult;
                 userGetResult = resourceType.getMethodTest();
@@ -239,7 +239,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            // Group
+            // Invoke group related tests.
             if (GetGroups) {
                 ArrayList<TestResult> groupGetResult;
                 groupGetResult = resourceType2.getMethodTest();
@@ -290,7 +290,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            // Me
+            // Invoke Me related tests.
             if (GetMe) {
                 ArrayList<TestResult> meGetResult;
                 meGetResult = resourceType6.getMethodTest();
@@ -327,7 +327,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
-            // Bulk
+            // Invoke Bulk related tests.
             if (PostBulk) {
                 ArrayList<TestResult> bulkPostResult;
                 bulkPostResult = resourceType7.postMethodTest();
@@ -357,6 +357,7 @@ public class ComplianceTestSuite extends HttpServlet {
                 }
             }
 
+            // Calculate test statistics.
             Statistics statistics = new Statistics();
             for (TestResult result : results) {
 
@@ -380,7 +381,7 @@ public class ComplianceTestSuite extends HttpServlet {
 
             finalResults = new Result(statistics, results);
 
-            //generate pdf results sheet
+            // Generate pdf results sheet.
 //            try {
 //                String fullPath = "/home/anjanap/Desktop/SCIM2\n";
 //                String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);

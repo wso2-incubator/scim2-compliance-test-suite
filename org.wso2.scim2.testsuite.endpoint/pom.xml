@@ -212,7 +212,7 @@
 
                         <configuration>
                             <environmentVariables>
-                                <PUBLIC_URL>http://frugalisminds.com/${project.artifactId}</PUBLIC_URL>
+                                <PUBLIC_URL>http://scim2compliancetestsuite.com/${project.artifactId}</PUBLIC_URL>
                                 <REACT_APP_ROUTER_BASE>/${project.artifactId}</REACT_APP_ROUTER_BASE>
                             </environmentVariables>
                         </configuration>

@@ -190,8 +190,8 @@ public class UserTestImpl implements ResourceType {
 
         } catch (Exception e) {
             /*
-            Read the response body.
-            Get all headers.
+             Read the response body.
+             Get all headers.
              */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
@@ -909,8 +909,8 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 /*
-                Read the response body.
-                Get all headers.
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -1257,9 +1257,9 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -1528,8 +1528,8 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 /*
-                Read the response body.
-                Get all headers.
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -1748,8 +1748,8 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 /*
-                Read the response body.
-                Get all headers.
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -1938,8 +1938,8 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 /*
-                Read the response body.
-                Get all headers.
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -2076,9 +2076,9 @@ public class UserTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " " +
                         response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -2202,9 +2202,17 @@ public class UserTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Execute all tests.
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException {
 
+        // This method is not needed for the current implementation.
         return null;
     }
 }

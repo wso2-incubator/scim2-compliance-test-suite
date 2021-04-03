@@ -188,9 +188,9 @@ public class MeTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
 
         } catch (Exception e) {
-             /*
-            Read the response body.
-            Get all headers.
+            /*
+             Read the response body.
+             Get all headers.
              */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
@@ -278,9 +278,9 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -311,9 +311,9 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-               /*
-                Obtain the schema corresponding to user.
-                Unless configured returns core-user schema or else returns extended user schema.
+                /*
+                 Obtain the schema corresponding to user.
+                 Unless configured returns core-user schema or else returns extended user schema.
                  */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -478,9 +478,9 @@ public class MeTestImpl implements ResourceType {
                         response.getStatusLine().getReasonPhrase();
 
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -511,8 +511,8 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
                 /*
-                Obtain the schema corresponding to user.
-                Unless configured returns core-user schema or else returns extended user schema.
+                 Obtain the schema corresponding to user.
+                 Unless configured returns core-user schema or else returns extended user schema.
                  */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -708,8 +708,8 @@ public class MeTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 /*
-                Read the response body.
-                Get all headers.
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -743,9 +743,9 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Expected : 200");
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
-                 /*
-                Obtain the schema corresponding to user.
-                Unless configured returns core-user schema or else returns extended user schema.
+                /*
+                 Obtain the schema corresponding to user.
+                 Unless configured returns core-user schema or else returns extended user schema.
                  */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -924,9 +924,9 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -959,8 +959,8 @@ public class MeTestImpl implements ResourceType {
                 subTests.add("Status : Success");
                 subTests.add(StringUtils.EMPTY);
                 /*
-                Obtain the schema corresponding to user.
-                Unless configured returns core-user schema or else returns extended user schema.
+                 Obtain the schema corresponding to user.
+                 Unless configured returns core-user schema or else returns extended user schema.
                  */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -1121,9 +1121,9 @@ public class MeTestImpl implements ResourceType {
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
-                  /*
-                Read the response body.
-                Get all headers.
+                /*
+                 Read the response body.
+                 Get all headers.
                  */
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
@@ -1227,9 +1227,17 @@ public class MeTestImpl implements ResourceType {
         return null;
     }
 
+    /**
+     * Execute all tests.
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException {
 
+        // This method is not needed for the current implementation.
         return null;
     }
 }

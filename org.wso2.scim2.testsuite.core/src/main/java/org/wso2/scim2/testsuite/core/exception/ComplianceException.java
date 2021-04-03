@@ -22,10 +22,10 @@ package org.wso2.scim2.testsuite.core.exception;
  */
 public class ComplianceException extends Exception {
 
-    //A detailed human-readable message.
+    // A detailed human-readable message.
     protected String detail;
 
-    //The HTTP status code
+    // The HTTP status code.
     protected int status;
 
     public ComplianceException(int status, String detail) {
@@ -42,9 +42,9 @@ public class ComplianceException extends Exception {
      * cause. Note that the detail message associated with
      * causeis not automatically incorporated in this exception's detail message.
      *
-     * @param message the detail message (which is saved for later retrieval
+     * @param message The detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).
-     * @param cause   the cause (which is saved for later retrieval by the
+     * @param cause   The cause (which is saved for later retrieval by the
      *                {@link #getCause()} method).  (A null value is
      *                permitted, and indicates that the cause is nonexistent or
      *                unknown.)

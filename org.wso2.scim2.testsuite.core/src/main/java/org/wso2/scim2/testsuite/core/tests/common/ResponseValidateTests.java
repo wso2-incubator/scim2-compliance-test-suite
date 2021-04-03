@@ -50,19 +50,19 @@ public class ResponseValidateTests {
     /**
      * Main method to handle validation tests.
      *
-     * @param scimObject
-     * @param schema
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
-     * @param method
-     * @param responseString
-     * @param headerString
-     * @param responseStatus
-     * @param subTests
-     * @throws BadRequestException
-     * @throws CharonException
-     * @throws GeneralComplianceException
-     * @throws ComplianceException
+     * @param scimObject                   Resource object.
+     * @param schema                       Resource schema.
+     * @param requestedAttributes          Requested attributes.
+     * @param requestedExcludingAttributes Excluded attribute from request.
+     * @param method                       Http request type.
+     * @param responseString               Json response by service provider.
+     * @param headerString                 Response headers from service provider.
+     * @param responseStatus               Status code of response.
+     * @param subTests                     Assertions done for each test case.
+     * @throws BadRequestException        Exception for bad request.
+     * @throws CharonException            Exceptions by chron library.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     public static void runValidateTests(SCIMObject scimObject,
                                         SCIMResourceTypeSchema schema,
@@ -116,11 +116,20 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
+    /**
      * Validate SCIMObject for required attributes given the object and the corresponding schema.
      *
-     * @param scimObject
-     * @param resourceSchema
+     * @param scimObject     Resource object.
+     * @param resourceSchema Resource schema.
+     * @param method         Http request type.
+     * @param responseString Json response by service provider.
+     * @param headerString   Response headers from service provider.
+     * @param responseStatus Status code of response.
+     * @param subTests       Assertions done for each test case.
+     * @throws BadRequestException        Exception for bad request.
+     * @throws CharonException            Exceptions by chron library.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private static void validateSCIMObjectForRequiredAttributes(SCIMObject scimObject,
                                                                 SCIMResourceTypeSchema resourceSchema,
@@ -130,12 +139,13 @@ public class ResponseValidateTests {
                                                                 String responseStatus,
                                                                 ArrayList<String> subTests)
             throws BadRequestException, CharonException, GeneralComplianceException, ComplianceException {
-        //get attributes from schema.
+
+        // Get attributes from schema.
         List<AttributeSchema> attributeSchemaList = resourceSchema.getAttributesList();
-        //get attribute list from scim object.
+        // Get attribute list from scim object.
         Map<String, Attribute> attributeList = scimObject.getAttributeList();
         for (AttributeSchema attributeSchema : attributeSchemaList) {
-            //check for required attributes.
+            // Check for required attributes.
             if (attributeSchema.getRequired()) {
                 if (!attributeList.containsKey(attributeSchema.getName())) {
                     String error = "Required attribute " + attributeSchema.getName() + " is missing in the SCIM " +
@@ -146,20 +156,26 @@ public class ResponseValidateTests {
                                     headerString, responseStatus, subTests)));
                 }
             }
-            //check for required sub attributes.
+            // Check for required sub attributes.
             AbstractAttribute attribute = (AbstractAttribute) attributeList.get(attributeSchema.getName());
             validateSCIMObjectForRequiredSubAttributes(attribute, attributeSchema,
                     method, responseString, headerString, responseStatus, subTests);
         }
     }
 
-    /*
+    /**
      * Validate SCIMObject for required sub attributes given the object and the corresponding schema.
      *
-     * @param attribute
-     * @param attributeSchema
-     * @throws CharonException
-     * @throws BadRequestException
+     * @param attribute       Attribute for validation.
+     * @param attributeSchema Attribute definitions.
+     * @param method          Http request type.
+     * @param responseString  Json response by service provider.
+     * @param headerString    Response headers from service provider.
+     * @param responseStatus  Status code of response.
+     * @param subTests        Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws CharonException            Exceptions by chron library.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private static void validateSCIMObjectForRequiredSubAttributes(AbstractAttribute attribute,
                                                                    AttributeSchema attributeSchema,
@@ -204,7 +220,7 @@ public class ResponseValidateTests {
                             }
                         }
                     }
-                    //Following is only applicable for extension schema validation.
+                    // Following is only applicable for extension schema validation.
                     AbstractAttribute subAttribute = null;
                     if (attribute instanceof ComplexAttribute) {
                         subAttribute = (AbstractAttribute) ((ComplexAttribute) attribute).getSubAttribute
@@ -228,11 +244,18 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
-     * Validate SCIMObject for schema list
+    /**
+     * Validate SCIMObject for schema list.
      *
-     * @param scimObject
-     * @param resourceSchema
+     * @param scimObject     Resource object.
+     * @param resourceSchema Resource schema.
+     * @param method         Http request type.
+     * @param responseString Json response by service provider.
+     * @param headerString   Response headers from service provider.
+     * @param responseStatus Status code of response.
+     * @param subTests       Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     public static void validateSchemaList(SCIMObject scimObject,
                                           SCIMResourceTypeSchema resourceSchema,
@@ -243,13 +266,13 @@ public class ResponseValidateTests {
                                           ArrayList<String> subTests)
             throws GeneralComplianceException, ComplianceException {
 
-        //get resource schema list
+        // Get resource schema list.
         List<String> resourceSchemaList = resourceSchema.getSchemasList();
-        //get the scim object schema list
+        // Get the scim object schema list.
         List<String> objectSchemaList = scimObject.getSchemaList();
 
         for (String schema : resourceSchemaList) {
-            //check for schema.
+            // Check for schema.
             if (!objectSchemaList.contains(schema)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Schema List Test",
                         "Not all schemas are set", ComplianceUtils.getWire(method,
@@ -258,13 +281,20 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
+    /**
      * This method is to remove any defined and requested attributes and include
      * requested attributes if not they have been removed.
      *
-     * @param scimObject
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
+     * @param scimObject                   Resource object.
+     * @param requestedAttributes          Attributes request in the method.
+     * @param requestedExcludingAttributes Attributes excluding in the method.
+     * @param method                       Http request type.
+     * @param responseString               Json response by service provider.
+     * @param headerString                 Response headers from service provider.
+     * @param responseStatus               Status code of response.
+     * @param subTests                     Assertions done for each test case.
+     * @throws GeneralComplianceException
+     * @throws ComplianceException
      */
     public static void validateReturnedAttributes(AbstractSCIMObject scimObject,
                                                   String requestedAttributes,
@@ -280,11 +310,11 @@ public class ResponseValidateTests {
         List<String> requestedExcludingAttributesList = null;
 
         if (requestedAttributes != null) {
-            //make a list from the comma separated requestedAttributes
+            // Make a list from the comma separated requestedAttributes.
             requestedAttributesList = Arrays.asList(requestedAttributes.split(","));
         }
         if (requestedExcludingAttributes != null) {
-            //make a list from the comma separated requestedExcludingAttributes
+            // Make a list from the comma separated requestedExcludingAttributes.
             requestedExcludingAttributesList = Arrays.asList(requestedExcludingAttributes.split(","));
         }
         Map<String, Attribute> attributeList = scimObject.getAttributeList();
@@ -293,23 +323,27 @@ public class ResponseValidateTests {
             attributeTemporyList.add(attribute);
         }
         for (Attribute attribute : attributeTemporyList) {
-            //check for never/request attributes.
+            // Check for never/request attributes.
             if (attribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                         "Attribute : " + attribute.getName() + " violates mutability condition.",
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
-            //if the returned property is request, need to check whether is it specifically requested by the user.
-            // If so return it.
+            /*
+             If the returned property is request, need to check whether is it specifically requested by the user.
+             If so return it.
+             */
             if (requestedAttributes == null && requestedExcludingAttributes == null) {
                 if (attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     scimObject.deleteAttribute(attribute.getName());
                 }
             } else {
-                //A request should only contains either attributes or exclude attribute params. Not both
+                // A request should only contains either attributes or exclude attribute params. Not both.
                 if (requestedAttributes != null) {
-                    //if attributes are set, delete all the request and default attributes
-                    //and add only the requested attributes
+                    /*
+                     If attributes are set, delete all the request and default attributes
+                     and add only the requested attributes.
+                     */
                     if ((attribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT)
                             || attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                             && (!requestedAttributesList.contains(attribute.getName())
@@ -321,7 +355,7 @@ public class ResponseValidateTests {
                                         subTests)));
                     }
                 } else if (requestedExcludingAttributes != null) {
-                    //removing attributes which has returned as request. This is because no request is made
+                    // Removing attributes which has returned as request. This is because no request is made.
                     if (attribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability  " +
                                 "Test",
@@ -329,8 +363,10 @@ public class ResponseValidateTests {
                                 ComplianceUtils.getWire(method, responseString, headerString, responseStatus,
                                         subTests)));
                     }
-                    //if exclude attribute is set, set of exclude attributes need to be
-                    // removed from the default set of attributes
+                    /*
+                     If exclude attribute is set, set of exclude attributes need to be
+                     removed from the default set of attributes
+                     */
                     if ((attribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                             && requestedExcludingAttributesList.contains(attribute.getName())) {
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability " +
@@ -341,10 +377,12 @@ public class ResponseValidateTests {
                     }
                 }
             }
-            // If the Returned type ALWAYS : no need to check and it will be not affected by
-            // requestedExcludingAttributes parameter
+            /*
+             If the Returned type ALWAYS : no need to check and it will be not affected by
+             requestedExcludingAttributes parameter.
+             */
 
-            //check the same for sub attributes
+            // Check the same for sub attributes.
             if (attribute.getType().equals(SCIMDefinitions.DataType.COMPLEX)) {
                 if (attribute.getMultiValued()) {
                     List<Attribute> valuesList = ((MultiValuedAttribute) attribute).getAttributeValues();
@@ -353,8 +391,10 @@ public class ResponseValidateTests {
                         Map<String, Attribute> valuesSubAttributeList = ((ComplexAttribute) subAttribute)
                                 .getSubAttributesList();
                         ArrayList<Attribute> valuesSubAttributeTemporyList = new ArrayList<Attribute>();
-                        //as we are deleting the attributes form the list, list size will change,
-                        //hence need to traverse on a copy
+                        /*
+                         As we are deleting the attributes form the list, list size will change,
+                         hence need to traverse on a copy.
+                         */
                         for (Attribute subSimpleAttribute : valuesSubAttributeList.values()) {
                             valuesSubAttributeTemporyList.add(subSimpleAttribute);
                         }
@@ -373,7 +413,7 @@ public class ResponseValidateTests {
                     }
                     for (Attribute subAttribute : subAttributeTemporyList) {
                         if (subAttribute.getType().equals(SCIMDefinitions.DataType.COMPLEX)) {
-                            //this applicable for extension schema only
+                            // This applicable for extension schema only.
                             if (subAttribute.getMultiValued()) {
 
                                 List<Attribute> valuesList = ((MultiValuedAttribute) subAttribute).getAttributeValues();
@@ -382,8 +422,10 @@ public class ResponseValidateTests {
                                     Map<String, Attribute> subValuesSubAttributeList = ((ComplexAttribute)
                                             subSubValue).getSubAttributesList();
                                     ArrayList<Attribute> valuesSubSubAttributeTemporyList = new ArrayList<Attribute>();
-                                    //as we are deleting the attributes form the list, list size will change,
-                                    //hence need to traverse on a copy
+                                    /*
+                                     As we are deleting the attributes form the list, list size will change,
+                                     hence need to traverse on a copy.
+                                     */
                                     for (Attribute subSubSimpleAttribute : subValuesSubAttributeList.values()) {
                                         valuesSubSubAttributeTemporyList.add(subSubSimpleAttribute);
                                     }
@@ -425,13 +467,13 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
+    /**
      * This checks whether, within the 'requestedAttributes', is there a sub attribute of the 'attribute'.
-     * If so we should not delete the 'attribute'
+     * If so we should not delete the 'attribute'.
      *
-     * @param requestedAttributes
-     * @param attribute
-     * @return boolean
+     * @param requestedAttributes List of attributes to get checked in the method.
+     * @param attribute           Attribute to get checked in the method.
+     * @return boolean True or false.
      */
     private static boolean isSubAttributeExistsInList(List<String> requestedAttributes,
                                                       Attribute attribute) {
@@ -449,7 +491,7 @@ public class ResponseValidateTests {
                             return true;
                         }
                     }
-                    //this case is only valid for extension schema
+                    // This case is only valid for extension schema.
                     if (subAttribute.getType().equals(SCIMDefinitions.DataType.COMPLEX)) {
                         boolean isSubSubAttributeExists = isSubSubAttributeExistsInList(requestedAttributes,
                                 attribute, subAttribute);
@@ -460,14 +502,14 @@ public class ResponseValidateTests {
                 }
             }
         } else if (attribute instanceof ComplexAttribute) {
-            //complex attributes have sub attribute map, hence need conversion to arraylist
+            // Complex attributes have sub attribute map, hence need conversion to arraylist.
             subAttributes = new ArrayList<Attribute>
                     (((Map) (((ComplexAttribute) attribute).getSubAttributesList())).values());
             for (Attribute subAttribute : subAttributes) {
                 if (requestedAttributes.contains(attribute.getName() + "." + subAttribute.getName())) {
                     return true;
                 }
-                //this case is only valid for extension schema
+                // This case is only valid for extension schema.
                 if (subAttribute.getType().equals(SCIMDefinitions.DataType.COMPLEX)) {
                     boolean isSubSubAttributeExists = isSubSubAttributeExistsInList(requestedAttributes,
                             attribute, subAttribute);
@@ -480,15 +522,15 @@ public class ResponseValidateTests {
         return false;
     }
 
-    /*
+    /**
      * This checks whether, within the 'requestedAttributes', is there a sub attribute of the 'subAttribute'.
-     * If so we should not delete the 'attribute'
-     * This case is only applicable for extension
+     * If so we should not delete the 'attribute'.
+     * This case is only applicable for extension.
      *
-     * @param requestedAttributes
-     * @param grandParentAttribute
-     * @param parentAttribute
-     * @return
+     * @param requestedAttributes  List of attributes to get checked in the method.
+     * @param grandParentAttribute Grandparent attribute.
+     * @param parentAttribute      Parent attribute.
+     * @return boolean True or false.
      */
     private static boolean isSubSubAttributeExistsInList(List<String> requestedAttributes,
                                                          Attribute grandParentAttribute, Attribute parentAttribute) {
@@ -510,7 +552,7 @@ public class ResponseValidateTests {
                 }
             }
         } else if (parentAttribute instanceof ComplexAttribute) {
-            //complex attributes have sub attribute map, hence need conversion to arraylist
+            // Complex attributes have sub attribute map, hence need conversion to arraylist.
             subAttributes = new ArrayList<Attribute>
                     (((Map) (((ComplexAttribute) parentAttribute).getSubAttributesList())).values());
             for (Attribute subAttribute : subAttributes) {
@@ -523,18 +565,24 @@ public class ResponseValidateTests {
         return false;
     }
 
-    /*
+    /**
      * This method is to remove any defined and requested sub attributes and include requested sub attributes
-     * from multivalued attributes
+     * from multivalued attributes.
      *
-     * @param subSimpleAttribute
-     * @param subAttribute
-     * @param attribute
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
-     * @param requestedAttributesList
-     * @param requestedExcludingAttributesList
-     * @param scimObject
+     * @param subSimpleAttribute               Sub simple attribute.
+     * @param subAttribute                     Sub attribute.
+     * @param attribute                        Attribute.
+     * @param requestedAttributes              Requested attribute.
+     * @param requestedExcludingAttributes     Requested excluded attribute.
+     * @param requestedAttributesList          List of attributes to get checked in the method.
+     * @param requestedExcludingAttributesList List of excluded attributes to get checked in the method.
+     * @param method                           Http request type.
+     * @param responseString                   Json response by service provider.
+     * @param headerString                     Response headers from service provider.
+     * @param responseStatus                   Status code of response.
+     * @param subTests                         Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private static void removeValuesSubAttributeOnReturn(Attribute subSimpleAttribute, Attribute subAttribute,
                                                          Attribute attribute, String requestedAttributes,
@@ -564,10 +612,12 @@ public class ResponseValidateTests {
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
-            //A request should only contains either attributes or exclude attribute params. Not the both
+            // A request should only contains either attributes or exclude attribute params. Not the both.
             if (requestedAttributes != null) {
-                //if attributes are set, delete all the request and default attributes
-                // and add only the requested attributes
+                /*
+                 If attributes are set, delete all the request and default attributes
+                 and add only the requested attributes.
+                 */
                 if ((subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT)
                         || subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                         && (!requestedAttributesList.contains(
@@ -581,7 +631,7 @@ public class ResponseValidateTests {
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
-                //removing attributes which has returned as request. This is because no request is made
+                // Removing attributes which has returned as request. This is because no request is made.
                 if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                             "Attribute : " + attribute.getName() + "." +
@@ -589,8 +639,10 @@ public class ResponseValidateTests {
                                     "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
-                //if exclude attribute is set, set of exclude attributes need to be
-                // removed from the default set of attributes
+                /*
+                 If exclude attribute is set, set of exclude attributes need to be
+                 removed from the default set of attributes.
+                 */
                 if ((subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subSimpleAttribute.getName())) {
@@ -605,21 +657,25 @@ public class ResponseValidateTests {
 
     }
 
-    /*
+    /**
      * This method is to remove any defined and requested sub attributes and include requested sub attributes
-     * from multivalued attributes
-     * <p>
-     * This is only applicable for extension schema
+     * from multivalued attributes.
      *
-     * @param attribute
-     * @param subAttribute
-     * @param subValue
-     * @param subSimpleAttribute
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
-     * @param requestedAttributesList
-     * @param requestedExcludingAttributesList
-     * @param scimObject
+     * @param attribute                        Attribute.
+     * @param subAttribute                     Sub attribute.
+     * @param subValue                         Sub value.
+     * @param subSimpleAttribute               Sub simple attribute.
+     * @param requestedAttributes              Requested attribute.
+     * @param requestedExcludingAttributes     Requested excluded attribute.
+     * @param requestedAttributesList          List of attributes to get checked in the method.
+     * @param requestedExcludingAttributesList List of excluded attributes to get checked in the method.
+     * @param method                           Http request type.
+     * @param responseString                   Json response by service provider.
+     * @param headerString                     Response headers from service provider.
+     * @param responseStatus                   Status code of response.
+     * @param subTests                         Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private static void removeValuesSubSubAttributeOnReturn(Attribute attribute, Attribute subAttribute, Attribute
             subValue,
@@ -651,10 +707,12 @@ public class ResponseValidateTests {
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
-            //A request should only contains either attributes or exclude attribute params. Not the both
+            // A request should only contains either attributes or exclude attribute params. Not the both.
             if (requestedAttributes != null) {
-                //if attributes are set, delete all the request and default attributes
-                // and add only the requested attributes
+                /*
+                 If attributes are set, delete all the request and default attributes
+                 and add only the requested attributes
+                 */
                 if ((subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT)
                         || subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                         && (!requestedAttributesList.contains(
@@ -668,7 +726,7 @@ public class ResponseValidateTests {
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
-                //removing attributes which has returned as request. This is because no request is made
+                // Removing attributes which has returned as request. This is because no request is made.
                 if (subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                             "Attribute : " + attribute.getName() + "." +
@@ -676,8 +734,10 @@ public class ResponseValidateTests {
                                     "mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
-                //if exclude attribute is set, set of exclude attributes need to be
-                // removed from the default set of attributes
+                /*
+                 If exclude attribute is set, set of exclude attributes need to be
+                 removed from the default set of attributes.
+                 */
                 if ((subSimpleAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName() + "." + subSimpleAttribute.getName())) {
@@ -691,21 +751,24 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
+    /**
      * This method is to remove any defined and requested sub attributes and include requested sub attributes
      * from complex attributes.
-     * <p>
-     * This is applicable for extension schema only
      *
-     * @param attribute
-     * @param subAttribute
-     * @param subSubAttribute
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
-     * @param requestedAttributesList
-     * @param requestedExcludingAttributesList
-     * @param scimObject
-     * @throws CharonException
+     * @param attribute                        Attribute.
+     * @param subAttribute                     Sub attribute.
+     * @param subSubAttribute                  Attribute is sub atribute of another sub attribute.
+     * @param requestedAttributes              Requested attribute.
+     * @param requestedExcludingAttributes     Requested excluded attribute.
+     * @param requestedAttributesList          List of attributes to get checked in the method.
+     * @param requestedExcludingAttributesList List of excluded attributes to get checked in the method.
+     * @param method                           Http request type.
+     * @param responseString                   Json response by service provider.
+     * @param headerString                     Response headers from service provider.
+     * @param responseStatus                   Status code of response.
+     * @param subTests                         Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
     private static void removeSubSubAttributesOnReturn(Attribute attribute,
                                                        Attribute subAttribute,
@@ -719,15 +782,18 @@ public class ResponseValidateTests {
                                                        String headerString,
                                                        String responseStatus, ArrayList<String> subTests)
             throws GeneralComplianceException, ComplianceException {
-        //check for never/request attributes.
+
+        // Check for never/request attributes.
         if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                     "Attribute : " + attribute.getName() + "." +
                             subAttribute.getName() + " violates mutability condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
-        //if the returned property is request, need to check whether is it specifically requested by the user.
-        // If so return it.
+        /*
+         If the returned property is request, need to check whether is it specifically requested by the user.
+         If so return it.
+         */
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
@@ -736,10 +802,12 @@ public class ResponseValidateTests {
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
-            //A request should only contains either attributes or exclude attribute params. Not the both
+            // A request should only contains either attributes or exclude attribute params. Not the both.
             if (requestedAttributes != null) {
-                //if attributes are set, delete all the request and default attributes
-                // and add only the requested attributes
+                /*
+                 If attributes are set, delete all the request and default attributes
+                 and add only the requested attributes.
+                 */
                 if ((subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT)
                         || subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                         && (!requestedAttributesList.contains(
@@ -753,15 +821,17 @@ public class ResponseValidateTests {
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
-                //removing attributes which has returned as request. This is because no request is made
+                // Removing attributes which has returned as request. This is because no request is made.
                 if (subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                             "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
-                //if exclude attribute is set, set of exclude attributes need to be
-                // removed from the default set of attributes
+                /*
+                 If exclude attribute is set, set of exclude attributes need to be
+                 removed from the default set of attributes.
+                 */
                 if ((subSubAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName() + "." + subSubAttribute.getName())) {
@@ -774,19 +844,24 @@ public class ResponseValidateTests {
         }
     }
 
-    /*
+    /**
      * This method is to remove any defined and requested sub attributes and include requested sub attributes
      * from complex attributes.
      *
-     * @param subAttribute
-     * @param attribute
-     * @param requestedAttributes
-     * @param requestedExcludingAttributes
-     * @param requestedAttributesList
-     * @param requestedExcludingAttributesList
-     * @param scimObject
+     * @param subAttribute                     Sub attribute.
+     * @param attribute                        Attribute.
+     * @param requestedAttributes              Requested attribute.
+     * @param requestedExcludingAttributes     Requested excluded attribute.
+     * @param requestedAttributesList          List of attributes to get checked in the method.
+     * @param requestedExcludingAttributesList List of excluded attributes to get checked in the method.
+     * @param method                           Http request type.
+     * @param responseString                   Json response by service provider.
+     * @param headerString                     Response headers from service provider.
+     * @param responseStatus                   Status code of response.
+     * @param subTests                         Assertions done for each test case.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
-
     private static void removeSubAttributesOnReturn(Attribute subAttribute,
                                                     Attribute attribute,
                                                     String requestedAttributes,
@@ -798,15 +873,18 @@ public class ResponseValidateTests {
                                                     String headerString,
                                                     String responseStatus, ArrayList<String> subTests)
             throws GeneralComplianceException, ComplianceException {
-        //check for never/request attributes.
+
+        // Check for never/request attributes.
         if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.NEVER)) {
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                     "Attribute : " + attribute.getName() + "." +
                             subAttribute.getName() + " violates mutability condition.",
                     ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
         }
-        //if the returned property is request, need to check whether is it specifically requested by the user.
-        // If so return it.
+        /*
+         If the returned property is request, need to check whether is it specifically requested by the user.
+         If so return it.
+         */
         if (requestedAttributes == null && requestedExcludingAttributes == null) {
             if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                 throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
@@ -815,10 +893,12 @@ public class ResponseValidateTests {
                         ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
             }
         } else {
-            //A request should only contains either attributes or exclude attribute params. Not the both
+            // A request should only contains either attributes or exclude attribute params. Not the both.
             if (requestedAttributes != null) {
-                //if attributes are set, delete all the request and default attributes
-                // and add only the requested attributes
+                /*
+                 If attributes are set, delete all the request and default attributes
+                 and add only the requested attributes.
+                 */
                 if ((subAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT)
                         || subAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST))
                         && (!requestedAttributesList.contains(
@@ -831,15 +911,17 @@ public class ResponseValidateTests {
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
             } else if (requestedExcludingAttributes != null) {
-                //removing attributes which has returned as request. This is because no request is made
+                // Removing attributes which has returned as request. This is because no request is made.
                 if (subAttribute.getReturned().equals(SCIMDefinitions.Returned.REQUEST)) {
                     throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "Attribute Mutability Test",
                             "Attribute : " + attribute.getName() + "." +
                                     subAttribute.getName() + " violates mutability condition.",
                             ComplianceUtils.getWire(method, responseString, headerString, responseStatus, subTests)));
                 }
-                //if exclude attribute is set, set of exclude attributes need to be
-                // removed from the default set of attributes
+                /*
+                 If exclude attribute is set, set of exclude attributes need to be
+                 removed from the default set of attributes.
+                 */
                 if ((subAttribute.getReturned().equals(SCIMDefinitions.Returned.DEFAULT))
                         && requestedExcludingAttributesList.contains(
                         attribute.getName() + "." + subAttribute.getName())) {

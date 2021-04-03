@@ -324,64 +324,63 @@ export default function Home() {
 
     if (typeof childIndex !== 'undefined' || typeof childId !== 'undefined') {
       // [SCENARIO] - a child checkbox was selected.
-      //console.log('child clicked: ', childIndex);
 
-      // get total of checked sub checkboxes in existing array
+      // Get total of checked sub checkboxes in existing array.
       let checkedCount = 0;
       features.forEach((feature) => feature.checked && checkedCount++);
 
       if (!features[childIndex].checked) {
-        // [SCENARIO] - previous state of child was 'FALSE'
-        //console.log('in child function, previous state is false');
-        // [TASK] - set the child to selected
+        // [SCENARIO] - previous state of child was 'FALSE'.
+
+        // [TASK] - set the child to selected.
         const modifiedFeature = {
           ...features[childIndex],
           checked: true,
         };
 
-        // [TASK] - insert modified child back into parent
+        // [TASK] - insert modified child back into parent.
         features[childIndex] = modifiedFeature;
         const modifiedFeatures = features;
 
-        // [TASK] - check if parent is selected (is this the first child to be selected)
+        // [TASK] - check if parent is selected (is this the first child to be selected).
         if (checkedCount === 0) {
           const modifiedtest = {
             ...test,
             checked: true,
             sub: modifiedFeatures,
           };
-          // insert the test back into the list
+          // Insert the test back into the list.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
           setTestcases([...modifiedtests]);
         } else {
-          // non-first child checkbox being selected
+          // Non-first child checkbox being selected.
           const modifiedtest = {
             ...test,
             sub: modifiedFeatures,
           };
-          // insert the test back into the list
+          // Insert the test back into the list.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
           setTestcases([...modifiedtests]);
         }
       } else {
-        // [SCENARIO] - previous state of child was 'TRUE'
-        //console.log('in child function, previous state is true');
-        // [TASK] - deselect the child checkbox
+        // [SCENARIO] - previous state of child was 'TRUE'.
+
+        // [TASK] - deselect the child checkbox.
         const modifiedFeature = {
           ...features[childIndex],
           checked: false,
         };
 
-        // [TASK] - insert modified child back into parent
+        // [TASK] - insert modified child back into parent.
         features[childIndex] = modifiedFeature;
         const modifiedFeatures = features;
 
         if (checkedCount === 1) {
-          // [SCENARIO] - deselecting the last child checkbox
+          // [SCENARIO] - deselecting the last child checkbox.
           const modifiedtest = {
             ...test,
             checked: false,
@@ -389,19 +388,19 @@ export default function Home() {
             allChildrenSelected: false,
             sub: modifiedFeatures,
           };
-          // insert the test back into the list
+          // Insert the test back into the list.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
           setTestcases([...modifiedtests]);
         } else {
-          // [SCENARIO] - just deselecting a non-first child checkbox
+          // [SCENARIO] - just deselecting a non-first child checkbox.
           const modifiedtest = {
             ...test,
             allChildrenSelected: false,
             sub: modifiedFeatures,
           };
-          // insert the test back into the list
+          // Insert the test back into the list.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
@@ -410,17 +409,16 @@ export default function Home() {
       }
     } else {
       // [SCENARIO] - a parent checkbox was selected.
-      //console.log('parent clicked: ', parentIndex);
       if (!test.checked) {
-        // [SCENARIO] - previous state of parent was 'FALSE'
+        // [SCENARIO] - previous state of parent was 'FALSE'.
 
-        // [TASK] - select all features
+        // [TASK] - select all features.
         const modifiedFeatures = features.map((feature) => ({
           ...feature,
           checked: !feature.checked,
         }));
 
-        // [TASK] - set modified test
+        // [TASK] - set modified test.
         const modifiedtest = {
           ...test,
           checked: true,
@@ -430,25 +428,25 @@ export default function Home() {
           sub: modifiedFeatures,
         };
 
-        // [TASK] - put the test back in the list of tests
+        // [TASK] - put the test back in the list of tests.
         tests[parentIndex] = modifiedtest;
         const modifiedtests = tests;
 
-        // [TASK] - set state of overall list
+        // [TASK] - set state of overall list.
         setTestcases([...modifiedtests]);
       } else {
-        // [SCENARIO] - previous state of parent was 'TRUE'
+        // [SCENARIO] - previous state of parent was 'TRUE'.
 
         if (allChildrenSelected) {
-          // [SCENARIO] - all children checkboxs selected. deselect and close expansion
-          //console.log('all children are currently selected');
-          // [TASK] - deselect all features
+          // [SCENARIO] - all children checkboxs selected. deselect and close expansion.
+
+          // [TASK] - deselect all features.
           const modifiedFeatures = features.map((feature) => ({
             ...feature,
             checked: false,
           }));
 
-          // [TASK] - set modified test
+          // [TASK] - set modified test.
           const modifiedtest = {
             ...test,
             checked: false,
@@ -458,23 +456,23 @@ export default function Home() {
             sub: modifiedFeatures,
           };
 
-          // [TASK] - put the test back in the list of tests
+          // [TASK] - put the test back in the list of tests.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
-          // [TASK] - set state of overall list
+          // [TASK] - set state of overall list.
           setTestcases([...modifiedtests]);
         } else {
           // [SCENARIO] - not all children are selected.
 
-          // [TASK] - select all remaining children checkboxs
-          // TODO - way to skip already true ones?
+          // [TASK] - select all remaining children checkboxs.
+          // TODO - way to skip already true ones.
           const modifiedFeatures = features.map((feature) => ({
             ...feature,
             checked: true,
           }));
 
-          // [TASK] - set modified test
+          // [TASK] - set modified test.
           const modifiedtest = {
             ...test,
             allChildrenSelected: true,
@@ -483,11 +481,11 @@ export default function Home() {
             sub: modifiedFeatures,
           };
 
-          // [TASK] - put the test back in the list of tests
+          // [TASK] - put the test back in the list of tests.
           tests[parentIndex] = modifiedtest;
           const modifiedtests = tests;
 
-          // [TASK] - set state of overall list
+          // [TASK] - set state of overall list.
           setTestcases([...modifiedtests]);
         }
       }

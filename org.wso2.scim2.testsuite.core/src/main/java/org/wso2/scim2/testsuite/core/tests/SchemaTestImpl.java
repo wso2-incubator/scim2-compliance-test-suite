@@ -237,9 +237,17 @@ public class SchemaTestImpl implements ResourceType {
         return null;
     }
 
+    /**
+     * Execute all tests.
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException {
 
+        // This method is not needed for the current implementation.
         return null;
     }
 }

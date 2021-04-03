@@ -31,7 +31,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -49,7 +49,7 @@ public class PDFGenerator {
     /**
      * Init report generation.
      *
-     * @param finalResults
+     * @param finalResults Array of test results.
      */
     private static void init(Result finalResults) {
 
@@ -73,10 +73,10 @@ public class PDFGenerator {
     /**
      * Method to generate the report in PDF format.
      *
-     * @param finalResults
-     * @param fullPath
-     * @return
-     * @throws IOException
+     * @param finalResults Array of test results.
+     * @param fullPath     Path to save pdf.
+     * @return url Location of saved document.
+     * @throws IOException Exception is related to Input and Output operations.
      */
     public static String generatePdfResults(Result finalResults, String fullPath) throws IOException {
 
@@ -85,7 +85,7 @@ public class PDFGenerator {
         PDType0Font font = PDType0Font.load(document, new File("/home/anjanap/tr.ttf"));
         int pageNo = 0;
         for (TestResult testResult : finalResults.getResults()) {
-            //Retrieving the pages of the document
+            // Retrieving the pages of the document.
             PDPage page = document.getPage(pageNo);
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
@@ -127,10 +127,10 @@ public class PDFGenerator {
             List emptyLine = new ArrayList();
             emptyLine.add(" ");
 
-            //Drawing a rectangle
+            // Drawing a rectangle.
             contentStream.addRect(startX, startY - 5, width, 1);
 
-            //Begin text printing
+            // Begin text printing.
             contentStream.fill();
             contentStream.beginText();
             contentStream.setFont(PDType1Font.TIMES_ITALIC, fontSize);
@@ -196,8 +196,8 @@ public class PDFGenerator {
             printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, toServer);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, requestBody);
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-
-            JSONObject json = null; // Convert text to object
+            // Convert text to object.
+            JSONObject json = null;
             String r = null;
             try {
                 r = testResult.getWire().getResponseBody();
@@ -212,14 +212,9 @@ public class PDFGenerator {
             contentStream.setFont(PDType1Font.COURIER, smallFontSize);
             contentStream.setNonStrokingColor(Color.BLUE);
             printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, fromServer);
-            //printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
             if (json != null) {
                 try {
                     if (json.getInt("totalResults") > 10) {
-//                        String r2 = json.toString(4);
-//                        List<String> r3 = getLines(r, fontSize, pdfFont, width);
-//                        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, r3);
-                        //printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
                         contentStream.showText("Response contains more than 10 results which is larger to show in one" +
                                 " page.");
                     } else {
@@ -230,17 +225,17 @@ public class PDFGenerator {
                 }
             }
             printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            //Ending the content stream
+            // Ending the content stream.
             contentStream.endText();
             contentStream.close();
             pageNo++;
 
-            //Retrieving the pages of the document
+            // Retrieving the pages of the document.
             PDPage page2 = document.getPage(pageNo);
             PDPageContentStream contentStream2 = new PDPageContentStream(document, page2);
-            //Drawing a rectangle
+            // Drawing a rectangle.
             contentStream2.addRect(startX, startY - 5, width, 1);
-            //Begin text printing
+            // Begin text printing.
             contentStream2.fill();
             contentStream2.beginText();
             contentStream2.setFont(PDType1Font.TIMES_ITALIC, fontSize);
@@ -258,16 +253,16 @@ public class PDFGenerator {
             printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, subTests);
             printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
-            //Ending the content stream
+            // Ending the content stream.
             contentStream2.endText();
             contentStream2.close();
             pageNo++;
         }
-        //last page
+        // Last page.
         PDPage blankPage = new PDPage();
         // Adding the blank page to the document.
         document.addPage(blankPage);
-        //Retrieving the pages of the document
+        // Retrieving the pages of the document.
         PDPage page = document.getPage(pageNo);
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
@@ -286,10 +281,10 @@ public class PDFGenerator {
         List emptyLine = new ArrayList();
         emptyLine.add(" ");
 
-        //Drawing a rectangle
+        // Drawing a rectangle.
         contentStream.addRect(startX, startY - 5, width, 1);
 
-        //Begin text printing
+        // Begin text printing.
         contentStream.fill();
         contentStream.beginText();
         contentStream.setFont(PDType1Font.TIMES_ITALIC, fontSize);
@@ -355,33 +350,32 @@ public class PDFGenerator {
         contentStream.showText(Long.toString(finalResults.getStatistics().getTime()));
         printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
 
-        //Ending the content stream
+        // Ending the content stream.
         contentStream.endText();
         contentStream.close();
 
-        //save the document
+        // Save the document.
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");
         String url = fullPath + "\\" + sdf.format(cal.getTime()) + ".pdf";
         document.save(new File(url));
 
-        //Closing the document
+        // Closing the document.
         document.close();
         return url;
-
     }
 
     /**
      * Print the results to PDF.
      *
-     * @param contentStream
-     * @param fontSize
-     * @param pdfFont
-     * @param leading
-     * @param startX
-     * @param startY
-     * @param lines
-     * @throws IOException
+     * @param contentStream Page contentStream.
+     * @param fontSize      General font to use in pdf.
+     * @param pdfFont       Font size to use in pdf.
+     * @param leading       Leading in document.
+     * @param startX        Start x point to print text.
+     * @param startY        Start y point to print text.
+     * @param lines         Empty line to add between text.
+     * @throws IOException Exception is related to Input and Output operations.
      */
     public static void printResult(PDPageContentStream contentStream, float fontSize,
                                    PDFont pdfFont, float leading, float startX, float startY, List<String> lines)
@@ -396,12 +390,12 @@ public class PDFGenerator {
     /**
      * Method to separate lines of the PDF.
      *
-     * @param text
-     * @param fontSize
-     * @param pdfFont
-     * @param width
-     * @return
-     * @throws IOException
+     * @param text     Input stream of string.
+     * @param fontSize General font size.
+     * @param pdfFont  Font size to use in pdf.
+     * @param width    Page width.
+     * @return lines List of lines of text.
+     * @throws IOException Exception is related to Input and Output operations.
      */
     private static List<String> getLines(String text, float fontSize, PDFont pdfFont, float width)
             throws IOException {
@@ -438,11 +432,11 @@ public class PDFGenerator {
     /**
      * This return the character count of a given text.
      *
-     * @param requiredSize
-     * @param subString
-     * @param pdfFont
-     * @return
-     * @throws IOException
+     * @param requiredSize Expected size.
+     * @param subString    String to get character count.
+     * @param pdfFont      Font use in pdf.
+     * @return length Character count of string.
+     * @throws IOException Exception is related to Input and Output operations.
      */
     private static int getCharacterCount(float requiredSize, String subString, PDFont pdfFont) throws IOException {
 
@@ -457,9 +451,9 @@ public class PDFGenerator {
     /**
      * This removes the unsupported characters from the text.
      *
-     * @param test
-     * @return
-     * @throws IOException
+     * @param test Stream of text.
+     * @return textToBeShown Stream of text without unsupported characters.
+     * @throws IOException Exception is related to Input and Output operations.
      */
     private static ArrayList<String> removeUnsupportedCharacters(String test) throws IOException {
 

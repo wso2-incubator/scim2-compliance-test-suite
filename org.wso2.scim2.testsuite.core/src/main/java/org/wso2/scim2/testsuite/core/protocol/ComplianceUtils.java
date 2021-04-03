@@ -35,13 +35,13 @@ public class ComplianceUtils {
     /**
      * method to get the wire.
      *
-     * @param method
-     * @param responseBody
-     * @param headerString
-     * @param responseStatus
-     * @param subTests
-     * @return
-     * @throws ComplianceException
+     * @param method         Http method.
+     * @param responseBody   Json response form service provider.
+     * @param headerString   Headers from service provider.
+     * @param responseStatus Status code of the response.
+     * @param subTests       Assertions done for each test case.
+     * @return wire Object which contains all the test data.
+     * @throws ComplianceException Constructed new exception with the specified detail message.
      */
     public static Wire getWire(HttpRequestBase method, String responseBody,
                                String headerString, String responseStatus,

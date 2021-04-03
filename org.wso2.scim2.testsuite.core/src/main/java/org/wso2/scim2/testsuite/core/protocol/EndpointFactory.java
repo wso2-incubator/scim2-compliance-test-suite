@@ -30,7 +30,7 @@ import org.wso2.scim2.testsuite.core.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.testsuite.core.tests.UserTestImpl;
 
 /**
- * Method for calling factory.
+ * This class contains test endpoints for the test suite.
  */
 public class EndpointFactory {
 
@@ -40,9 +40,10 @@ public class EndpointFactory {
     private String token;
 
     /**
-     * Initialize.
-     *
-     * @param url,userName,password,token
+     * @param url      Service Provider endpoint.
+     * @param userName For basic authentication.
+     * @param password For basic authentication.
+     * @param token    For bearer token based authentication.
      */
     public EndpointFactory(String url, String userName, String password, String token) {
 
@@ -52,38 +53,40 @@ public class EndpointFactory {
         this.token = token;
     }
 
-    public ResourceType getInstance(String str) {
+    /**
+     * Method provide relevant test endpoint.
+     *
+     * @param endpoint Indicate which test endpoint to run.
+     * @return ResourceType Return corresponding resource object.
+     */
+    public ResourceType getInstance(String endpoint) {
 
         ComplianceTestMetaDataHolder complianceTestMetaDataHolder = new ComplianceTestMetaDataHolder();
         complianceTestMetaDataHolder.setUrl(url);
         complianceTestMetaDataHolder.setUsername(userName);
         complianceTestMetaDataHolder.setPassword(password);
-//        complianceTestMetaDataHolder.setAuthorization_server(authorizationServer);
         complianceTestMetaDataHolder.setAuthorization_header(token);
-//        complianceTestMetaDataHolder.setAuthorization_method(authMethod);
-//        complianceTestMetaDataHolder.setClient_id(clientId);
-//        complianceTestMetaDataHolder.setClient_secret(clientSecret);
 
         SCIMSchema scimSchema = new SCIMSchema();
 
-        // set the scim schema object
+        // Set the scim schema object.
         complianceTestMetaDataHolder.setScimSchema(scimSchema);
 
-        if (str.equals("serviceProviderConfig")) {
+        if (endpoint.equals("serviceProviderConfig")) {
             return new ServiceProviderConfigTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("user")) {
+        } else if (endpoint.equals("user")) {
             return new UserTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("group")) {
+        } else if (endpoint.equals("group")) {
             return new GroupTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("resourceType")) {
+        } else if (endpoint.equals("resourceType")) {
             return new ResourceTypeTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("schemaTest")) {
+        } else if (endpoint.equals("schemaTest")) {
             return new SchemaTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("me")) {
+        } else if (endpoint.equals("me")) {
             return new MeTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("bulk")) {
+        } else if (endpoint.equals("bulk")) {
             return new BulkTestImpl(complianceTestMetaDataHolder);
-        } else if (str.equals("role")) {
+        } else if (endpoint.equals("role")) {
             return new RolesTestImpl(complianceTestMetaDataHolder);
         }
         return null;

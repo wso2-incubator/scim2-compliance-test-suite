@@ -18,7 +18,7 @@
 package org.wso2.scim2.testsuite.core.utils;
 
 /**
- * This class contains the constances used in.
+ * This class contains the constants used in.
  */
 public class ComplianceConstants {
 
@@ -71,7 +71,8 @@ public class ComplianceConstants {
         public static final String ALL_USERS_IN_TEST = "Test listing all users";
         public static final String PAGINATION_USER_TEST = "Pagination User Test";
         public static final String PAGINATION_GROUP_TEST = "Pagination Group Test";
-        public static final String FILTER_CONTENT_TEST = "Validate the filter response with the filter search attribute";
+        public static final String FILTER_CONTENT_TEST = "Validate the filter response with the filter search " +
+                "attribute";
         public static final String SORT_USERS_TEST = "Sort Users Test";
         public static final String FILTER_USER_WITH_PAGINATION = "Test user filtering with pagination params";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
@@ -286,7 +287,8 @@ public class ComplianceConstants {
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
                 "[{\"method\": \"POST\",\"path\": \"/Users\",\"data\":" +
                 "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"],\"userName\": " +
-                "\"loginUser8\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\",\"data\":{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
+                "\"loginUser8\",\"password\":\"pw12435\"}},{\"method\": \"POST\",\"path\": \"/Users\",\"data\":" +
+                "{\"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:User\"," +
                 "\"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"],\"userName\":\"loginUser9\"," +
                 "\"password\":\"pw13424\"}}]}";
 
@@ -301,7 +303,8 @@ public class ComplianceConstants {
 
         public static String defineBulkRequest5 = "{\"failOnErrors\":1,\"schemas\":" +
                 "[\"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"],\"Operations\":" +
-                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\"},{\"method\": \"POST\",\"path\": \"/Users\"," +
+                "[{\"method\": \"POST\",\"path\": \"/Users\",\"bulkId\": \"qwerty\"},{\"method\": \"POST\",\"path\":" +
+                " \"/Users\"," +
                 "\"bulkId\":\"ytrewq\"}]}";
 
         public static String defineBulkRequest6 = "   {\n" +

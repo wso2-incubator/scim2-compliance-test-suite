@@ -18,8 +18,8 @@
 
 package org.wso2.scim2.testsuite.core.protocol;
 
-//import org.apache.commons.lang.StringUtils;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
@@ -28,27 +28,15 @@ import org.wso2.scim2.testsuite.core.tests.ResourceType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
 /**
- * Method for calling factory and implements servlet.
+ * This class invoke all tests in compliance test suite.
  */
-@Path("/DemoServlet")
-public class Compliance extends HttpServlet {
+public class Compliance {
 
-    @Context
-    static
-    ServletContext context;
+    private static Log logger = LogFactory.getLog(Compliance.class);
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Result runTests(String a[]) {
+    public static void main(String[] arg) {
 
         EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2", "admin", "admin", "");
         ResourceType resourceType = endFactory.getInstance("user");
@@ -59,34 +47,31 @@ public class Compliance extends HttpServlet {
         ResourceType resourceType6 = endFactory.getInstance("me");
         ResourceType resourceType7 = endFactory.getInstance("bulk");
         ResourceType resourceType8 = endFactory.getInstance("role");
-
-        Result finalResults = null;
-
         try {
-            ArrayList<TestResult> results = new ArrayList<TestResult>();
+            ArrayList<TestResult> results = new ArrayList<>();
 
-            // ServiceProviderConfig
+            // Invoke ServiceProviderConfig test.
             ArrayList<TestResult> serviceProviderResult;
             serviceProviderResult = resourceType3.getMethodTest();
             for (TestResult testResult : serviceProviderResult) {
                 results.add(testResult);
             }
 
-            // resourceType
+            // Invoke ResourceTypes test.
             ArrayList<TestResult> resourceTypeResult;
             resourceTypeResult = resourceType4.getMethodTest();
             for (TestResult testResult : resourceTypeResult) {
                 results.add(testResult);
             }
 
-            // schemaTest
+            // Invoke schemas test.
             ArrayList<TestResult> schemaTestResult;
             schemaTestResult = resourceType5.getMethodTest();
             for (TestResult testResult : schemaTestResult) {
                 results.add(testResult);
             }
 
-            //  User
+            //  Invoke user related tests.
             ArrayList<TestResult> userGetResult;
             userGetResult = resourceType.getMethodTest();
             for (TestResult testResult : userGetResult) {
@@ -129,7 +114,7 @@ public class Compliance extends HttpServlet {
                 results.add(testResult);
             }
 
-            // Group
+            // Invoke group related tests.
             ArrayList<TestResult> groupGetResult;
             groupGetResult = resourceType2.getMethodTest();
             for (TestResult testResult : groupGetResult) {
@@ -172,7 +157,7 @@ public class Compliance extends HttpServlet {
                 results.add(testResult);
             }
 
-            // Me
+            // Invoke Me related tests.
             ArrayList<TestResult> meGetResult;
             meGetResult = resourceType6.getMethodTest();
             for (TestResult testResult : meGetResult) {
@@ -203,7 +188,7 @@ public class Compliance extends HttpServlet {
                 results.add(testResult);
             }
 
-            // Bulk
+            // Invoke Bulk related tests.
             ArrayList<TestResult> bulkPostResult;
             bulkPostResult = resourceType7.postMethodTest();
             for (TestResult testResult : bulkPostResult) {
@@ -228,6 +213,7 @@ public class Compliance extends HttpServlet {
                 results.add(testResult);
             }
 
+            // Calculate test statistics.
             Statistics statistics = new Statistics();
             for (TestResult result : results) {
 
@@ -249,22 +235,20 @@ public class Compliance extends HttpServlet {
             }
             statistics.setTime(time);
 
-            finalResults = new Result(statistics, results);
-
-            //generate pdf results sheet
+            Result finalResults = new Result(statistics, results);
+            // Get absolute path of root directory.
+            String pathTemp = System.getProperty("user.dir");
+            // Generate pdf results sheet.
             try {
-                String fullPath = "/home/anjanap/Desktop/SCIM2\n";
+                String fullPath = pathTemp + "/org.wso2.scim2.testsuite.core/target/SCIM 2.0 Compliance Test Suite - " +
+                        "Auto Generated Test Report";
                 String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
-                //TODO : Change this on server
                 finalResults.setReportLink("file://" + reportURL);
-            } catch (IOException pdf) {
-                return (new Result(pdf.getMessage()));
+            } catch (IOException pdfError) {
+                logger.error("PDF generation failed with error : ", pdfError);
             }
-
-        } catch (Exception ee) {
-            return (new Result(ee.getMessage()));
+        } catch (Exception e) {
+            logger.error("Test execution failed with error : ", e);
         }
-
-        return finalResults;
     }
 }

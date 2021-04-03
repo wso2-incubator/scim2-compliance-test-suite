@@ -23,6 +23,9 @@ import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Provide functionality to store one test case data.
+ */
 @XmlRootElement
 public class TestResult {
 

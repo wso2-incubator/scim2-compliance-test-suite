@@ -421,8 +421,8 @@ public class RolesTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
         } catch (Exception e) {
             /*
-            Read the response body.
-            Get all headers.
+             Read the response body.
+             Get all headers.
              */
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
@@ -944,39 +944,82 @@ public class RolesTestImpl implements ResourceType {
         return testResults;
     }
 
+    /**
+     * Post role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Patch role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> patchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Put role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> putMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Delete role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> deleteMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Search role tests.
+     *
+     * @return testResults Array containing test results.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> searchMethodTest() throws GeneralComplianceException, ComplianceException {
 
         return null;
     }
 
+    /**
+     * Execute all tests.
+     *
+     * @return null.
+     * @throws GeneralComplianceException General exceptions.
+     * @throws ComplianceException        Constructed new exception with the specified detail message.
+     */
     @Override
     public ArrayList<TestResult> executeAllTests() throws GeneralComplianceException, ComplianceException {
 
+        // This method is not needed for the current implementation.
         return null;
     }
 }

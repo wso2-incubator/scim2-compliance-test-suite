@@ -19,6 +19,9 @@ package org.wso2.scim2.testsuite.core.objects;
 
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
 
+/**
+ * Scim resourceType definition.
+ */
 public class SCIMResourceType extends AbstractSCIMObject {
 
 }

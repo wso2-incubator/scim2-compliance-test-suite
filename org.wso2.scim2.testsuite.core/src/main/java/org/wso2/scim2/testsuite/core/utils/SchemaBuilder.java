@@ -45,15 +45,15 @@ public class SchemaBuilder {
     /**
      * This create the schemas according to service provider as defined by /Schemas endpoint.
      *
-     * @param jsonSchema
-     * @param method
-     * @param headerString
-     * @param responseStatus
-     * @param subTests
-     * @param url
-     * @param scimSchema
-     * @throws ComplianceException
-     * @throws CriticalComplianceException
+     * @param jsonSchema     Json response by service provider.
+     * @param method         Http request type.
+     * @param headerString   Response headers from service provider.
+     * @param responseStatus Status code of response.
+     * @param subTests       Assertions done for each test case.
+     * @param url            Url of request.
+     * @param scimSchema     Resource schema.
+     * @throws ComplianceException         Constructed new exception with the specified detail message.
+     * @throws CriticalComplianceException Critical exception.
      */
     public static void buildSchema(String jsonSchema,
                                    HttpGet method,
@@ -79,27 +79,27 @@ public class SchemaBuilder {
                                             headerString, responseStatus, subTests)));
                 }
                 if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:User")) {
-                    //set the user schema
+                    // Set the user schema.
                     scimSchema.setUserSchema(buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
                             new ArrayList<String>(Arrays.asList(SCIMConstants.USER_CORE_SCHEMA_URI))));
                 } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-                    //set the group schema
+                    // Set the group schema.
                     scimSchema.setGroupSchema(buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
                             new ArrayList<String>(Arrays.asList(SCIMConstants.GROUP_CORE_SCHEMA_URI))));
                 } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:ResourceType")) {
-                    //set the resource type schema
+                    // Set the resource type schema.
                     scimSchema.setResourceTypeSchema(buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
                             new ArrayList<String>(Arrays.asList(SCIMConstants.RESOURCE_TYPE_SCHEMA_URI))));
                 } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig")) {
-                    //set the user service provider schema
+                    // Set the user service provider schema.
                     scimSchema.setServiceProviderConfigSchema(buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
                             new ArrayList<String>(Arrays.asList(SCIMConstants.SERVICE_PROVIDER_CONFIG_SCHEMA_URI))));
                 } else if (resourceId.equals("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")) {
-                    //set the user extension schema
+                    // Set the user extension schema.
                     ArrayList currentAttributes = scimSchema.getUserSchema().getAttributesList();
                     SCIMResourceTypeSchema extensionSchema = buildResourceSchema(resourceId, resourceObject,
                             responseStatus, method, headerString, url, jsonSchema, subTests,
@@ -121,18 +121,18 @@ public class SchemaBuilder {
     /**
      * This build the charon defined resource schema.
      *
-     * @param resourceId
-     * @param resourceObject
-     * @param responseStatus
-     * @param method
-     * @param headerString
-     * @param url
-     * @param jsonSchema
-     * @param subTests
-     * @param schemaURIs
-     * @return
-     * @throws ComplianceException
-     * @throws CriticalComplianceException
+     * @param resourceId     Resource id.
+     * @param resourceObject Resource object.
+     * @param responseStatus Status code of response.
+     * @param method         Http request type.
+     * @param headerString   Response headers from service provider.
+     * @param url            Url of request.
+     * @param jsonSchema     Json schema.
+     * @param subTests       Assertions done for each test case.
+     * @param schemaURIs     List of schema uris.
+     * @return SCIMResourceTypeSchema Return created scim resource schema.
+     * @throws ComplianceException         Constructed new exception with the specified detail message.
+     * @throws CriticalComplianceException Critical exception.
      */
     public static SCIMResourceTypeSchema buildResourceSchema(String resourceId,
                                                              JSONObject resourceObject,
@@ -225,17 +225,17 @@ public class SchemaBuilder {
     /**
      * This method build the charon defined attribute schema.
      *
-     * @param attribute
-     * @param uri
-     * @param method
-     * @param responseStatus
-     * @param subTests
-     * @param headerString
-     * @param jsonSchema
-     * @param url
-     * @return
-     * @throws ComplianceException
-     * @throws CriticalComplianceException
+     * @param attribute      Attribute of schema.
+     * @param uri            Uri of request.
+     * @param method         Http request type.
+     * @param responseStatus Status code of response.
+     * @param subTests       Assertions done for each test case.
+     * @param headerString   Response headers from service provider.
+     * @param jsonSchema     Json schema.
+     * @param url            url of request.
+     * @return SCIMAttributeSchema Return created scim attribute schema
+     * @throws ComplianceException         Constructed new exception with the specified detail message.
+     * @throws CriticalComplianceException Critical exception.
      */
     public static SCIMAttributeSchema buildAttributeSchema(JSONObject attribute,
                                                            String uri,

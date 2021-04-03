@@ -20,6 +20,9 @@ package org.wso2.scim2.testsuite.core.entities;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ *  Provide functionality to store request data and response data.
+ */
 @XmlRootElement
 public class Wire {
 

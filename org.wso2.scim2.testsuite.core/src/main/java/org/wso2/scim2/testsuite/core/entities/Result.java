@@ -22,47 +22,56 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Implementation of result.
+ */
 @XmlRootElement
 public class Result {
 
     @XmlElement(name = "results")
-    List<TestResult> results      = new ArrayList<TestResult>();
+    List<TestResult> results = new ArrayList<TestResult>();
 
     @XmlElement(name = "statistics")
     Statistics statistics;
 
     @XmlElement(name = "errorMessage")
-    String           errorMessage = "";
+    String errorMessage = "";
 
     @XmlElement(name = "linkToReport")
-    String           link = "";
+    String link = "";
 
     public Result() {
 
     }
 
     public Result(Statistics statistics, List<TestResult> results) {
+
         this.statistics = statistics;
         this.results = results;
     }
 
     public Result(String errorMessage) {
+
         this.errorMessage = errorMessage;
     }
 
     public List<TestResult> getResults() {
+
         return results;
     }
 
     public Statistics getStatistics() {
+
         return statistics;
     }
 
     public String getErrorMessage() {
+
         return errorMessage;
     }
 
     public void setReportLink(String reportLink) {
+
         link = reportLink;
     }
 }
