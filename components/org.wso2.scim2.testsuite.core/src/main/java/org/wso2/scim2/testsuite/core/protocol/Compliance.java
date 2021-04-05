@@ -240,7 +240,8 @@ public class Compliance {
             String pathTemp = System.getProperty("user.dir");
             // Generate pdf results sheet.
             try {
-                String fullPath = pathTemp + "/org.wso2.scim2.testsuite.core/target/SCIM 2.0 Compliance Test Suite - " +
+                String fullPath = pathTemp + "/components/org.wso2.scim2.testsuite.core/target/SCIM 2.0 Compliance " +
+                        "Test Suite - " +
                         "Auto Generated Test Report";
                 String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
                 finalResults.setReportLink("file://" + reportURL);

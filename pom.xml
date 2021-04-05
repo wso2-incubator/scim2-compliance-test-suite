@@ -6,8 +6,8 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>org.wso2.scim2.testsuite.core</module>
-        <module>org.wso2.scim2.testsuite.endpoint</module>
+        <module>components/org.wso2.scim2.testsuite.core</module>
+        <module>components/org.wso2.scim2.testsuite.endpoint</module>
     </modules>
     <name>TestSuite</name>
     <url>https://github.com/erdtman/simplecloud.info</url>
