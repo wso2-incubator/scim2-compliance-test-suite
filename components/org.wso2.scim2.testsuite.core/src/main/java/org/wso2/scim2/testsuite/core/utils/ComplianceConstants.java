@@ -35,7 +35,6 @@ public class ComplianceConstants {
         public static final String AUTHORIZATION_SERVER = "authorizationServer";
         public static final String AUTHORIZATION_HEADER = "authorizationHeader";
         public static final String AUTHORIZATION_METHOD = "authMethod";
-
         public static final String HTTP = "http";
         public static final String HTTPS = "https";
     }

@@ -18,17 +18,13 @@
 
 package org.wso2.scim2.testsuite.endpoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.type.TypeReference;
-import org.json.JSONException;
 
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
-import org.wso2.scim2.testsuite.core.pdf.PDFGenerator;
 import org.wso2.scim2.testsuite.core.protocol.EndpointFactory;
 import org.wso2.scim2.testsuite.core.tests.ResourceType;
 
@@ -47,12 +43,10 @@ import javax.servlet.http.HttpServletResponse;
 public class ComplianceTestSuite extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static Log log = LogFactory.getLog(ComplianceTestSuite.class);
 
     public ComplianceTestSuite() {
 
         super();
-        // TODO Auto-generated constructor stub
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,295 +60,206 @@ public class ComplianceTestSuite extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String endpoint;
-        String userName;
-        String password;
-        String token;
-        Boolean GetServiceProviderConfig = false;
-        Boolean GetSchemas = false;
-        Boolean GetResourceTypes = false;
+        // Map request json data to invoke tests.
+        ObjectMapper requestMapper = new ObjectMapper();
+        Map<String, Object> map = requestMapper.readValue(request.getInputStream(),
+                new TypeReference<Map<String, Object>>() {
+                });
+        String endpoint = (String) map.get("endpoint");
+        String userName = (String) map.get("userName");
+        String password = (String) map.get("password");
+        String token = (String) map.get("token");
+        Boolean getServiceProviderConfig = (Boolean) map.get("getServiceProviderConfig");
+        Boolean getSchemas = (Boolean) map.get("getSchemas");
+        Boolean getResourceTypes = (Boolean) map.get("getResourceTypes");
 
-        Boolean GetUsers = false;
-        Boolean GetUserById = false;
-        Boolean PostUser = false;
-        Boolean PutUser = false;
-        Boolean PatchUser = false;
-        Boolean DeleteUser = false;
-        Boolean SearchUser = false;
+        Boolean getUsers = (Boolean) map.get("getUsers");
+        Boolean getUserById = (Boolean) map.get("getUserById");
+        Boolean postUser = (Boolean) map.get("postUser");
+        Boolean putUser = (Boolean) map.get("putUser");
+        Boolean patchUser = (Boolean) map.get("patchUser");
+        Boolean deleteUser = (Boolean) map.get("deleteUser");
+        Boolean searchUser = (Boolean) map.get("searchUser");
 
-        Boolean GetGroups = false;
-        Boolean GetGroupById = false;
-        Boolean PostGroup = false;
-        Boolean PutGroup = false;
-        Boolean PatchGroup = false;
-        Boolean DeleteGroup = false;
-        Boolean SearchGroup = false;
+        Boolean getGroups = (Boolean) map.get("getGroups");
+        Boolean getGroupById = (Boolean) map.get("getGroupById");
+        Boolean postGroup = (Boolean) map.get("postGroup");
+        Boolean putGroup = (Boolean) map.get("putGroup");
+        Boolean patchGroup = (Boolean) map.get("patchGroup");
+        Boolean deleteGroup = (Boolean) map.get("deleteGroup");
+        Boolean searchGroup = (Boolean) map.get("searchGroup");
 
-        Boolean GetMe = false;
-        Boolean PostMe = false;
-        Boolean PutMe = false;
-        Boolean PatchMe = false;
-        Boolean DeleteMe = false;
+        Boolean getMe = (Boolean) map.get("getMe");
+        Boolean postMe = (Boolean) map.get("postMe");
+        Boolean putMe = (Boolean) map.get("putMe");
+        Boolean patchMe = (Boolean) map.get("patchMe");
+        Boolean deleteMe = (Boolean) map.get("deleteMe");
 
-        Boolean PostBulk = false;
-        Boolean PutBulk = false;
-        Boolean PatchBulk = false;
-        Boolean DeleteBulk = false;
+        Boolean postBulk = (Boolean) map.get("postBulk");
+        Boolean putBulk = (Boolean) map.get("putBulk");
+        Boolean patchBulk = (Boolean) map.get("patchBulk");
+        Boolean deleteBulk = (Boolean) map.get("deleteBulk");
 
-        try {
-            ObjectMapper requestMapper = new ObjectMapper();
-            //JSONObject jsonObject =  HTTP.toJSONObject(jb.toString());
-            Map<String, Object> map = requestMapper.readValue(request.getInputStream(),
-                    new TypeReference<Map<String, Object>>() {
-                    });
-            endpoint = (String) map.get("endpoint"); // will return price value.
-            userName = (String) map.get("userName");
-            password = (String) map.get("password");
-            token = (String) map.get("token");
-            GetServiceProviderConfig = (Boolean) map.get("GetServiceProviderConfig");
-            GetSchemas = (Boolean) map.get("GetSchemas");
-            GetResourceTypes = (Boolean) map.get("GetResourceTypes");
-
-            GetUsers = (Boolean) map.get("GetUsers");
-            GetUserById = (Boolean) map.get("GetUserById");
-            PostUser = (Boolean) map.get("PostUser");
-            PutUser = (Boolean) map.get("PutUser");
-            PatchUser = (Boolean) map.get("PatchUser");
-            DeleteUser = (Boolean) map.get("DeleteUser");
-            SearchUser = (Boolean) map.get("SearchUser");
-
-            GetGroups = (Boolean) map.get("GetGroups");
-            GetGroupById = (Boolean) map.get("GetGroupById");
-            PostGroup = (Boolean) map.get("PostGroup");
-            PutGroup = (Boolean) map.get("PutGroup");
-            PatchGroup = (Boolean) map.get("PatchGroup");
-            DeleteGroup = (Boolean) map.get("DeleteGroup");
-            SearchGroup = (Boolean) map.get("SearchGroup");
-
-            GetMe = (Boolean) map.get("GetMe");
-            PostMe = (Boolean) map.get("PostMe");
-            PutMe = (Boolean) map.get("PutMe");
-            PatchMe = (Boolean) map.get("PatchMe");
-            DeleteMe = (Boolean) map.get("DeleteMe");
-
-            PostBulk = (Boolean) map.get("PostBulk");
-            PutBulk = (Boolean) map.get("PutBulk");
-            PatchBulk = (Boolean) map.get("PatchBulk");
-            DeleteBulk = (Boolean) map.get("DeleteBulk");
-
-        } catch (JSONException e) {
-            throw new IOException("Error parsing JSON request string");
-        }
-
+        // Invoke test library by providing authentication data.
         EndpointFactory endFactory = new EndpointFactory(endpoint, userName, password, token);
-        ResourceType resourceType = endFactory.getInstance("user");
-        ResourceType resourceType2 = endFactory.getInstance("group");
-        ResourceType resourceType3 = endFactory.getInstance("serviceProviderConfig");
-        ResourceType resourceType4 = endFactory.getInstance("resourceType");
-        ResourceType resourceType5 = endFactory.getInstance("schemaTest");
-        ResourceType resourceType6 = endFactory.getInstance("me");
-        ResourceType resourceType7 = endFactory.getInstance("bulk");
-        ResourceType resourceType8 = endFactory.getInstance("role");
+        ResourceType user = endFactory.getInstance("user");
+        ResourceType group = endFactory.getInstance("group");
+        ResourceType serviceProviderConfig = endFactory.getInstance("serviceProviderConfig");
+        ResourceType resourceType = endFactory.getInstance("resourceType");
+        ResourceType schema = endFactory.getInstance("schemaTest");
+        ResourceType self = endFactory.getInstance("me");
+        ResourceType bulk = endFactory.getInstance("bulk");
 
         Result finalResults = null;
 
         try {
-            ArrayList<TestResult> results = new ArrayList<TestResult>();
+            ArrayList<TestResult> results = new ArrayList<>();
+
+            // Get service provider config to check which tests are compatible with service provider.
+            serviceProviderConfig.getMethodTest();
 
             // Invoke ServiceProviderConfig test.
-            if (GetServiceProviderConfig) {
+            if (getServiceProviderConfig) {
                 ArrayList<TestResult> serviceProviderResult;
-                serviceProviderResult = resourceType3.getMethodTest();
-                for (TestResult testResult : serviceProviderResult) {
-                    results.add(testResult);
-                }
+                serviceProviderResult = serviceProviderConfig.getMethodTest();
+                results.addAll(serviceProviderResult);
             }
 
             // Invoke ResourceTypes test.
-            if (GetResourceTypes) {
+            if (getResourceTypes) {
                 ArrayList<TestResult> resourceTypeResult;
-                resourceTypeResult = resourceType4.getMethodTest();
-                for (TestResult testResult : resourceTypeResult) {
-                    results.add(testResult);
-                }
+                resourceTypeResult = resourceType.getMethodTest();
+                results.addAll(resourceTypeResult);
             }
 
             // Invoke schemas test.
-            if (GetSchemas) {
+            if (getSchemas) {
                 ArrayList<TestResult> schemaTestResult;
-                schemaTestResult = resourceType5.getMethodTest();
-                for (TestResult testResult : schemaTestResult) {
-                    results.add(testResult);
-                }
+                schemaTestResult = schema.getMethodTest();
+                results.addAll(schemaTestResult);
             }
 
             //  Invoke user related tests.
-            if (GetUsers) {
+            if (getUsers) {
                 ArrayList<TestResult> userGetResult;
-                userGetResult = resourceType.getMethodTest();
-                for (TestResult testResult : userGetResult) {
-                    results.add(testResult);
-                }
+                userGetResult = user.getMethodTest();
+                results.addAll(userGetResult);
             }
-            if (PostUser) {
+            if (postUser) {
                 ArrayList<TestResult> userPostResult;
-                userPostResult = resourceType.postMethodTest();
-                for (TestResult testResult : userPostResult) {
-                    results.add(testResult);
-                }
+                userPostResult = user.postMethodTest();
+                results.addAll(userPostResult);
             }
-            if (PatchUser) {
+            if (patchUser) {
                 ArrayList<TestResult> userPatchResult;
-                userPatchResult = resourceType.patchMethodTest();
-                for (TestResult testResult : userPatchResult) {
-                    results.add(testResult);
-                }
+                userPatchResult = user.patchMethodTest();
+                results.addAll(userPatchResult);
             }
-            if (SearchUser) {
+            if (searchUser) {
                 ArrayList<TestResult> userSearchResult;
-                userSearchResult = resourceType.searchMethodTest();
-                for (TestResult testResult : userSearchResult) {
-                    results.add(testResult);
-                }
+                userSearchResult = user.searchMethodTest();
+                results.addAll(userSearchResult);
             }
-            if (PutUser) {
+            if (putUser) {
                 ArrayList<TestResult> userPutResult;
-                userPutResult = resourceType.putMethodTest();
-                for (TestResult testResult : userPutResult) {
-                    results.add(testResult);
-                }
+                userPutResult = user.putMethodTest();
+                results.addAll(userPutResult);
             }
-            if (DeleteUser) {
+            if (deleteUser) {
                 ArrayList<TestResult> userDeleteResult;
-                userDeleteResult = resourceType.deleteMethodTest();
-                for (TestResult testResult : userDeleteResult) {
-                    results.add(testResult);
-                }
+                userDeleteResult = user.deleteMethodTest();
+                results.addAll(userDeleteResult);
             }
-            if (GetUserById) {
+            if (getUserById) {
                 ArrayList<TestResult> userGetByIDResult;
-                userGetByIDResult = resourceType.getByIdMethodTest();
-                for (TestResult testResult : userGetByIDResult) {
-                    results.add(testResult);
-                }
+                userGetByIDResult = user.getByIdMethodTest();
+                results.addAll(userGetByIDResult);
             }
 
             // Invoke group related tests.
-            if (GetGroups) {
+            if (getGroups) {
                 ArrayList<TestResult> groupGetResult;
-                groupGetResult = resourceType2.getMethodTest();
-                for (TestResult testResult : groupGetResult) {
-                    results.add(testResult);
-                }
+                groupGetResult = group.getMethodTest();
+                results.addAll(groupGetResult);
             }
-            if (PostGroup) {
+            if (postGroup) {
                 ArrayList<TestResult> groupPostResult;
-                groupPostResult = resourceType2.postMethodTest();
-                for (TestResult testResult : groupPostResult) {
-                    results.add(testResult);
-                }
+                groupPostResult = group.postMethodTest();
+                results.addAll(groupPostResult);
             }
-            if (PatchGroup) {
+            if (patchGroup) {
                 ArrayList<TestResult> groupPatchResult;
-                groupPatchResult = resourceType2.patchMethodTest();
-                for (TestResult testResult : groupPatchResult) {
-                    results.add(testResult);
-                }
+                groupPatchResult = group.patchMethodTest();
+                results.addAll(groupPatchResult);
             }
-            if (SearchGroup) {
+            if (searchGroup) {
                 ArrayList<TestResult> groupSearchResult;
-                groupSearchResult = resourceType2.searchMethodTest();
-                for (TestResult testResult : groupSearchResult) {
-                    results.add(testResult);
-                }
+                groupSearchResult = group.searchMethodTest();
+                results.addAll(groupSearchResult);
             }
-            if (PutGroup) {
+            if (putGroup) {
                 ArrayList<TestResult> groupPutResult;
-                groupPutResult = resourceType2.putMethodTest();
-                for (TestResult testResult : groupPutResult) {
-                    results.add(testResult);
-                }
+                groupPutResult = group.putMethodTest();
+                results.addAll(groupPutResult);
             }
-            if (DeleteGroup) {
+            if (deleteGroup) {
                 ArrayList<TestResult> groupDeleteResult;
-                groupDeleteResult = resourceType2.deleteMethodTest();
-                for (TestResult testResult : groupDeleteResult) {
-                    results.add(testResult);
-                }
+                groupDeleteResult = group.deleteMethodTest();
+                results.addAll(groupDeleteResult);
             }
-            if (GetGroupById) {
+            if (getGroupById) {
                 ArrayList<TestResult> groupGetByIDResult;
-                groupGetByIDResult = resourceType2.getByIdMethodTest();
-                for (TestResult testResult : groupGetByIDResult) {
-                    results.add(testResult);
-                }
+                groupGetByIDResult = group.getByIdMethodTest();
+                results.addAll(groupGetByIDResult);
             }
 
             // Invoke Me related tests.
-            if (GetMe) {
+            if (getMe) {
                 ArrayList<TestResult> meGetResult;
-                meGetResult = resourceType6.getMethodTest();
-                for (TestResult testResult : meGetResult) {
-                    results.add(testResult);
-                }
+                meGetResult = self.getMethodTest();
+                results.addAll(meGetResult);
             }
-            if (PostMe) {
+            if (postMe) {
                 ArrayList<TestResult> mePostResult;
-                mePostResult = resourceType6.postMethodTest();
-                for (TestResult testResult : mePostResult) {
-                    results.add(testResult);
-                }
+                mePostResult = self.postMethodTest();
+                results.addAll(mePostResult);
             }
-            if (PatchMe) {
+            if (patchMe) {
                 ArrayList<TestResult> mePatchResult;
-                mePatchResult = resourceType6.patchMethodTest();
-                for (TestResult testResult : mePatchResult) {
-                    results.add(testResult);
-                }
+                mePatchResult = self.patchMethodTest();
+                results.addAll(mePatchResult);
             }
-            if (PutMe) {
+            if (putMe) {
                 ArrayList<TestResult> mePutResult;
-                mePutResult = resourceType6.putMethodTest();
-                for (TestResult testResult : mePutResult) {
-                    results.add(testResult);
-                }
+                mePutResult = self.putMethodTest();
+                results.addAll(mePutResult);
             }
-            if (DeleteMe) {
+            if (deleteMe) {
                 ArrayList<TestResult> meDeleteResult;
-                meDeleteResult = resourceType6.deleteMethodTest();
-                for (TestResult testResult : meDeleteResult) {
-                    results.add(testResult);
-                }
+                meDeleteResult = self.deleteMethodTest();
+                results.addAll(meDeleteResult);
             }
 
             // Invoke Bulk related tests.
-            if (PostBulk) {
+            if (postBulk) {
                 ArrayList<TestResult> bulkPostResult;
-                bulkPostResult = resourceType7.postMethodTest();
-                for (TestResult testResult : bulkPostResult) {
-                    results.add(testResult);
-                }
+                bulkPostResult = bulk.postMethodTest();
+                results.addAll(bulkPostResult);
             }
-            if (PatchBulk) {
+            if (patchBulk) {
                 ArrayList<TestResult> bulkPatchResult;
-                bulkPatchResult = resourceType7.patchMethodTest();
-                for (TestResult testResult : bulkPatchResult) {
-                    results.add(testResult);
-                }
+                bulkPatchResult = bulk.patchMethodTest();
+                results.addAll(bulkPatchResult);
             }
-            if (PutBulk) {
+            if (putBulk) {
                 ArrayList<TestResult> bulkPutResult;
-                bulkPutResult = resourceType7.putMethodTest();
-                for (TestResult testResult : bulkPutResult) {
-                    results.add(testResult);
-                }
+                bulkPutResult = bulk.putMethodTest();
+                results.addAll(bulkPutResult);
             }
-            if (DeleteBulk) {
+            if (deleteBulk) {
                 ArrayList<TestResult> bulkDeleteResult;
-                bulkDeleteResult = resourceType7.deleteMethodTest();
-                for (TestResult testResult : bulkDeleteResult) {
-                    results.add(testResult);
-                }
+                bulkDeleteResult = bulk.deleteMethodTest();
+                results.addAll(bulkDeleteResult);
             }
 
             // Calculate test statistics.
@@ -381,29 +286,17 @@ public class ComplianceTestSuite extends HttpServlet {
 
             finalResults = new Result(statistics, results);
 
-            // Generate pdf results sheet.
-//            try {
-//                String fullPath = "/home/anjanap/Desktop/SCIM2\n";
-//                String reportURL = PDFGenerator.generatePdfResults(finalResults, fullPath);
-//                //TODO : Change this on server
-//                finalResults.setReportLink("file://" + reportURL);
-//            } catch (IOException pdf) {
-//                new Result(pdf.getMessage());
-//            }
-
         } catch (Exception ee) {
             new Result(ee.getMessage());
         }
-        response.setContentType("application/json");
-        // Get the printwriter object from response to write the required json object to the output stream.
-        PrintWriter out = response.getWriter();
 
+        response.setContentType("application/json");
+        // Get the printWriter object from response to write the required json object to the output stream.
+        PrintWriter out = response.getWriter();
         // Map java object  to a json.
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(finalResults);
-
         // Assuming your json object is **jsonObject**, perform the following, it will return your json object.
         out.print(json);
-
     }
 }
