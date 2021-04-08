@@ -24,7 +24,7 @@ import org.wso2.scim2.testsuite.core.entities.TestResult;
  */
 public class GeneralComplianceException extends Exception {
 
-    private TestResult result = null;
+    private TestResult result;
 
     private static final long serialVersionUID = 1L;
 

@@ -29,14 +29,11 @@ import org.apache.http.ssl.TrustStrategy;
 import org.wso2.scim2.testsuite.core.exception.ComplianceException;
 import org.wso2.scim2.testsuite.core.protocol.ComplianceTestMetaDataHolder;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
 
 /**
  * This class is to depicts the HTTP client.
@@ -48,12 +45,7 @@ public class HTTPClient {
     public static HttpClient getHttpClient() throws ComplianceException {
 
         if (httpClient == null) {
-            TrustStrategy trustAllStrategy = new TrustStrategy() {
-                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-
-                    return true;
-                }
-            };
+            TrustStrategy trustAllStrategy = (chain, authType) -> true;
             SSLContextBuilder builder = new SSLContextBuilder();
             try {
                 builder.loadTrustMaterial(trustAllStrategy);
@@ -61,19 +53,14 @@ public class HTTPClient {
                 throw new ComplianceException("Error in setting up the http client");
             }
 
-            SSLConnectionSocketFactory sslsf = null;
+            SSLConnectionSocketFactory ssl;
             try {
-                HostnameVerifier allHostsValid = new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-
-                        return true;
-                    }
-                };
-                sslsf = new SSLConnectionSocketFactory(builder.build(), allHostsValid);
+                HostnameVerifier allHostsValid = (hostname, session) -> true;
+                ssl = new SSLConnectionSocketFactory(builder.build(), allHostsValid);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new ComplianceException("Error in setting up the http client");
             }
-            httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+            httpClient = HttpClients.custom().setSSLSocketFactory(ssl).build();
             return httpClient;
         }
         return httpClient;
@@ -84,7 +71,7 @@ public class HTTPClient {
 
         String auth = complianceTestMetaDataHolder.getUsername() + ":" + complianceTestMetaDataHolder.getPassword();
         if (!auth.equals(":")) {
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
             String authHeader = "Basic " + new String(encodedAuth);
             method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         }
@@ -100,7 +87,7 @@ public class HTTPClient {
 
         String auth = userName + ":" + password;
         if (!auth.equals(":")) {
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
             String authHeader = "Basic " + new String(encodedAuth);
             method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         }

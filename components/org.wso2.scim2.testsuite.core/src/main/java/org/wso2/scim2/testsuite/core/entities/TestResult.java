@@ -20,40 +20,23 @@ package org.wso2.scim2.testsuite.core.entities;
 import org.wso2.scim2.testsuite.core.exception.ComplianceException;
 import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Provide functionality to store one test case data.
  */
-@XmlRootElement
 public class TestResult {
 
-    private static String[] statusLabels = new String[]{ComplianceConstants.TestConstants.LABEL_IMPORTANT,
+    private static final String[] statusLabels = new String[]{ComplianceConstants.TestConstants.LABEL_IMPORTANT,
             ComplianceConstants.TestConstants.LABEL_SUCCESS, ComplianceConstants.TestConstants.LABEL_INFO};
-
-    private static String[] statusTexts = new String[]{ComplianceConstants.TestConstants.FAILED,
+    private static final String[] statusTexts = new String[]{ComplianceConstants.TestConstants.FAILED,
             ComplianceConstants.TestConstants.SUCCESS, ComplianceConstants.TestConstants.SKIPPED};
-
     public static final int ERROR = 0;
     public static final int SUCCESS = 1;
     public static final int SKIPPED = 2;
-
-    @XmlElement(name = "name")
     String name = "";
-
-    @XmlElement(name = "message")
     String message = "";
-
-    @XmlElement(name = "status_text")
     String statusText = "Failed";
-
-    @XmlElement(name = "status_label")
     String statusLabel = "label-important";
-
-    @XmlElement(name = "wire")
     Wire wire;
-
     private int status;
     private long elapsedTime;
 
@@ -78,7 +61,6 @@ public class TestResult {
         this.message = message;
         this.wire = wire;
         this.status = status;
-
         this.statusText = statusTexts[status];
         this.statusLabel = statusLabels[status];
     }
@@ -89,7 +71,6 @@ public class TestResult {
         this.message = "";
         this.wire = null;
         this.status = status;
-
         this.statusText = statusTexts[status];
         this.statusLabel = statusLabels[status];
     }

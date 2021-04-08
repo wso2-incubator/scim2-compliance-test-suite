@@ -40,7 +40,7 @@ public class ComplianceException extends Exception {
     /**
      * Constructs a new exception with the specified detail message and
      * cause. Note that the detail message associated with
-     * causeis not automatically incorporated in this exception's detail message.
+     * cause is not automatically incorporated in this exception's detail message.
      *
      * @param message The detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

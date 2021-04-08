@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -107,19 +108,19 @@ public class GroupTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedUsers.size(); i++) {
+        for (String definedUser : definedUsers) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
-                HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedUser.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -129,9 +130,9 @@ public class GroupTestImpl implements ResourceType {
                     // Obtain the schema corresponding to the user.
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                     JSONDecoder jsonDecoder = new JSONDecoder();
-                    User user = null;
+                    User user;
                     try {
-                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                        user = jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
@@ -143,6 +144,7 @@ public class GroupTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -176,12 +178,12 @@ public class GroupTestImpl implements ResourceType {
         String deleteUserURL = url + "/" + id;
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             response = client.execute(method);
@@ -199,6 +201,7 @@ public class GroupTestImpl implements ResourceType {
              Read the response body.
              Get all headers.
              */
+            assert response != null;
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -211,7 +214,7 @@ public class GroupTestImpl implements ResourceType {
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                             subTests), stopTime - startTime));
         }
-        if (response.getStatusLine().getStatusCode() == 204) {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
             return true;
         } else {
             long stopTime = System.currentTimeMillis();
@@ -261,7 +264,7 @@ public class GroupTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         //create groups
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
@@ -269,11 +272,11 @@ public class GroupTestImpl implements ResourceType {
         StringBuilder headerString = new StringBuilder();
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedGroups.size(); i++) {
+        for (String definedGroup : definedGroups) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create the group.
-                HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
+                HttpEntity entity = new ByteArrayEntity(definedGroup.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -285,7 +288,7 @@ public class GroupTestImpl implements ResourceType {
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     Group group;
                     try {
-                        group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                        group = jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
@@ -297,6 +300,7 @@ public class GroupTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -326,16 +330,16 @@ public class GroupTestImpl implements ResourceType {
             throws GeneralComplianceException, ComplianceException {
 
         long startTime = System.currentTimeMillis();
-        String deleteGroupURL = null;
+        String deleteGroupURL;
         deleteGroupURL = url + "/" + groupId;
         HttpDelete method = new HttpDelete(deleteGroupURL);
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             response = client.execute(method);
@@ -353,6 +357,7 @@ public class GroupTestImpl implements ResourceType {
              Read the response body.
              Get all headers.
              */
+            assert response != null;
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -365,7 +370,7 @@ public class GroupTestImpl implements ResourceType {
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                             subTests), stopTime - startTime));
         }
-        if (response.getStatusLine().getStatusCode() == 204) {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
             return true;
         } else {
             long stopTime = System.currentTimeMillis();
@@ -415,8 +420,8 @@ public class GroupTestImpl implements ResourceType {
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
         ArrayList<TestResult> testResults = new ArrayList<>();
-        ArrayList<String> userIDs = new ArrayList<>();
-        ArrayList<String> groupIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
+        ArrayList<String> groupIDs;
         // Create 5 test users to assign for groups.
         userIDs = createTestsUsers("Many");
         // Create test groups with users.
@@ -569,21 +574,21 @@ public class GroupTestImpl implements ResourceType {
                 requestPath6, requestPath7, requestPath8, requestPath9, requestPath10, requestPath11, requestPath12,
                 requestPath13, requestPath14, requestPath15, requestPath16, requestPath17, requestPath18};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
-            String requestUrl = url + requestPaths[i].getUrl();
+            String requestUrl = url + requestPath.getUrl();
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer startIndex = null;
-            Integer count = null;
+            Integer startIndex;
+            Integer count;
             ArrayList<String> subTests = new ArrayList<>();
-            Boolean errorOccur = false;
+            boolean errorOccur = false;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -600,38 +605,40 @@ public class GroupTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() && response.getStatusLine().getStatusCode() != 501) {
+                if (requestPath.getTestSupported() &&
+                        response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_IMPLEMENTED) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not list the groups at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
-                JSONObject jsonObjResponse = null;
+                JSONObject jsonObjResponse;
                 ArrayList<Group> groupList = new ArrayList<>();
                 try {
                     JSONObject jsonObj = new JSONObject(responseString);
@@ -642,213 +649,220 @@ public class GroupTestImpl implements ResourceType {
                     JSONObject tmp;
                     for (int j = 0; j < groupsArray.length(); j++) {
                         tmp = groupsArray.getJSONObject(j);
-                        groupList.add((Group) jsonDecoder.decodeResource(tmp.toString(), schema, new Group()));
+                        groupList.add(jsonDecoder.decodeResource(tmp.toString(), schema, new Group()));
                         try {
                             ResponseValidateTests.runValidateTests(groupList.get(j), schema,
                                     null, null, method,
                                     responseString, headerString.toString(), responseStatus, subTests);
                         } catch (BadRequestException | CharonException e) {
-                            subTests.add("Status : Failed");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            continue;
+                            errorOccur = true;
+                            break;
                         }
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                     responseStatus, subTests), stopTime - startTime));
                     continue;
-                } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                            "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests), stopTime - startTime));
-                    continue;
                 }
-                if (requestPaths[i].getTestCaseName().equals("List groups") ||
-                        requestPaths[i].getTestCaseName().equals("List groups with only using startIndex")) {
-                    // check for all created groups
-                    subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
-                    ArrayList<String> returnedGroupIDs = new ArrayList<>();
-                    for (Group group : groupList) {
-                        returnedGroupIDs.add(group.getId());
-                    }
-                    for (String id : groupIDs) {
-                        if (!returnedGroupIDs.contains(id)) {
+                switch (requestPath.getTestCaseName()) {
+                    case "List groups":
+                    case "List groups with only using startIndex":
+                        // check for all created groups
+                        subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
+                        ArrayList<String> returnedGroupIDs = new ArrayList<>();
+                        for (Group group : groupList) {
+                            returnedGroupIDs.add(group.getId());
+                        }
+                        for (String id : groupIDs) {
+                            if (!returnedGroupIDs.contains(id)) {
+                                subTests.add("Message : Check the created 5 groups are listed.");
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain all the created groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                errorOccur = true;
+                                break;
+                            }
+                        }
+                        if (!errorOccur) {
                             subTests.add("Message : Check the created 5 groups are listed.");
-                            subTests.add("Status : Failed");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
+                    case "Get groups with displayName as filter":
+                    case "List groups by filtering - displayName eq with only" +
+                            " using startIndex":
+                    case "List groups by f" +
+                            "iltering - displayName eq to check case insensitivity of attribute":
+                    case "List groups by filtering - displayName eq to check " +
+                            "case insensitivity of operator":
+                    case "List groups by filtering - displayName co":
+                    case "List groups by filtering - displayName sw":
+                    case "List groups by filtering - displayName ew": {
+                        subTests.add(requestPath.getTestCaseName() + " test");
+                        String value = "EYtXcD21";
+                        for (Group group : groupList) {
+                            if (!Objects.equals(value, group.getDisplayName())) {
+                                subTests.add("Actual : displayName:" + group.getDisplayName());
+                                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "displayName:" + value);
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the expected groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                errorOccur = true;
+                                break;
+                            }
+                        }
+                        if (!errorOccur) {
+                            subTests.add("Actual : displayName:" + value);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "displayName:" + value);
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
+                    }
+                    case "Get groups with index pagination and count":
+                    case "Get users having negative number as index":
+                        subTests.add(requestPath.getTestCaseName() + "Test");
+                        if (groupList.size() != 2) {
+                            subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size());
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain all the created groups",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of paginated groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
+                            continue;
                         }
-                    }
-                    if (!errorOccur) {
-                        subTests.add("Message : Check the created 5 groups are listed.");
-                        subTests.add("Status : Success");
-                        subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups with displayName as filter") ||
-                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName eq with only" +
-                                " using startIndex") || requestPaths[i].getTestCaseName().equals("List groups by f" +
-                        "iltering - displayName eq to check case insensitivity of attribute") ||
-                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName eq to check " +
-                                "case insensitivity of operator") ||
-                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName co") ||
-                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName sw") ||
-                        requestPaths[i].getTestCaseName().equals("List groups by filtering - displayName ew")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " test");
-                    String value = "EYtXcD21";
-                    for (Group group : groupList) {
-                        if (!Objects.equals(value, group.getDisplayName())) {
-                            subTests.add("Actual : displayName:" + group.getDisplayName());
-                            subTests.add("Expected : displayName:" + value);
-                            subTests.add("Status : Failed");
-                            subTests.add(StringUtils.EMPTY);
-                            long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected groups",
-                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
-                        }
-                    }
-                    if (!errorOccur) {
-                        subTests.add("Actual : displayName:" + value);
-                        subTests.add("Expected : displayName:" + value);
-                        subTests.add("Status : Success");
-                        subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups with index pagination and count") ||
-                        requestPaths[i].getTestCaseName().equals("Get users having negative number as index")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + "Test");
-                    if (groupList.size() != 2) {
                         subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size());
-                        subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failed");
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                         subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of paginated groups",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size());
-                    subTests.add("Expected : startIndex:1,totalResults:2");
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups with group id sorting and " +
-                        "ascending order")) {
-                    subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
-                    try {
-                        if (isGroupListSorted(groupList)) {
-                            subTests.add("Status : Failed");
+                        break;
+                    case "Get groups with group id sorting and " +
+                            "ascending order":
+                        subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
+                        try {
+                            if (isGroupListSorted(groupList)) {
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the sorted list of groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                continue;
+                            }
+                        } catch (CharonException e) {
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                     "Response does not contain the sorted list of groups",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
-                    } catch (CharonException e) {
-                        subTests.add("Status : Failed");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                         subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain the sorted list of groups",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups with displayName as filter and " +
-                        "with pagination")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
-                    if (groupList.size() != 1) {
-                        subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size());
-                        subTests.add("Expected : startIndex:1,totalResults:1");
-                        subTests.add("Status : Failed");
-                        subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of users.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    String value = "EYtXcD21";
-                    for (Group group : groupList) {
-                        if (!Objects.equals(value, group.getDisplayName())) {
-                            subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size() +
-                                    ",displayName:" + group.getDisplayName());
-                            subTests.add("Expected : startIndex:1,totalResults:1,displayName:loginUser1");
-                            subTests.add("Status : Failed");
+                        break;
+                    case "Get groups with displayName as filter and " +
+                            "with pagination": {
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
+                        if (groupList.size() != 1) {
+                            subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size());
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:1");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected groups",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of users.",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
+                            continue;
                         }
+                        String value = "EYtXcD21";
+                        for (Group group : groupList) {
+                            if (!Objects.equals(value, group.getDisplayName())) {
+                                subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + groupList.size() +
+                                        ",displayName:" + group.getDisplayName());
+                                subTests.add(ComplianceConstants.TestConstants.EXPECTED +
+                                        "startIndex:1,totalResults:1," + "displayName:loginUser1");
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the expected groups",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                errorOccur = true;
+                                break;
+                            }
+                        }
+                        if (!errorOccur) {
+                            subTests.add("Actual : startIndex:1,totalResults:1,displayName:loginUser1");
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:1," +
+                                    "displayName:loginUser1");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
                     }
-                    if (!errorOccur) {
-                        subTests.add("Actual : startIndex:1,totalResults:1,displayName:loginUser1");
-                        subTests.add("Expected : startIndex:1,totalResults:1,displayName:loginUser1");
-                        subTests.add("Status : Success");
+                    case "Get groups without index and only using count":
+                        subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
+                        if (startIndex != 1 && count != 2) {
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            subTests.add(StringUtils.EMPTY);
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of pagination.",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                         subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Get groups without index and only using count")) {
-                    subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
-                    if (startIndex != 1 && count != 2) {
-                        subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failed");
-                        subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of pagination.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
-                    subTests.add("Expected : startIndex:1,totalResults:2");
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
+                        break;
                 }
                 long stopTime = System.currentTimeMillis();
                 if (!errorOccur) {
                     testResults.add(new TestResult
-                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                            (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                     headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
-            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPath.getTestSupported() ||
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                        (TestResult.SKIPPED, requestPath.getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
@@ -856,7 +870,7 @@ public class GroupTestImpl implements ResourceType {
             } else {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                        (TestResult.ERROR, requestPath.getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
@@ -885,7 +899,7 @@ public class GroupTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
 
         RequestPath[] requestPaths;
 
@@ -907,22 +921,22 @@ public class GroupTestImpl implements ResourceType {
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
-            Group group = null;
-            String getGroupURL = null;
-            getGroupURL = url + "/" + id + requestPaths[i].getUrl();
+            Group group;
+            String getGroupURL;
+            getGroupURL = url + "/" + id + requestPath.getUrl();
             HttpGet method = new HttpGet(getGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -937,6 +951,7 @@ public class GroupTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 // Get all headers.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -945,45 +960,45 @@ public class GroupTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
+                    cleanUpUser(uId, requestPath.getTestCaseName());
                 }
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
-                if (!requestPaths[i].getTestCaseName().equals("Get group with non existing ID and validate group " +
+                cleanUpGroup(id, requestPath.getTestCaseName());
+                if (!requestPath.getTestCaseName().equals("Get group with non existing ID and validate group " +
                         "not found error response")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not get the default group from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                    group = jsonDecoder.decodeResource(responseString, schema, new Group());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean up users.
                     for (String uId : userIDs) {
-                        cleanUpUser(uId, requestPaths[i].getTestCaseName());
+                        cleanUpUser(uId, requestPath.getTestCaseName());
                     }
-                    cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    cleanUpGroup(id, requestPath.getTestCaseName());
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -994,15 +1009,15 @@ public class GroupTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean up users.
                     for (String uId : userIDs) {
-                        cleanUpUser(uId, requestPaths[i].getTestCaseName());
+                        cleanUpUser(uId, requestPath.getTestCaseName());
                     }
-                    cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    cleanUpGroup(id, requestPath.getTestCaseName());
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -1010,26 +1025,26 @@ public class GroupTestImpl implements ResourceType {
                 }
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
+                    cleanUpUser(uId, requestPath.getTestCaseName());
                 }
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                cleanUpGroup(id, requestPath.getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Get group with non existing ID and validate " +
+            } else if (requestPath.getTestCaseName().equals("Get group with non existing ID and validate " +
                     "group not found error response") &&
-                    response.getStatusLine().getStatusCode() == 404) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NOT_FOUND);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 "Server successfully given the expected error 404(Group not found in the user store) " +
                                         "message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
@@ -1037,12 +1052,12 @@ public class GroupTestImpl implements ResourceType {
             } else {
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUpUser(uId, requestPaths[i].getTestCaseName());
+                    cleanUpUser(uId, requestPath.getTestCaseName());
                 }
-                cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                cleanUpGroup(id, requestPath.getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.ERROR, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }
@@ -1061,7 +1076,7 @@ public class GroupTestImpl implements ResourceType {
     public ArrayList<TestResult> postMethodTest() throws GeneralComplianceException, ComplianceException {
 
         ArrayList<TestResult> testResults = new ArrayList<>();
-        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
         ArrayList<String> definedGroups = new ArrayList<>();
         String groupId = null;
         userIDs = createTestsUsers("Many");
@@ -1092,23 +1107,23 @@ public class GroupTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            Group group = null;
-            String definedGroup = null;
+            Group group;
+            String definedGroup;
             definedGroup = definedGroups.get(i);
             HttpPost method = new HttpPost(url);
             // Create group test.
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             method.setHeader("Content-Type", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Create the group.
-                HttpEntity entity = new ByteArrayEntity(definedGroup.getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedGroup.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -1125,6 +1140,7 @@ public class GroupTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1134,9 +1150,9 @@ public class GroupTestImpl implements ResourceType {
                 if (requestPaths[i].getTestCaseName().equals("Create group")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 201");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_CREATED);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, "Create Group",
@@ -1146,18 +1162,18 @@ public class GroupTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 201) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 201");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_CREATED);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                    group = jsonDecoder.decodeResource(responseString, schema, new Group());
                     groupId = group.getId();
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
@@ -1171,7 +1187,7 @@ public class GroupTestImpl implements ResourceType {
                     ResponseValidateTests.runValidateTests(group, schema, null, null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, "Create Group",
@@ -1186,12 +1202,12 @@ public class GroupTestImpl implements ResourceType {
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Create group with existing displayName") &&
-                    response.getStatusLine().getStatusCode() == 409) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_CONFLICT) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 409");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_CONFLICT);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1200,12 +1216,12 @@ public class GroupTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Create group without displayName") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_BAD_REQUEST);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1328,22 +1344,22 @@ public class GroupTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            Group group = null;
+            Group group;
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
-            String patchGroupURL = null;
+            String patchGroupURL;
             patchGroupURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPatch method = new HttpPatch(patchGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Patch group.
-                HttpEntity entity = new ByteArrayEntity(definedPatchedGroup.get(i).getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedPatchedGroup.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 method.setHeader("Accept", "application/json");
                 method.setHeader("Content-Type", "application/json");
@@ -1360,6 +1376,7 @@ public class GroupTestImpl implements ResourceType {
 
             } catch (Exception e) {
                 // Get all headers.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1370,12 +1387,12 @@ public class GroupTestImpl implements ResourceType {
                 if (!requestPaths[i].getTestCaseName().equals("Patch group and validate error response") &&
                         !requestPaths[i].getTestCaseName().equals("Patch non existing group") &&
                         requestPaths[i].getTestSupported() &&
-                        response.getStatusLine().getStatusCode() != 501) {
+                        response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_IMPLEMENTED) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1385,12 +1402,12 @@ public class GroupTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 /*
                  Obtain the schema corresponding to user.
@@ -1399,7 +1416,7 @@ public class GroupTestImpl implements ResourceType {
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                    group = jsonDecoder.decodeResource(responseString, schema, new Group());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
                     long stopTime = System.currentTimeMillis();
@@ -1414,7 +1431,7 @@ public class GroupTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     cleanUpGroup(id, requestPaths[i].getTestCaseName());
                     long stopTime = System.currentTimeMillis();
@@ -1430,12 +1447,12 @@ public class GroupTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Patch group and validate error response") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_BAD_REQUEST);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1446,12 +1463,12 @@ public class GroupTestImpl implements ResourceType {
                                         responseStatus, subTests), stopTime - startTime));
 
             } else if (requestPaths[i].getTestCaseName().equals("Patch non existing group") &&
-                    response.getStatusLine().getStatusCode() == 404) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NOT_FOUND);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1459,11 +1476,12 @@ public class GroupTestImpl implements ResourceType {
                                 "Server successfully given the expected error 404 message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPaths[i].getTestSupported() ||
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1476,9 +1494,9 @@ public class GroupTestImpl implements ResourceType {
             } else {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Failed");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                 subTests.add(StringUtils.EMPTY);
                 //cleanUpGroup(id, requestPaths[i].getTestCaseName());
                 long stopTime = System.currentTimeMillis();
@@ -1528,7 +1546,7 @@ public class GroupTestImpl implements ResourceType {
                 "}");
         definedGroups.add("{\"displaayName\": \"XwLtOP23-Updated\"}");
         definedGroups.add("{\"displayName\": \"XwLtOP23-UpdatedWithNonExistingId\"}");
-        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
         RequestPath[] requestPaths;
 
         RequestPath requestPath1 = new RequestPath();
@@ -1548,21 +1566,21 @@ public class GroupTestImpl implements ResourceType {
             userIDs = createTestsUsers("Many");
             ArrayList<String> groupId = createTestsGroups(userIDs, "One");
             String id = groupId.get(0);
-            Group group = null;
-            String updateUserURL = null;
+            Group group;
+            String updateUserURL;
             updateUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPut method = new HttpPut(updateUserURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 // Update the group.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedGroups.get(i).getBytes("UTF-8"));
+                        (definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 method.setHeader("Accept", "application/json");
                 method.setHeader("Content-Type", "application/json");
@@ -1578,6 +1596,7 @@ public class GroupTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 //get all headers
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1592,9 +1611,9 @@ public class GroupTestImpl implements ResourceType {
                 if (requestPaths[i].getTestCaseName().equals("Update Group")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1604,12 +1623,12 @@ public class GroupTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 /*
                  Obtain the schema corresponding to user.
@@ -1618,7 +1637,7 @@ public class GroupTestImpl implements ResourceType {
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                    group = jsonDecoder.decodeResource(responseString, schema, new Group());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean up users.
                     for (String uId : userIDs) {
@@ -1638,7 +1657,7 @@ public class GroupTestImpl implements ResourceType {
                             responseString, headerString.toString(), responseStatus, subTests);
 
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean up users.
                     for (String uId : userIDs) {
@@ -1664,12 +1683,12 @@ public class GroupTestImpl implements ResourceType {
                                         responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Update group with schema violation to validate " +
                     "error response") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_BAD_REQUEST);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1680,12 +1699,12 @@ public class GroupTestImpl implements ResourceType {
                                         responseStatus, subTests), stopTime - startTime));
 
             } else if ((requestPaths[i].getTestCaseName().equals("Update non existing group and and verify Http " +
-                    "status code")) && response.getStatusLine().getStatusCode() == 404) {
+                    "status code")) && response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NOT_FOUND);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1722,7 +1741,7 @@ public class GroupTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
         userIDs = createTestsUsers("Many");
         ArrayList<String> groupId = createTestsGroups(userIDs, "One");
         String id = groupId.get(0);
@@ -1743,19 +1762,18 @@ public class GroupTestImpl implements ResourceType {
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
-            Group group = null;
-            String deleteGroupURL = null;
-            deleteGroupURL = url + "/" + id + requestPaths[i].getUrl();
+            String deleteGroupURL;
+            deleteGroupURL = url + "/" + id + requestPath.getUrl();
             HttpDelete method = new HttpDelete(deleteGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -1773,54 +1791,55 @@ public class GroupTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName().equals("Delete group by ID")) {
+                if (requestPath.getTestCaseName().equals("Delete group by ID")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 204");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NO_CONTENT);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean up group.
-                    cleanUpGroup(id, requestPaths[i].getTestCaseName());
+                    cleanUpGroup(id, requestPath.getTestCaseName());
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not delete the default group at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 204) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 204");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NO_CONTENT);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if ((requestPaths[i].getTestCaseName().equals("Delete group twice and verify Http status code") ||
-                    requestPaths[i].getTestCaseName().equals("Delete group with non existing ID and validate " +
+            } else if ((requestPath.getTestCaseName().equals("Delete group twice and verify Http status code") ||
+                    requestPath.getTestCaseName().equals("Delete group with non existing ID and validate " +
                             "group not found error response")) &&
-                    response.getStatusLine().getStatusCode() == 404) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NOT_FOUND);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 "Server successfully given the expected error 404 message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
@@ -1828,7 +1847,7 @@ public class GroupTestImpl implements ResourceType {
             } else {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.ERROR, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }
@@ -1883,28 +1902,26 @@ public class GroupTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            String searchUsersUrl = null;
+            String searchUsersUrl;
             searchUsersUrl = url + "/.search";
             HttpPost method = new HttpPost(searchUsersUrl);
             // Create group test.
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             method.setHeader("Content-Type", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
-            Integer startIndex = null;
-            Integer count = null;
+            String responseStatus;
             Integer totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
-            Boolean errorOccur = false;
+            boolean errorOccur = false;
             try {
                 // Create the request.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedSearchMethods.get(i).getBytes("UTF-8"));
+                        (definedSearchMethods.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -1922,6 +1939,7 @@ public class GroupTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1932,9 +1950,9 @@ public class GroupTestImpl implements ResourceType {
                 if (!requestPaths[i].getTestCaseName().equals("Search group with invalid filter")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1944,34 +1962,33 @@ public class GroupTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
-                JSONObject jsonObjResponse = null;
+                JSONObject jsonObjResponse;
                 ArrayList<Group> groupList = new ArrayList<>();
                 try {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray groupsArray = jsonObj.getJSONArray("Resources");
-                    startIndex = (Integer) jsonObjResponse.get("startIndex");
                     totalResults = (Integer) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < groupsArray.length(); j++) {
                         tmp = groupsArray.getJSONObject(j);
-                        groupList.add((Group) jsonDecoder.decodeResource(tmp.toString(), schema, new Group()));
+                        groupList.add(jsonDecoder.decodeResource(tmp.toString(), schema, new Group()));
                         try {
                             ResponseValidateTests.runValidateTests(groupList.get(j), schema,
                                     null, null, method,
                                     responseString, headerString.toString(), responseStatus, subTests);
                         } catch (BadRequestException | CharonException e) {
-                            subTests.add("Status : Failed");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1982,14 +1999,7 @@ public class GroupTestImpl implements ResourceType {
                             break;
                         }
                     }
-                } catch (JSONException e) {
-                    long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                            "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                    responseStatus, subTests), stopTime - startTime));
-                    continue;
-                } catch (BadRequestException | CharonException | InternalErrorException e) {
+                } catch (JSONException | BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
@@ -2001,7 +2011,7 @@ public class GroupTestImpl implements ResourceType {
                 subTests.add("Message : Check expected group with displayName XwLtOP23 contained in response.");
                 if (totalResults == 1) {
                     // Assert expected result.
-                    subTests.add("Status : Success");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                     if (!errorOccur) {
                         long stopTime = System.currentTimeMillis();
@@ -2012,16 +2022,16 @@ public class GroupTestImpl implements ResourceType {
                     }
                 } else {
                     // Assert expected result.
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
             } else if (requestPaths[i].getTestCaseName().equals("Search group with invalid filter")
-                    && response.getStatusLine().getStatusCode() == 400) {
+                    && response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_BAD_REQUEST);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult

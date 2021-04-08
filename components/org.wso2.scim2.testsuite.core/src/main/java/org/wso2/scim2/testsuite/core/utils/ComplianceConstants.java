@@ -33,8 +33,6 @@ public class ComplianceConstants {
         public static final String CLIENT_ID = "clientId";
         public static final String CLIENT_SECRET = "clientSecret";
         public static final String AUTHORIZATION_SERVER = "authorizationServer";
-        public static final String AUTHORIZATION_HEADER = "authorizationHeader";
-        public static final String AUTHORIZATION_METHOD = "authMethod";
         public static final String HTTP = "http";
         public static final String HTTPS = "https";
     }
@@ -52,6 +50,7 @@ public class ComplianceConstants {
         public static final String SUCCESS = "Success";
         public static final String SKIPPED = "Skipped";
 
+        // Endpoint constants.
         public static final String SERVICE_PROVIDER_ENDPOINT = "/ServiceProviderConfig";
         public static final String RESOURCE_TYPE_ENDPOINT = "/ResourceTypes";
         public static final String USERS_ENDPOINT = "/Users";
@@ -61,6 +60,7 @@ public class ComplianceConstants {
         public static final String BULK_ENDPOINT = "/Bulk";
         public static final String SCHEMAS_ENDPOINT = "/Schemas";
 
+        // Test name constants.
         public static final String SCHEMA_TEST = "Schema Test";
         public static final String REQUIRED_ATTRIBUTE_TEST = "Required Attribute Test";
         public static final String ATTRIBUTE_MUTABILITY_TEST = "Attribute Mutability Test";
@@ -75,9 +75,23 @@ public class ComplianceConstants {
         public static final String SORT_USERS_TEST = "Sort Users Test";
         public static final String FILTER_USER_WITH_PAGINATION = "Test user filtering with pagination params";
         public static final String SORT_GROUPS_TEST = "Sort Groups Test";
+        public static final String GET_CONFIG = "Get ServiceProviderConfig";
+        public static final String GET_RESOURCETYPE = "Get ResourceType";
+        public static final String GET_SCHEMAS = "Get Schemas";
 
+        // Enterprise user schema uri.
         public static final String EXTENSION_SCHEMA_URI =
                 "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
+
+        // Sub tests constants.
+        public static final String ACTUAL = "Actual : ";
+        public static final String EXPECTED = "Expected : ";
+        public static final String STATUS_SUCCESS = "Status : Success";
+        public static final String STATUS_FAILED = "Status : FAILED";
+        public static final String STATUS_SKIPPED = "Status : Skipped";
+
+        // Status codes.
+        public static final int SC_REDIRECT = 308;
     }
 
     /**

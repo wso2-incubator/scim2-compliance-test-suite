@@ -26,6 +26,7 @@ import org.wso2.scim2.testsuite.core.entities.Wire;
 import org.wso2.scim2.testsuite.core.exception.ComplianceException;
 
 import java.util.ArrayList;
+import javax.ws.rs.HttpMethod;
 
 /**
  * This class contains utils used in the test suite.
@@ -47,17 +48,17 @@ public class ComplianceUtils {
                                String headerString, String responseStatus,
                                ArrayList<String> subTests) throws ComplianceException {
 
-        StringBuffer toServer = new StringBuffer();
-        StringBuffer fromServer = new StringBuffer();
-        StringBuffer subTestsPerformed = new StringBuffer();
-        StringBuffer requestUri = new StringBuffer();
-        StringBuffer requestType = new StringBuffer();
-        StringBuffer requestHeaders = new StringBuffer();
-        StringBuffer requestBody = new StringBuffer();
+        StringBuilder toServer = new StringBuilder(); // Todo - don't make  variable which has redundant data.
+        StringBuilder fromServer = new StringBuilder();
+        StringBuilder subTestsPerformed = new StringBuilder();
+        StringBuilder requestUri = new StringBuilder();
+        StringBuilder requestType = new StringBuilder();
+        StringBuilder requestHeaders = new StringBuilder();
+        StringBuilder requestBody = new StringBuilder();
 
         toServer.append(method.getRequestLine().getMethod()).append(" ");
         requestType.append(method.getRequestLine().getMethod());
-        toServer.append(method.getRequestLine().getUri() + "\n");
+        toServer.append(method.getRequestLine().getUri()).append("\n");
         requestUri.append(method.getRequestLine().getUri());
         toServer.append(method.getRequestLine().getProtocolVersion().getProtocol());
         for (org.apache.http.Header header : method.getAllHeaders()) {
@@ -65,7 +66,8 @@ public class ComplianceUtils {
             requestHeaders.append(header.getName()).append(": ").append(header.getValue()).append("\n");
         }
         toServer.append("\n");
-        if (method.getMethod() != "GET" && method.getMethod() != "DELETE") {
+        if (!method.getMethod().equals(HttpMethod.GET) && !method.getMethod().equals(HttpMethod.DELETE)) {
+            // With constants.
             try {
                 HttpEntity entity = ((HttpEntityEnclosingRequest) method).getEntity();
                 toServer.append(EntityUtils.toString(entity));
@@ -75,10 +77,10 @@ public class ComplianceUtils {
             }
         }
         fromServer.append("\n" + "Headers : " + "\n");
-        fromServer.append(headerString + "\n");
+        fromServer.append(headerString).append("\n");
         fromServer.append("\n" + "Status : ");
-        fromServer.append(responseStatus + "\n");
-        fromServer.append("\n" + responseBody);
+        fromServer.append(responseStatus).append("\n");
+        fromServer.append("\n").append(responseBody);
         for (String subTest : subTests) {
             subTestsPerformed.append(subTest).append("\n");
         }
@@ -88,7 +90,7 @@ public class ComplianceUtils {
     }
 
     public static Wire getWire(Throwable e) {
-
+// Todo - using another constructor
         return new Wire(ExceptionUtils.getFullStackTrace(e), "", "", "", "", "", "", "", "", "");
     }
 }

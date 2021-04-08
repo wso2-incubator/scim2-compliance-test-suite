@@ -17,25 +17,14 @@
  */
 package org.wso2.scim2.testsuite.core.entities;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Provide functionality to indicate overall statistics of test cases.
  */
-@XmlRootElement
 public class Statistics {
 
-    @XmlElement(name = "success")
     int success = 0;
-
-    @XmlElement(name = "failed")
     int failed = 0;
-
-    @XmlElement(name = "skipped")
     int skipped = 0;
-
-    @XmlElement(name = "time")
     long time = 0;
 
     public Statistics() {

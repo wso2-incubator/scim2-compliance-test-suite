@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
 import org.codehaus.jettison.json.JSONException;
@@ -54,7 +53,7 @@ public class PDFGenerator {
     private static void init(Result finalResults) {
 
         document = new PDDocument();
-        if (finalResults.getErrorMessage() != "") {
+        if (!finalResults.getErrorMessage().equals("")) {
             // Creating a blank page.
             PDPage blankPage = new PDPage();
             // Adding the blank page to the document.
@@ -81,8 +80,6 @@ public class PDFGenerator {
     public static String generatePdfResults(Result finalResults, String fullPath) throws IOException {
 
         init(finalResults);
-        // Loading a ttf file containing text style.
-        PDType0Font font = PDType0Font.load(document, new File("/home/anjanap/tr.ttf"));
         int pageNo = 0;
         for (TestResult testResult : finalResults.getResults()) {
             // Retrieving the pages of the document.
@@ -90,17 +87,16 @@ public class PDFGenerator {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
             PDFont pdfFont = PDType1Font.HELVETICA;
-            float typeWriterFont = 30;
             float titleFont = 10;
             float fontSize = 8;
             float smallFontSize = 7;
             float leading = 1.5f * fontSize;
 
-            PDRectangle mediabox = page.getMediaBox();
+            PDRectangle mediaBox = page.getMediaBox();
             float margin = 42;
-            float width = mediabox.getWidth() - 2 * margin;
-            float startX = mediabox.getLowerLeftX() + margin;
-            float startY = mediabox.getUpperRightY() - margin;
+            float width = mediaBox.getWidth() - 2 * margin;
+            float startX = mediaBox.getLowerLeftX() + margin;
+            float startY = mediaBox.getUpperRightY() - margin;
 
             ArrayList<String> toServer = new ArrayList<>();
             ArrayList<String> fromServer = new ArrayList<>();
@@ -111,11 +107,11 @@ public class PDFGenerator {
                 subTests = removeUnsupportedCharacters(testResult.getWire().getTests());
             }
 
-            List testName = getLines(testResult.getName(), fontSize, pdfFont, width);
-            List testMessage = getLines(testResult.getMessage(), fontSize, pdfFont, width);
-            List testLabel = getLines(testResult.getStatusText(), fontSize, pdfFont, width);
-            List responseBody = new ArrayList();
-            List requestBody = new ArrayList();
+            List<String> testName = getLines(testResult.getName(), fontSize, pdfFont, width);
+            List<String> testMessage = getLines(testResult.getMessage(), fontSize, pdfFont, width);
+            List<String> testLabel = getLines(testResult.getStatusText(), fontSize, pdfFont, width);
+            List<String> responseBody = new ArrayList<>();
+            List<String> requestBody = new ArrayList<>();
             if (!toServer.isEmpty()) {
                 requestBody = getLines(toServer.get(toServer.size() - 1), fontSize, pdfFont, width);
                 toServer.remove(toServer.size() - 1);
@@ -124,7 +120,7 @@ public class PDFGenerator {
                 responseBody = getLines(fromServer.get(fromServer.size() - 1), fontSize, pdfFont, width);
                 fromServer.remove(fromServer.size() - 1);
             }
-            List emptyLine = new ArrayList();
+            List<String> emptyLine = new ArrayList<>();
             emptyLine.add(" ");
 
             // Drawing a rectangle.
@@ -137,17 +133,17 @@ public class PDFGenerator {
             contentStream.newLineAtOffset(startX, startY);
 
             contentStream.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
+            printResult(contentStream, leading, emptyLine);
             Color titleColor = new Color(102, 0, 153);
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText("Test Case Name : ");
             contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
             contentStream.setNonStrokingColor(titleColor);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testName);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
+            printResult(contentStream, leading, testName);
+            printResult(contentStream, leading, emptyLine);
 
             Color timeColor = new Color(149, 69, 19);
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
@@ -155,10 +151,10 @@ public class PDFGenerator {
             contentStream.showText("Test Case Elapsed Time(ms) : ");
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(timeColor);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
             contentStream.showText(Long.toString(testResult.getElapsedTime()));
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
+            printResult(contentStream, leading, emptyLine);
 
             if (!testMessage.isEmpty()) {
                 contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
@@ -166,9 +162,9 @@ public class PDFGenerator {
                 contentStream.showText("Test Case Errors : ");
                 contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
                 contentStream.setNonStrokingColor(Color.RED);
-                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testMessage);
-                printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+                printResult(contentStream, leading, emptyLine);
+                printResult(contentStream, leading, testMessage);
+                printResult(contentStream, leading, emptyLine);
             }
             Color statusColor = new Color(0, 102, 0);
             Color statusColor2 = new Color(204, 204, 0);
@@ -176,29 +172,29 @@ public class PDFGenerator {
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText("Test Case Status : ");
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
-            if (testResult.getStatusText() == "Success") {
+            if (testResult.getStatusText().equals("Success")) {
                 contentStream.setNonStrokingColor(statusColor);
-            } else if (testResult.getStatusText() == "Failed") {
+            } else if (testResult.getStatusText().equals("Failed")) {
                 contentStream.setNonStrokingColor(Color.red);
             } else {
                 contentStream.setNonStrokingColor(statusColor2);
             }
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, testLabel);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
+            printResult(contentStream, leading, testLabel);
+            printResult(contentStream, leading, emptyLine);
 
             contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.showText(("Request : "));
             contentStream.setFont(PDType1Font.COURIER, smallFontSize);
             contentStream.setNonStrokingColor(Color.BLUE);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, toServer);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, requestBody);
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
+            printResult(contentStream, leading, toServer);
+            printResult(contentStream, leading, requestBody);
+            printResult(contentStream, leading, emptyLine);
             // Convert text to object.
-            JSONObject json = null;
-            String r = null;
+            JSONObject json;
+            String r;
             try {
                 r = testResult.getWire().getResponseBody();
                 json = new JSONObject(r);
@@ -211,20 +207,20 @@ public class PDFGenerator {
             contentStream.showText("Response : ");
             contentStream.setFont(PDType1Font.COURIER, smallFontSize);
             contentStream.setNonStrokingColor(Color.BLUE);
-            printResult(contentStream, smallFontSize, pdfFont, leading, startX, startY, fromServer);
+            printResult(contentStream, leading, fromServer);
             if (json != null) {
                 try {
                     if (json.getInt("totalResults") > 10) {
                         contentStream.showText("Response contains more than 10 results which is larger to show in one" +
                                 " page.");
                     } else {
-                        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+                        printResult(contentStream, leading, responseBody);
                     }
                 } catch (JSONException e) {
-                    printResult(contentStream, fontSize, pdfFont, leading, startX, startY, responseBody);
+                    printResult(contentStream, leading, responseBody);
                 }
             }
-            printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream, leading, emptyLine);
             // Ending the content stream.
             contentStream.endText();
             contentStream.close();
@@ -241,17 +237,17 @@ public class PDFGenerator {
             contentStream2.setFont(PDType1Font.TIMES_ITALIC, fontSize);
             contentStream2.newLineAtOffset(startX, startY);
             contentStream2.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
-            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream2, leading, emptyLine);
+            printResult(contentStream2, leading, emptyLine);
 
             contentStream2.setFont(PDType1Font.COURIER_BOLD, fontSize);
             contentStream2.setNonStrokingColor(Color.BLACK);
             contentStream2.showText("Assertions : ");
             contentStream2.setFont(PDType1Font.COURIER, fontSize);
             contentStream2.setNonStrokingColor(Color.BLUE);
-            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
-            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, subTests);
-            printResult(contentStream2, fontSize, pdfFont, leading, startX, startY, emptyLine);
+            printResult(contentStream2, leading, emptyLine);
+            printResult(contentStream2, leading, subTests);
+            printResult(contentStream2, leading, emptyLine);
 
             // Ending the content stream.
             contentStream2.endText();
@@ -266,19 +262,17 @@ public class PDFGenerator {
         PDPage page = document.getPage(pageNo);
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
-        PDFont pdfFont = PDType1Font.HELVETICA;
         float typeWriterFont = 12;
         float titleFont = 10;
         float fontSize = 8;
-        float smallFontSize = 7;
         float leading = 1.5f * fontSize;
 
-        PDRectangle mediabox = page.getMediaBox();
+        PDRectangle mediaBox = page.getMediaBox();
         float margin = 42;
-        float width = mediabox.getWidth() - 2 * margin;
-        float startX = mediabox.getLowerLeftX() + margin;
-        float startY = mediabox.getUpperRightY() - margin;
-        List emptyLine = new ArrayList();
+        float width = mediaBox.getWidth() - 2 * margin;
+        float startX = mediaBox.getLowerLeftX() + margin;
+        float startY = mediaBox.getUpperRightY() - margin;
+        List<String> emptyLine = new ArrayList<>();
         emptyLine.add(" ");
 
         // Drawing a rectangle.
@@ -291,8 +285,8 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(startX, startY);
 
         contentStream.showText("SCIM 2.0 Compliance Test Suite - Auto Generated Test Report");
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         Color titleColor = new Color(102, 0, 153);
         Color dataColor = new Color(149, 69, 19);
@@ -302,53 +296,53 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(titleColor);
         contentStream.showText("Summary : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(success);
         contentStream.showText("Success Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
         contentStream.showText(Integer.toString(finalResults.getStatistics().getSuccess()));
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(Color.RED);
         contentStream.showText("Failed Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
         contentStream.showText(Integer.toString(finalResults.getStatistics().getFailed()));
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(skipped);
         contentStream.showText("Skipped Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
         contentStream.showText(Integer.toString(finalResults.getStatistics().getSkipped()));
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(Color.BLACK);
         contentStream.showText("Total Test cases : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
         contentStream.showText(Integer.toString(finalResults.getStatistics().getTotal()));
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         contentStream.setFont(PDType1Font.COURIER_BOLD, fontSize);
         contentStream.setNonStrokingColor(Color.BLACK);
         contentStream.showText("Time elapsed to run all Test cases(ms) : ");
         contentStream.setFont(PDType1Font.COURIER_BOLD, titleFont);
         contentStream.setNonStrokingColor(dataColor);
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
         contentStream.showText(Long.toString(finalResults.getStatistics().getTime()));
-        printResult(contentStream, fontSize, pdfFont, leading, startX, startY, emptyLine);
+        printResult(contentStream, leading, emptyLine);
 
         // Ending the content stream.
         contentStream.endText();
@@ -369,16 +363,12 @@ public class PDFGenerator {
      * Print the results to PDF.
      *
      * @param contentStream Page contentStream.
-     * @param fontSize      General font to use in pdf.
-     * @param pdfFont       Font size to use in pdf.
      * @param leading       Leading in document.
-     * @param startX        Start x point to print text.
-     * @param startY        Start y point to print text.
      * @param lines         Empty line to add between text.
      * @throws IOException Exception is related to Input and Output operations.
      */
-    public static void printResult(PDPageContentStream contentStream, float fontSize,
-                                   PDFont pdfFont, float leading, float startX, float startY, List<String> lines)
+    public static void printResult(PDPageContentStream contentStream,
+                                   float leading, List<String> lines)
             throws IOException {
 
         for (String line : lines) {
@@ -401,7 +391,7 @@ public class PDFGenerator {
             throws IOException {
 
         width = width - 150;
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         int lastSpace = -1;
         while (text.length() > 0) {
             int spaceIndex = text.indexOf(' ', lastSpace + 1);
@@ -412,9 +402,8 @@ public class PDFGenerator {
             float size = fontSize * pdfFont.getStringWidth(subString) / 1000;
             if (size > width) {
                 float requiredSize = (width * 1000) / fontSize;
-                int characterSize = getCharacterCount(requiredSize, subString, pdfFont);
                 //if (lastSpace < 0)
-                lastSpace = characterSize;
+                lastSpace = getCharacterCount(requiredSize, subString, pdfFont);
                 subString = text.substring(0, lastSpace);
                 lines.add(subString);
                 text = text.substring(lastSpace).trim();
@@ -453,9 +442,8 @@ public class PDFGenerator {
      *
      * @param test Stream of text.
      * @return textToBeShown Stream of text without unsupported characters.
-     * @throws IOException Exception is related to Input and Output operations.
      */
-    private static ArrayList<String> removeUnsupportedCharacters(String test) throws IOException {
+    private static ArrayList<String> removeUnsupportedCharacters(String test) {
 
         ArrayList<String> textToBeShown = new ArrayList<>();
         StringBuilder b = new StringBuilder();

@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -51,6 +52,7 @@ import org.wso2.scim2.testsuite.core.tests.common.ResponseValidateTests;
 import org.wso2.scim2.testsuite.core.tests.model.RequestPath;
 import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,8 +62,8 @@ import java.util.UUID;
  */
 public class UserTestImpl implements ResourceType {
 
-    private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
-    private String url;
+    private final ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
+    private final String url;
 
     /**
      * Initialize.
@@ -102,19 +104,19 @@ public class UserTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedUsers.size(); i++) {
+        for (String definedUser : definedUsers) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
-                HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedUser.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -124,9 +126,9 @@ public class UserTestImpl implements ResourceType {
                     // Obtain the schema corresponding to the user.
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                     JSONDecoder jsonDecoder = new JSONDecoder();
-                    User user = null;
+                    User user;
                     try {
-                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                        user = jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
@@ -138,6 +140,7 @@ public class UserTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -159,22 +162,21 @@ public class UserTestImpl implements ResourceType {
      *
      * @param id       User id to delete a user.
      * @param testName Respective test case.
-     * @return true or false.
      * @throws GeneralComplianceException General exceptions.
      * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
-    private boolean cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
+    private void cleanUpUser(String id, String testName) throws GeneralComplianceException, ComplianceException {
 
         long startTime = System.currentTimeMillis();
         String deleteUserURL = url + "/" + id;
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             response = client.execute(method);
@@ -193,6 +195,7 @@ public class UserTestImpl implements ResourceType {
              Read the response body.
              Get all headers.
              */
+            assert response != null;
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -205,9 +208,7 @@ public class UserTestImpl implements ResourceType {
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                             subTests), stopTime - startTime));
         }
-        if (response.getStatusLine().getStatusCode() == 204) {
-            return true;
-        } else {
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) {
             long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,
@@ -486,7 +487,7 @@ public class UserTestImpl implements ResourceType {
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
         ArrayList<TestResult> testResults = new ArrayList<>();
-        ArrayList<String> userIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
         RequestPath[] requestPaths;
 
         // Initialize 5 users.
@@ -494,21 +495,21 @@ public class UserTestImpl implements ResourceType {
         // Initiate data necessary for getMethod test.
         requestPaths = initiateData();
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
-            String requestUrl = url + requestPaths[i].getUrl();
+            String requestUrl = url + requestPath.getUrl();
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
-            Integer startIndex = null;
-            Integer count = null;
+            String responseStatus;
+            Integer startIndex;
+            Integer count;
             ArrayList<String> subTests = new ArrayList<>();
-            Boolean errorOccur = false;
+            boolean errorOccur = false;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -525,40 +526,41 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() && response.getStatusLine().getStatusCode() != 501) {
+                if (requestPath.getTestSupported() &&
+                        response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_IMPLEMENTED) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not list the users at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 ArrayList<User> userList = new ArrayList<>();
-                JSONObject jsonObjResponse = null;
-                User user = null;
+                JSONObject jsonObjResponse;
                 try {
                     // Called only for user get by id.
                     JSONObject jsonObj = new JSONObject(responseString);
@@ -569,17 +571,16 @@ public class UserTestImpl implements ResourceType {
                     JSONObject tmp;
                     for (int j = 0; j < usersArray.length(); j++) {
                         tmp = usersArray.getJSONObject(j);
-                        userList.add((User) jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
+                        userList.add(jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
                         try {
                             ResponseValidateTests.runValidateTests(userList.get(j), schema,
                                     null, null, method,
                                     responseString, headerString.toString(), responseStatus, subTests);
-
                         } catch (BadRequestException | CharonException e) {
-                            subTests.add("Status : Failed");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                     "Response Validation Error",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
@@ -587,226 +588,240 @@ public class UserTestImpl implements ResourceType {
                             break;
                         }
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                     responseStatus, subTests), stopTime - startTime));
                     continue;
-                } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                            "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests), stopTime - startTime));
-                    continue;
                 }
                 // Check for all created groups.
-                if (requestPaths[i].getTestCaseName().equals("List Users")) {
-                    // Check for list of users returned.
-                    subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
-                    ArrayList<String> returnedUserIDs = new ArrayList<>();
-                    for (User u : userList) {
-                        returnedUserIDs.add(u.getId());
-                    }
-                    for (String id : userIDs) {
-                        if (!returnedUserIDs.contains(id)) {
-                            subTests.add("Message : Check the created 5 users are listed.");
-                            subTests.add("Status : Failed");
-                            subTests.add(StringUtils.EMPTY);
-                            long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain all the created users",
-                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
+                switch (requestPath.getTestCaseName()) {
+                    case "List Users":
+                        // Check for list of users returned.
+                        subTests.add(ComplianceConstants.TestConstants.ALL_USERS_IN_TEST);
+                        ArrayList<String> returnedUserIDs = new ArrayList<>();
+                        for (User u : userList) {
+                            returnedUserIDs.add(u.getId());
                         }
-                    }
-                    if (!errorOccur) {
-                        subTests.add("Message : Check the created 5 users are listed.");
-                        subTests.add("Status : Success");
-                        subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq")
-                        || requestPaths[i].getTestCaseName().equals("List users by filtering - userName eq to " +
-                        "check case insensitivity of attribute") || requestPaths[i].getTestCaseName().equals("List" +
-                        " users by filtering - userName eq to check case insensitivity of operator") ||
-                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName co") ||
-                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName sw") ||
-                        requestPaths[i].getTestCaseName().equals("List users by filtering - userName ew")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
-                    String value = "loginUser1";
-                    for (User user1 : userList) {
-                        try {
-                            if (!value.equals(user1.getUserName())) {
-                                subTests.add("Actual : userName:" + user1.getUserName());
-                                subTests.add("Expected : userName:" + value);
-                                subTests.add("Status : Failed");
+                        for (String id : userIDs) {
+                            if (!returnedUserIDs.contains(id)) {
+                                subTests.add("Message : Check the created 5 users are listed.");
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                                 subTests.add(StringUtils.EMPTY);
                                 long stopTime = System.currentTimeMillis();
-                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain all the created users",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                errorOccur = true;
+                                break;
+                            }
+                        }
+                        if (!errorOccur) {
+                            subTests.add("Message : Check the created 5 users are listed.");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
+                    case "List users by filtering - userName eq":
+                    case "List users by filtering - userName eq to " +
+                            "check case insensitivity of attribute":
+                    case "List" +
+                            " users by filtering - userName eq to check case insensitivity of operator":
+                    case "List users by filtering - userName co":
+                    case "List users by filtering - userName sw":
+                    case "List users by filtering - userName ew": {
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
+                        String value = "loginUser1";
+                        for (User user1 : userList) {
+                            try {
+                                if (!value.equals(user1.getUserName())) {
+                                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + "userName:" +
+                                            user1.getUserName());
+                                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + "userName:" + value);
+                                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                    subTests.add(StringUtils.EMPTY);
+                                    long stopTime = System.currentTimeMillis();
+                                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                            "Response does not contain the expected users",
+                                            ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                    responseStatus, subTests), stopTime - startTime));
+                                    errorOccur = true;
+                                    break;
+                                }
+                            } catch (CharonException e) {
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                         "Response does not contain the expected users",
                                         ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                                 responseStatus, subTests), stopTime - startTime));
                                 errorOccur = true;
                                 break;
                             }
-                        } catch (CharonException e) {
-                            subTests.add("Status : Failed");
-                            subTests.add(StringUtils.EMPTY);
-                            long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected users",
-                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
                         }
+                        if (!errorOccur) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "userName:" + value);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "userName:" + value);
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
                     }
-                    if (!errorOccur) {
-                        subTests.add("Actual : userName:" + value);
-                        subTests.add("Expected : userName:" + value);
-                        subTests.add("Status : Success");
-                        subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("List users with pagination") ||
-                        requestPaths[i].getTestCaseName().equals("Paginate users with a negative startIndex")) {
-                    if (requestPaths[i].getTestCaseName().equals("List users with pagination")) {
-                        subTests.add("Validate paginated users response");
-                    } else if (requestPaths[i].getTestCaseName().equals("Paginate users with a negative startIndex")) {
-                        subTests.add("Test user pagination when startIndex is not specified");
-                    }
-                    if (userList.size() != 2) {
-                        subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
-                        subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failed");
-                        subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of pagination.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
-                    subTests.add("Expected : startIndex:1,totalResults:2");
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("Sort users by user id without pagination and " +
-                        "filtering params")) {
-                    subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
-                    try {
-                        if (isUserListSorted(userList)) {
-                            subTests.add("Status : Failed");
+                    case "List users with pagination":
+                    case "Paginate users with a negative startIndex":
+                        if (requestPath.getTestCaseName().equals("List users with pagination")) {
+                            subTests.add("Validate paginated users response");
+                        } else if (requestPath.getTestCaseName().equals("Paginate users with a negative startIndex")) {
+                            subTests.add("Test user pagination when startIndex is not specified");
+                        }
+                        if (userList.size() != 2) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" + startIndex + "," +
+                                    "totalResults:" + userList.size());
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the sorted list of users",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of pagination.",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
-                    } catch (CharonException e) {
-                        subTests.add("Status : Failed");
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" + startIndex + "," +
+                                "totalResults:" + userList.size());
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                         subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not decode the server response",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
-                } else if (requestPaths[i].getTestCaseName().equals("Filter users by username with pagination " +
-                        "params")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
-                    if (userList.size() != 1) {
-                        subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size());
-                        subTests.add("Expected : startIndex:1,totalResults:1");
-                        subTests.add("Status : Failed");
-                        subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of users.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    String value = "loginUser1";
-                    for (User user1 : userList) {
+                        break;
+                    case "Sort users by user id without pagination and " +
+                            "filtering params":
+                        subTests.add(ComplianceConstants.TestConstants.SORT_USERS_TEST);
                         try {
-                            if (!value.equals(user1.getUserName())) {
-                                subTests.add("Actual : startIndex:" + startIndex + ",totalResults:" + userList.size() +
-                                        ",userName:" + user1.getUserName());
-                                subTests.add("Expected : startIndex:1,totalResults:1,userName:loginUser1");
-                                subTests.add("Status : Failed");
+                            if (isUserListSorted(userList)) {
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                                 subTests.add(StringUtils.EMPTY);
                                 long stopTime = System.currentTimeMillis();
-                                testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the sorted list of users",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                continue;
+                            }
+                        } catch (CharonException e) {
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            subTests.add(StringUtils.EMPTY);
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not decode the server response",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        subTests.add(StringUtils.EMPTY);
+                        break;
+                    case "Filter users by username with pagination " +
+                            "params": {
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
+                        if (userList.size() != 1) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" + startIndex + "," +
+                                    "totalResults:" + userList.size());
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:1");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            subTests.add(StringUtils.EMPTY);
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of users.",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        String value = "loginUser1";
+                        for (User user1 : userList) {
+                            try {
+                                if (!value.equals(user1.getUserName())) {
+                                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" +
+                                            startIndex + ",totalResults:" + userList.size() +
+                                            ",userName:" + user1.getUserName());
+                                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1," +
+                                            "totalResults:1,userName:loginUser1");
+                                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                    subTests.add(StringUtils.EMPTY);
+                                    long stopTime = System.currentTimeMillis();
+                                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                            "Response does not contain the expected users",
+                                            ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                    responseStatus, subTests), stopTime - startTime));
+                                    errorOccur = true;
+                                    break;
+                                }
+                            } catch (CharonException e) {
+                                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                                subTests.add(StringUtils.EMPTY);
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                         "Response does not contain the expected users",
                                         ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                                 responseStatus, subTests), stopTime - startTime));
                                 errorOccur = true;
                                 break;
                             }
-                        } catch (CharonException e) {
-                            subTests.add("Status : Failed");
+                        }
+                        if (!errorOccur) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:1,totalResults:1," +
+                                    "userName:loginUser1");
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:1," +
+                                    "userName:loginUser1");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                            subTests.add(StringUtils.EMPTY);
+                        }
+                        break;
+                    }
+                    case "Paginate users without startIndex and with " +
+                            "positive count param":
+                        subTests.add("Test user pagination when startIndex is not specified");
+                        if (startIndex != 1 && count != 2) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" + startIndex + "," +
+                                    "totalResults:" + count);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected users",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of pagination.",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
-                            errorOccur = true;
-                            break;
+                            continue;
                         }
-                    }
-                    if (!errorOccur) {
-                        subTests.add("Actual : startIndex:1,totalResults:1,userName:loginUser1");
-                        subTests.add("Expected : startIndex:1,totalResults:1,userName:loginUser1");
-                        subTests.add("Status : Success");
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "startIndex:" + startIndex + "," +
+                                "totalResults:" + count);
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "startIndex:1,totalResults:2");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                         subTests.add(StringUtils.EMPTY);
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Paginate users without startIndex and with " +
-                        "positive count param")) {
-                    subTests.add("Test user pagination when startIndex is not specified");
-                    if (startIndex != 1 && count != 2) {
-                        subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
-                        subTests.add("Expected : startIndex:1,totalResults:2");
-                        subTests.add("Status : Failed");
-                        subTests.add(StringUtils.EMPTY);
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of pagination.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : startIndex:" + startIndex + "," + "totalResults:" + count);
-                    subTests.add("Expected : startIndex:1,totalResults:2");
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
+                        break;
                 }
                 long stopTime = System.currentTimeMillis();
                 if (!errorOccur) {
                     testResults.add(new TestResult
-                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                            (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                     headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
-            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPath.getTestSupported() ||
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                        (TestResult.SKIPPED, requestPath.getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
@@ -814,7 +829,7 @@ public class UserTestImpl implements ResourceType {
             } else {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                        (TestResult.ERROR, requestPath.getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
@@ -872,27 +887,26 @@ public class UserTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
                 requestPath6};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
             // Create default user.
-            ArrayList<String> userIDs = null;
+            ArrayList<String> userIDs;
             userIDs = createTestsUsers("One");
             String id = userIDs.get(0);
-            User user = null;
-            String getUserURL = url + "/" + id + requestPaths[i].getUrl();
+            String getUserURL = url + "/" + id + requestPath.getUrl();
             HttpGet method = new HttpGet(getUserURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
-            JSONObject jsonObj = null;
-            String givenName = null;
-            String userName = null;
+            JSONObject jsonObj;
+            String givenName;
+            String userName;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -912,6 +926,7 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -920,28 +935,28 @@ public class UserTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
-                if (!requestPaths[i].getTestCaseName().equals("Get a non existing user and validate user not found " +
+                if (!requestPath.getTestCaseName().equals("Get a non existing user and validate user not found " +
                         "error response")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not get the default user from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
@@ -954,19 +969,20 @@ public class UserTestImpl implements ResourceType {
                     // Clean the created user.
                     cleanUpUser(id, "Get User");
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode response from server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
+                User user;
                 try {
-                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    user = jsonDecoder.decodeResource(responseString, schema, new User());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, "Get User");
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -976,16 +992,16 @@ public class UserTestImpl implements ResourceType {
                 if (locationHeader != null) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Success");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + locationHeader);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                 } else {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + null);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
                 try {
@@ -993,185 +1009,196 @@ public class UserTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (Exception e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, "Get User");
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Response Validation Error", ComplianceUtils.getWire(method, responseString,
                             headerString.toString(), responseStatus, subTests), stopTime - startTime));
                     continue;
                 }
-                if (requestPaths[i].getTestCaseName().equals("Get a user with specific attributes userName and " +
-                        "givenName")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " test");
-                    try {
-                        JSONObject innerJsonObject = jsonObj.getJSONObject("name");
-                        givenName = innerJsonObject.getString("givenName");
-                    } catch (JSONException e) {
-                        subTests.add("Actual : givenName:" + givenName);
-                        subTests.add("Expected : givenName:Kim");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not decode givenName attribute from server response",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
+                switch (requestPath.getTestCaseName()) {
+                    case "Get a user with specific attributes userName and " +
+                            "givenName":
+                        subTests.add(requestPath.getTestCaseName() + " test");
+                        try {
+                            JSONObject innerJsonObject = jsonObj.getJSONObject("name");
+                            givenName = innerJsonObject.getString("givenName");
+                        } catch (JSONException e) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "givenName:" + null);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "givenName:Kim");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not decode givenName attribute from server response",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
 
-                    try {
-                        userName = user.getUserName();
-                    } catch (CharonException e) {
-                        subTests.add("Actual : userName:" + userName + "givenName:" + givenName);
-                        subTests.add("Expected : userName:loginUser,givenName:Kim");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not decode userName attribute from server response",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
+                        try {
+                            userName = user.getUserName();
+                        } catch (CharonException e) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "userName:" + null + "givenName:" +
+                                    givenName);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED +
+                                    "userName:loginUser,givenName:Kim");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not decode userName attribute from server response",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        if (!userName.equals("loginUser") || !givenName.equals("Kim")) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "userName:" + userName +
+                                    "givenName" + ":" + givenName);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED +
+                                    "userName:loginUser,givenName:Kim");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not retrieve the expected attributes.",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "userName:loginUser,givenName:Kim");
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "userName:loginUser,givenName:Kim");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        break;
+                    case "Get a user with excluding attribute emails":
+                        subTests.add(requestPath.getTestCaseName() + " test");
+                        List<MultiValuedComplexType> emails;
+                        try {
+                            emails = user.getEmails();
+                        } catch (Exception e) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "emails:" + null);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "emails:null");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not decode emails complex multivalued attribute from server response",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        if (emails.size() != 0) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "emails:" + emails);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "emails:null");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Excluded attribute is present in response.",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "emails:null");
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "emails:null");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        break;
+                    case "Get a enterprise user with specific attribute " +
+                            "employeeNumber": {
+                        subTests.add(requestPath.getTestCaseName() + " test");
+                        String employeeNumber;
+                        try {
+                            JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:" +
+                                    "extension:enterprise:2.0:User");
+                            employeeNumber = innerJsonObject.getString("employeeNumber");
+                        } catch (JSONException e) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "employeeNumber:" + null);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "employeeNumber:1234A");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not decode employeeNumber attribute from server response",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        if (!employeeNumber.equals("1234A")) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "employeeNumber:" + employeeNumber);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "employeeNumber:1234A");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Could not retrieve the expected attribute employeeNumber",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "employeeNumber:1234A");
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "employeeNumber:1234A");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        break;
                     }
-                    if (!userName.equals("loginUser") || !givenName.equals("Kim")) {
-                        subTests.add("Actual : userName:" + userName + "givenName:" + givenName);
-                        subTests.add("Expected : userName:loginUser,givenName:Kim");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not retrieve the expected attributes.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : userName:loginUser,givenName:Kim");
-                    subTests.add("Expected : userName:loginUser,givenName:Kim");
-                    subTests.add("Status : Success");
-                } else if (requestPaths[i].getTestCaseName().equals("Get a user with excluding attribute emails")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " test");
-                    List<MultiValuedComplexType> emails = null;
-                    try {
-                        emails = user.getEmails();
-                    } catch (Exception e) {
-                        subTests.add("Actual : emails:" + emails);
-                        subTests.add("Expected : emails:null");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not decode emails complex multivalued attribute from server response",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    if (emails.size() != 0) {
-                        subTests.add("Actual : emails:" + emails);
-                        subTests.add("Expected : emails:null");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Excluded attribute is present in response.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : emails:null");
-                    subTests.add("Expected : emails:null");
-                    subTests.add("Status : Success");
-                } else if (requestPaths[i].getTestCaseName().equals("Get a enterprise user with specific attribute " +
-                        "employeeNumber")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " test");
-                    String employeeNumber = null;
-                    try {
-                        JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:extension" +
-                                ":enterprise:2.0:User");
-                        employeeNumber = innerJsonObject.getString("employeeNumber");
-                    } catch (JSONException e) {
-                        subTests.add("Actual : employeeNumber:" + employeeNumber);
-                        subTests.add("Expected : employeeNumber:1234A");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not decode employeeNumber attribute from server response",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    if (!employeeNumber.equals("1234A")) {
-                        subTests.add("Actual : employeeNumber:" + employeeNumber);
-                        subTests.add("Expected : employeeNumber:1234A");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Could not retrieve the expected attribute employeeNumber",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : employeeNumber:1234A");
-                    subTests.add("Expected : employeeNumber:1234A");
-                    subTests.add("Status : Success");
-                } else if (requestPaths[i].getTestCaseName().equals("Get a enterprise user with excluding attribute " +
-                        "employeeNumber")) {
-                    subTests.add(requestPaths[i].getTestCaseName() + " test");
-                    String employeeNumber = null;
-                    try {
-                        JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:extension" +
-                                ":enterprise:2.0:User");
-                        employeeNumber = innerJsonObject.getString("employeeNumber");
-                    } catch (JSONException e) {
+                    case "Get a enterprise user with excluding attribute " +
+                            "employeeNumber": {
+                        subTests.add(requestPath.getTestCaseName() + " test");
+                        String employeeNumber = null;
+                        try {
+                            JSONObject innerJsonObject = jsonObj.getJSONObject("urn:ietf:params:scim:schemas:" +
+                                    "extension:enterprise:2.0:User");
+                            employeeNumber = innerJsonObject.getString("employeeNumber");
+                        } catch (JSONException ignored) {
 
+                        }
+                        if (employeeNumber != null) {
+                            subTests.add(ComplianceConstants.TestConstants.ACTUAL + "employeeNumber:" + employeeNumber);
+                            subTests.add(ComplianceConstants.TestConstants.EXPECTED + "employeeNumber:null");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                            // Clean the created user.
+                            cleanUpUser(id, "Get User");
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "EmployeeNumber attribute from server response is not excluded as expected",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + "employeeNumber:null");
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + "employeeNumber:null");
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        break;
                     }
-                    if (!employeeNumber.equals(null)) {
-                        subTests.add("Actual : employeeNumber:" + employeeNumber);
-                        subTests.add("Expected : employeeNumber:null");
-                        subTests.add("Status : Failed");
-                        // Clean the created user.
-                        cleanUpUser(id, "Get User");
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "EmployeeNumber attribute from server response is not excluded as expected",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    subTests.add("Actual : employeeNumber:null");
-                    subTests.add("Expected : employeeNumber:null");
-                    subTests.add("Status : Success");
                 }
                 // Clean the created user.
                 cleanUpUser(id, "Get User");
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName().equals("Get a non existing user and validate user not " +
+            } else if (requestPath.getTestCaseName().equals("Get a non existing user and validate user not " +
                     "found error response") &&
-                    response.getStatusLine().getStatusCode() == 404) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_NOT_FOUND);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 "Server successfully given the expected error 404(User not found in the user store) " +
                                         "message", ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
@@ -1180,7 +1207,7 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, "Get User");
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.ERROR, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }
@@ -1223,25 +1250,25 @@ public class UserTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            User user = null;
+            User user;
             HttpPost method = new HttpPost(url);
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             method.setHeader("Content-Type", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
-            String location = null;
-            JSONObject jsonObj = null;
+            String location;
+            JSONObject jsonObj;
             try {
                 // Create the user.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedUsers.get(i).getBytes("UTF-8"));
+                        (definedUsers.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -1261,6 +1288,7 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1270,9 +1298,9 @@ public class UserTestImpl implements ResourceType {
                 if (requestPaths[i].getTestCaseName().equals("Create User")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 201");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_CREATED);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1282,12 +1310,12 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 201) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 201");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_CREATED);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema.
@@ -1306,7 +1334,7 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
                 try {
-                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    user = jsonDecoder.decodeResource(responseString, schema, new User());
                     userIDs.add(user.getId());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
@@ -1317,26 +1345,35 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
                 // Assertion to check location header.
-                if (locationHeader.equals(location)) {
-                    // Check for status returned.
-                    subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + location);
-                    subTests.add("Status : Success");
-                    subTests.add(StringUtils.EMPTY);
+                if (locationHeader != null) {
+                    if (locationHeader.equals(location)) {
+                        // Check for status returned.
+                        subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + locationHeader);
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + location);
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
+                        subTests.add(StringUtils.EMPTY);
+                    } else {
+                        // Check for status returned.
+                        subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
+                        subTests.add(ComplianceConstants.TestConstants.ACTUAL + locationHeader);
+                        subTests.add(ComplianceConstants.TestConstants.EXPECTED + location);
+                        subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
+                        subTests.add(StringUtils.EMPTY);
+                    }
                 } else {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + location);
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + null);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + location);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
                 try {
                     ResponseValidateTests.runValidateTests(user, schema, null, null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1354,9 +1391,9 @@ public class UserTestImpl implements ResourceType {
                     response.getStatusLine().getStatusCode() == 409) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 409");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "409");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1365,12 +1402,12 @@ public class UserTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString,
                                         headerString.toString(), responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Create User without userName") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "400");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1490,26 +1527,25 @@ public class UserTestImpl implements ResourceType {
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
             // Create default user.
-            ArrayList<String> userIDs = null;
+            ArrayList<String> userIDs;
             userIDs = createTestsUsers("One");
             String id = userIDs.get(0);
-            User user = null;
-            String patchUserURL = null;
-            patchUserURL = url + "/" + id + requestPaths[i].getUrl();
+            User user;
+            String patchUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPatch method = new HttpPatch(patchUserURL);
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPatch) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
             try {
                 // Patch the user.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedUsers.get(i).getBytes("UTF-8"));
+                        (definedUsers.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 method.setHeader("Accept", "application/json");
                 method.setHeader("Content-Type", "application/json");
@@ -1531,6 +1567,7 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1541,12 +1578,13 @@ public class UserTestImpl implements ResourceType {
                 cleanUpUser(id, requestPaths[i].getTestCaseName());
                 if (!requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a path")
                         && !requestPaths[i].getTestCaseName().equals("Patch non existing user with array of operations")
-                        && requestPaths[i].getTestSupported() && response.getStatusLine().getStatusCode() != 501) {
+                        && requestPaths[i].getTestSupported() &&
+                        response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_IMPLEMENTED) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1556,19 +1594,19 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 // Unless configured returns core-user schema or else returns extended user schema).
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    user = jsonDecoder.decodeResource(responseString, schema, new User());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, requestPaths[i].getTestCaseName());
@@ -1583,16 +1621,16 @@ public class UserTestImpl implements ResourceType {
                 if (locationHeader != null) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Success");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + locationHeader);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                 } else {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + null);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
                 try {
@@ -1600,7 +1638,7 @@ public class UserTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     // Clean the created user.
@@ -1620,12 +1658,12 @@ public class UserTestImpl implements ResourceType {
                                         responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Patch User - remove attribute without defining a " +
                     "path") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "400");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1638,9 +1676,9 @@ public class UserTestImpl implements ResourceType {
                     response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "404");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1648,11 +1686,12 @@ public class UserTestImpl implements ResourceType {
                                 "Server successfully given the expected error 404 message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if (!requestPaths[i].getTestSupported() || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPaths[i].getTestSupported() ||
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1711,25 +1750,25 @@ public class UserTestImpl implements ResourceType {
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
             // Create default user.
-            ArrayList<String> userIDs = null;
+            ArrayList<String> userIDs;
             userIDs = createTestsUsers("One");
             String id = userIDs.get(0);
-            User user = null;
-            String updateUserURL = null;
+            User user;
+            String updateUserURL;
             updateUserURL = url + "/" + id + requestPaths[i].getUrl();
             HttpPut method = new HttpPut(updateUserURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPut) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             String locationHeader = null;
             try {
                 // Update the user.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedUsers.get(i).getBytes("UTF-8"));
+                        (definedUsers.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 method.setHeader("Accept", "application/json");
                 method.setHeader("Content-Type", "application/json");
@@ -1751,6 +1790,7 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -1762,9 +1802,9 @@ public class UserTestImpl implements ResourceType {
                 if (requestPaths[i].getTestCaseName().equals("Update User")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -1774,19 +1814,21 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
-                // Obtain the schema corresponding to user.
-                // Unless configured returns core-user schema or else returns extended user schema).
+                /*
+                 Obtain the schema corresponding to user.
+                 Unless configured returns core-user schema or else returns extended user schema.
+                 */
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                    user = jsonDecoder.decodeResource(responseString, schema, new User());
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean the created user.
                     cleanUpUser(id, "Update User");
@@ -1801,16 +1843,16 @@ public class UserTestImpl implements ResourceType {
                 if (locationHeader != null) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Success");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + locationHeader);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                 } else {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.LOCATION_HEADER);
-                    subTests.add("Actual : " + locationHeader);
-                    subTests.add("Expected : " + url + "/" + id);
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + null);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + url + "/" + id);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
                 try {
@@ -1818,7 +1860,7 @@ public class UserTestImpl implements ResourceType {
                             null, method,
                             responseString, headerString.toString(), responseStatus, subTests);
                 } catch (BadRequestException | CharonException e) {
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, "Update User");
@@ -1836,12 +1878,12 @@ public class UserTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Update user with schema violation") &&
-                    response.getStatusLine().getStatusCode() == 400) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "400");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1854,9 +1896,9 @@ public class UserTestImpl implements ResourceType {
                     "status code")) && response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "404");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
@@ -1891,7 +1933,7 @@ public class UserTestImpl implements ResourceType {
         testResults = new ArrayList<>();
 
         // Create default user.
-        ArrayList<String> userIDs = null;
+        ArrayList<String> userIDs;
         userIDs = createTestsUsers("One");
         String id = userIDs.get(0);
 
@@ -1911,19 +1953,18 @@ public class UserTestImpl implements ResourceType {
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
-            User user = null;
-            String deleteUserURL = null;
-            deleteUserURL = url + "/" + id + requestPaths[i].getUrl();
+            String deleteUserURL;
+            deleteUserURL = url + "/" + id + requestPath.getUrl();
             HttpDelete method = new HttpDelete(deleteUserURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -1941,23 +1982,24 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName().equals("Delete user by ID")) {
+                if (requestPath.getTestCaseName().equals("Delete user by ID")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 204");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + "204");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     // Clean the created user.
                     cleanUpUser(id, "Delete User");
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not delete the default user at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -1966,34 +2008,34 @@ public class UserTestImpl implements ResourceType {
             if (response.getStatusLine().getStatusCode() == 204) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 204");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "204");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
-            } else if ((requestPaths[i].getTestCaseName().equals("Delete non existing user and validate user not " +
-                    "found error response") || requestPaths[i].getTestCaseName().equals("Delete user twice and " +
+            } else if ((requestPath.getTestCaseName().equals("Delete non existing user and validate user not " +
+                    "found error response") || requestPath.getTestCaseName().equals("Delete user twice and " +
                     "verify Http status code")) && response.getStatusLine().getStatusCode() == 404) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 404");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "404");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 "Server successfully given the expected error 404 message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.ERROR, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }
@@ -2044,26 +2086,26 @@ public class UserTestImpl implements ResourceType {
 
         for (int i = 0; i < requestPaths.length; i++) {
             long startTime = System.currentTimeMillis();
-            String searchUsersUrl = null;
+            String searchUsersUrl;
             searchUsersUrl = url + "/.search";
             HttpPost method = new HttpPost(searchUsersUrl);
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             method.setHeader("Content-Type", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             Integer totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
-            Boolean errorOccur = false;
+            boolean errorOccur = false;
             try {
                 // Create the request.
                 HttpEntity entity = new ByteArrayEntity
-                        (definedSearchMethods.get(i).getBytes("UTF-8"));
+                        (definedSearchMethods.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -2080,18 +2122,19 @@ public class UserTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestCaseName() != "Search user with invalid filter") {
+                if (!requestPaths[i].getTestCaseName().equals("Search user with invalid filter")) {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                    subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                    subTests.add("Expected : 200");
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -2101,19 +2144,18 @@ public class UserTestImpl implements ResourceType {
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 200");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Obtain the schema corresponding to user.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 ArrayList<User> userList = new ArrayList<>();
-                JSONObject jsonObjResponse = null;
-                User user = null;
+                JSONObject jsonObjResponse;
                 try {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
@@ -2122,13 +2164,13 @@ public class UserTestImpl implements ResourceType {
                     JSONObject tmp;
                     for (int j = 0; j < usersArray.length(); j++) {
                         tmp = usersArray.getJSONObject(j);
-                        userList.add((User) jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
+                        userList.add(jsonDecoder.decodeResource(tmp.toString(), schema, new User()));
                         try {
                             ResponseValidateTests.runValidateTests(userList.get(j), schema,
                                     null, null, method,
                                     responseString, headerString.toString(), responseStatus, subTests);
                         } catch (BadRequestException | CharonException e) {
-                            subTests.add("Status : Failed");
+                            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                             subTests.add(StringUtils.EMPTY);
                             long stopTime = System.currentTimeMillis();
                             testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
@@ -2139,26 +2181,19 @@ public class UserTestImpl implements ResourceType {
                             break;
                         }
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | BadRequestException | CharonException | InternalErrorException e) {
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                     responseStatus, subTests), stopTime - startTime));
                     continue;
-                } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                            "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests), stopTime - startTime));
-                    continue;
                 }
                 subTests.add("Check expected result");
                 subTests.add("Message : Expected 5 users whose userNames starts with login contain in response.");
                 if (totalResults == 5) {
                     // Assert expected result.
-                    subTests.add("Status : Success");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
                     if (!errorOccur) {
@@ -2169,16 +2204,16 @@ public class UserTestImpl implements ResourceType {
                     }
                 } else {
                     // Assert expected result.
-                    subTests.add("Status : Failed");
+                    subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                 }
             } else if (requestPaths[i].getTestCaseName().equals("Search user with invalid filter")
-                    && response.getStatusLine().getStatusCode() == 400) {
+                    && response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-                subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-                subTests.add("Expected : 400");
-                subTests.add("Status : Success");
+                subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + "400");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult

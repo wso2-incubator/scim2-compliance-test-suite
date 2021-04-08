@@ -19,25 +19,15 @@ package org.wso2.scim2.testsuite.core.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Implementation of result.
  */
-@XmlRootElement
 public class Result {
 
-    @XmlElement(name = "results")
-    List<TestResult> results = new ArrayList<TestResult>();
-
-    @XmlElement(name = "statistics")
+    List<TestResult> results = new ArrayList<>();
     Statistics statistics;
-
-    @XmlElement(name = "errorMessage")
     String errorMessage = "";
-
-    @XmlElement(name = "linkToReport")
     String link = "";
 
     public Result() {

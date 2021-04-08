@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -106,19 +107,19 @@ public class RolesTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedUsers.size(); i++) {
+        for (String definedUser : definedUsers) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create Users.
-                HttpEntity entity = new ByteArrayEntity(definedUsers.get(i).getBytes("UTF-8"));
+                HttpEntity entity = new ByteArrayEntity(definedUser.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -128,9 +129,9 @@ public class RolesTestImpl implements ResourceType {
                     // Obtain the schema corresponding to the user.
                     SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getUserResourceSchema();
                     JSONDecoder jsonDecoder = new JSONDecoder();
-                    User user = null;
+                    User user;
                     try {
-                        user = (User) jsonDecoder.decodeResource(responseString, schema, new User());
+                        user = jsonDecoder.decodeResource(responseString, schema, new User());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Users",
@@ -142,6 +143,7 @@ public class RolesTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -200,7 +202,7 @@ public class RolesTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
@@ -208,11 +210,11 @@ public class RolesTestImpl implements ResourceType {
         StringBuilder headerString = new StringBuilder();
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedGroups.size(); i++) {
+        for (String definedGroup : definedGroups) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create the group.
-                HttpEntity entity = new ByteArrayEntity(definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
+                HttpEntity entity = new ByteArrayEntity(definedGroup.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -224,7 +226,7 @@ public class RolesTestImpl implements ResourceType {
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     Group group;
                     try {
-                        group = (Group) jsonDecoder.decodeResource(responseString, schema, new Group());
+                        group = jsonDecoder.decodeResource(responseString, schema, new Group());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
@@ -236,6 +238,7 @@ public class RolesTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -317,7 +320,7 @@ public class RolesTestImpl implements ResourceType {
         HttpPost method = new HttpPost(url);
         // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpPost) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         method.setHeader("Content-Type", "application/json");
         HttpResponse response = null;
@@ -325,11 +328,11 @@ public class RolesTestImpl implements ResourceType {
         StringBuilder headerString = new StringBuilder();
         String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
-        for (int i = 0; i < definedRoles.size(); i++) {
+        for (String definedRole : definedRoles) {
             long startTime = System.currentTimeMillis();
             try {
                 // Create the role.
-                HttpEntity entity = new ByteArrayEntity(definedRoles.get(i).getBytes(StandardCharsets.UTF_8));
+                HttpEntity entity = new ByteArrayEntity(definedRole.getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
                 response = client.execute(method);
                 // Read the response body.
@@ -341,7 +344,7 @@ public class RolesTestImpl implements ResourceType {
                     JSONDecoder jsonDecoder = new JSONDecoder();
                     Role role;
                     try {
-                        role = (Role) jsonDecoder.decodeResource(responseString, schema, new Role());
+                        role = jsonDecoder.decodeResource(responseString, schema, new Role());
                     } catch (BadRequestException | CharonException | InternalErrorException e) {
                         long stopTime = System.currentTimeMillis();
                         throw new GeneralComplianceException(new TestResult(TestResult.ERROR, "List Groups",
@@ -353,6 +356,7 @@ public class RolesTestImpl implements ResourceType {
                 }
             } catch (Exception e) {
                 // Read the response body.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -383,30 +387,38 @@ public class RolesTestImpl implements ResourceType {
         long startTime = System.currentTimeMillis();
         String deleteUserURL;
 
-        if (testName.equals("User")) {
-            String url = complianceTestMetaDataHolder.getUrl() +
-                    ComplianceConstants.TestConstants.USERS_ENDPOINT;
-            deleteUserURL = url + "/" + location;
-        } else if (testName.equals("Group")) {
-            String url = complianceTestMetaDataHolder.getUrl() +
-                    ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
-            deleteUserURL = url + "/" + location;
-        } else if (testName.equals("Role")) {
-            String url = complianceTestMetaDataHolder.getUrl() +
-                    ComplianceConstants.TestConstants.ROLES_ENDPOINT;
-            deleteUserURL = url + "/" + location;
-        } else {
-            deleteUserURL = location;
+        switch (testName) {
+            case "User": {
+                String url = complianceTestMetaDataHolder.getUrl() +
+                        ComplianceConstants.TestConstants.USERS_ENDPOINT;
+                deleteUserURL = url + "/" + location;
+                break;
+            }
+            case "Group": {
+                String url = complianceTestMetaDataHolder.getUrl() +
+                        ComplianceConstants.TestConstants.GROUPS_ENDPOINT;
+                deleteUserURL = url + "/" + location;
+                break;
+            }
+            case "Role": {
+                String url = complianceTestMetaDataHolder.getUrl() +
+                        ComplianceConstants.TestConstants.ROLES_ENDPOINT;
+                deleteUserURL = url + "/" + location;
+                break;
+            }
+            default:
+                deleteUserURL = location;
+                break;
         }
 
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpDelete) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             response = client.execute(method);
@@ -424,6 +436,7 @@ public class RolesTestImpl implements ResourceType {
              Read the response body.
              Get all headers.
              */
+            assert response != null;
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -436,7 +449,7 @@ public class RolesTestImpl implements ResourceType {
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                             subTests), stopTime - startTime));
         }
-        if (response.getStatusLine().getStatusCode() == 204) {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
             return true;
         } else {
             long stopTime = System.currentTimeMillis();
@@ -486,18 +499,15 @@ public class RolesTestImpl implements ResourceType {
     public ArrayList<TestResult> getMethodTest() throws GeneralComplianceException, ComplianceException {
 
         ArrayList<TestResult> testResults = new ArrayList<>();
-        ArrayList<String> userIDs = new ArrayList<>();
-        ArrayList<String> groupIDs = new ArrayList<>();
-        ArrayList<String> roleIDs = new ArrayList<>();
+        ArrayList<String> userIDs;
+        ArrayList<String> groupIDs;
+        ArrayList<String> roleIDs;
         // Create 5 test users to assign for groups.
         userIDs = createTestsUsers("Many");
         // Create test groups with users.
         groupIDs = createTestsGroups(userIDs, "Many");
-        try {
-            roleIDs = createTestsRoles(userIDs, groupIDs, "Many");
-        } catch (Exception e) {
-
-        }
+        // Create test roles with users and groups.
+        roleIDs = createTestsRoles(userIDs, groupIDs, "Many");
 
         RequestPath[] requestPaths;
 
@@ -551,21 +561,21 @@ public class RolesTestImpl implements ResourceType {
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4, requestPath5,
                 requestPath7};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
-            String requestUrl = url + requestPaths[i].getUrl();
+            String requestUrl = url + requestPath.getUrl();
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer startIndex = null;
-            Integer count = null;
+            Integer startIndex;
+            Integer count;
             ArrayList<String> subTests = new ArrayList<>();
-            Boolean errorOccur = false;
+            boolean errorOccur = false;
             try {
                 response = client.execute(method);
                 // Read the response body.
@@ -582,26 +592,28 @@ public class RolesTestImpl implements ResourceType {
                  Read the response body.
                  Get all headers.
                  */
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
                 }
                 responseStatus = response.getStatusLine().getStatusCode() + " "
                         + response.getStatusLine().getReasonPhrase();
-                if (requestPaths[i].getTestSupported() != false && response.getStatusLine().getStatusCode() != 501) {
+                if (requestPath.getTestSupported() &&
+                        response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_IMPLEMENTED) {
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not list the roles at url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getRoleResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
-                JSONObject jsonObjResponse = null;
+                JSONObject jsonObjResponse;
                 ArrayList<Role> roleList = new ArrayList<>();
                 try {
                     JSONObject jsonObj = new JSONObject(responseString);
@@ -612,7 +624,7 @@ public class RolesTestImpl implements ResourceType {
                     JSONObject tmp;
                     for (int j = 0; j < rolesArray.length(); j++) {
                         tmp = rolesArray.getJSONObject(j);
-                        roleList.add((Role) jsonDecoder.decodeResource(tmp.toString(), schema, new Role()));
+                        roleList.add(jsonDecoder.decodeResource(tmp.toString(), schema, new Role()));
                         try {
                             ResponseValidateTests.runValidateTests(roleList.get(j), schema,
                                     null, null, method,
@@ -620,128 +632,137 @@ public class RolesTestImpl implements ResourceType {
 
                         } catch (BadRequestException | CharonException e) {
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                     "Response Validation Error",
-                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
-                                            responseStatus, subTests), stopTime - startTime));
-                            continue;
-                        }
-                    }
-                } catch (JSONException e) {
-                    throw new ComplianceException(500, "Error in decoding the returned list resource.");
-                } catch (BadRequestException | CharonException | InternalErrorException e) {
-                    long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                            "Could not decode the server response",
-                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                    subTests), stopTime - startTime));
-                    continue;
-                }
-                if (requestPaths[i].getTestCaseName().equals("List roles")) { // check for all created roles
-                    subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
-                    ArrayList<String> returnedRoleIDs = new ArrayList<>();
-                    for (Role role : roleList) {
-                        returnedRoleIDs.add(role.getId());
-                    }
-                    for (String id : groupIDs) {
-                        if (!returnedRoleIDs.contains(id)) {
-                            long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain all the created roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             errorOccur = true;
                             break;
                         }
                     }
-                } else if (requestPaths[i].getTestCaseName().equals("Get roles with Filter")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
-                    String value = "loginRole1";
-                    for (Role role : roleList) {
-                        if (!Objects.equals(value, role.getDisplayName())) {
+                } catch (JSONException e) {
+                    throw new ComplianceException(500, "Error in decoding the returned list resource.");
+                } catch (BadRequestException | CharonException | InternalErrorException e) {
+                    long stopTime = System.currentTimeMillis();
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                            "Could not decode the server response",
+                            ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
+                                    subTests), stopTime - startTime));
+                    continue;
+                }
+                switch (requestPath.getTestCaseName()) {
+                    case "List roles":  // check for all created roles
+                        subTests.add(ComplianceConstants.TestConstants.ALL_GROUPS_IN_TEST);
+                        ArrayList<String> returnedRoleIDs = new ArrayList<>();
+                        for (Role role : roleList) {
+                            returnedRoleIDs.add(role.getId());
+                        }
+                        for (String id : groupIDs) {
+                            if (!returnedRoleIDs.contains(id)) {
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain all the created roles",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                errorOccur = true;
+                                break;
+                            }
+                        }
+                        break;
+                    case "Get roles with Filter": {
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
+                        String value = "loginRole1";
+                        for (Role role : roleList) {
+                            if (!Objects.equals(value, role.getDisplayName())) {
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the expected roles",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                            }
+                        }
+                        break;
+                    }
+                    case "Get roles with Pagination":
+                    case "Get users having negative number as index":
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
+                        subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
+                        if (roleList.size() != 2) {
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected roles",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of paginated roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Get roles with Pagination") ||
-                        requestPaths[i].getTestCaseName().equals("Get users having negative number as index")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_CONTENT_TEST);
-                    subTests.add(ComplianceConstants.TestConstants.PAGINATION_GROUP_TEST);
-                    if (roleList.size() != 2) {
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of paginated roles",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                } else if (requestPaths[i].getTestCaseName().equals("Sort test")) {
-                    subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
-                    try {
-                        if (isRoleListSorted(roleList)) {
+                        break;
+                    case "Sort test":
+                        subTests.add(ComplianceConstants.TestConstants.SORT_GROUPS_TEST);
+                        try {
+                            if (isRoleListSorted(roleList)) {
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the sorted list of roles",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                                continue;
+                            }
+                        } catch (CharonException e) {
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                                     "Response does not contain the sorted list of roles",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
-                    } catch (CharonException e) {
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain the sorted list of roles",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
 
-                } else if (requestPaths[i].getTestCaseName().equals("Filter with pagination test")) {
-                    subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
-                    if (roleList.size() != 1) {
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of users.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
-                    String value = "loginRole1";
-                    for (Role role : roleList) {
-                        if (!Objects.equals(value, role.getDisplayName())) {
+                        break;
+                    case "Filter with pagination test": {
+                        subTests.add(ComplianceConstants.TestConstants.FILTER_USER_WITH_PAGINATION);
+                        if (roleList.size() != 1) {
                             long stopTime = System.currentTimeMillis();
-                            testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                    "Response does not contain the expected roles",
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of users.",
                                     ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                             responseStatus, subTests), stopTime - startTime));
                             continue;
                         }
+                        String value = "loginRole1";
+                        for (Role role : roleList) {
+                            if (!Objects.equals(value, role.getDisplayName())) {
+                                long stopTime = System.currentTimeMillis();
+                                testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                        "Response does not contain the expected roles",
+                                        ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                                responseStatus, subTests), stopTime - startTime));
+                            }
+                        }
+                        break;
                     }
-                } else if (requestPaths[i].getTestCaseName().equals("Get roles without index and only using count")) {
-                    subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
-                    if (startIndex != 1 && count != 2) {
-                        long stopTime = System.currentTimeMillis();
-                        testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
-                                "Response does not contain right number of pagination.",
-                                ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
-                                        subTests), stopTime - startTime));
-                        continue;
-                    }
+                    case "Get roles without index and only using count":
+                        subTests.add(ComplianceConstants.TestConstants.PAGINATION_USER_TEST);
+                        if (startIndex != 1 && count != 2) {
+                            long stopTime = System.currentTimeMillis();
+                            testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
+                                    "Response does not contain right number of pagination.",
+                                    ComplianceUtils.getWire(method, responseString, headerString.toString(),
+                                            responseStatus, subTests), stopTime - startTime));
+                            continue;
+                        }
+                        break;
                 }
-                if (errorOccur == false) {
+                if (!errorOccur) {
                     long stopTime = System.currentTimeMillis();
                     testResults.add(new TestResult
-                            (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                            (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                     StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                     headerString.toString(), responseStatus, subTests), stopTime - startTime));
                 }
-            } else if (requestPaths[i].getTestSupported() == false || response.getStatusLine().getStatusCode() == 501) {
+            } else if (!requestPath.getTestSupported() ||
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_IMPLEMENTED) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SKIPPED, requestPaths[i].getTestCaseName(),
+                        (TestResult.SKIPPED, requestPath.getTestCaseName(),
                                 "This functionality is not implemented. Hence given status code 501",
                                 ComplianceUtils.getWire(method,
                                         responseString, headerString.toString(),
@@ -749,7 +770,7 @@ public class RolesTestImpl implements ResourceType {
             } else {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                        (TestResult.ERROR, requestPath.getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
             }
@@ -782,8 +803,8 @@ public class RolesTestImpl implements ResourceType {
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
 
-        ArrayList<String> userIDs = new ArrayList<>();
-        ArrayList<String> groupIds = new ArrayList<>();
+        ArrayList<String> userIDs;
+        ArrayList<String> groupIds;
 
         RequestPath[] requestPaths;
 
@@ -805,23 +826,23 @@ public class RolesTestImpl implements ResourceType {
 
         requestPaths = new RequestPath[]{requestPath1, requestPath2, requestPath3, requestPath4};
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (RequestPath requestPath : requestPaths) {
             long startTime = System.currentTimeMillis();
             userIDs = createTestsUsers("Many");
             groupIds = createTestsGroups(userIDs, "Many");
             ArrayList<String> roleId = createTestsRoles(userIDs, groupIds, "One");
             String id = roleId.get(0);
-            Role role = null;
-            String getRoleURL = null;
-            getRoleURL = url + "/" + id + requestPaths[i].getUrl();
+            Role role;
+            String getRoleURL;
+            getRoleURL = url + "/" + id + requestPath.getUrl();
             HttpGet method = new HttpGet(getRoleURL);
             HttpClient client = HTTPClient.getHttpClient();
-            method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+            HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
             method.setHeader("Accept", "application/json");
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-            String responseStatus = StringUtils.EMPTY;
+            String responseStatus;
             ArrayList<String> subTests = new ArrayList<>();
             try {
                 response = client.execute(method);
@@ -836,6 +857,7 @@ public class RolesTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
             } catch (Exception e) {
                 // Get all headers.
+                assert response != null;
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -844,41 +866,41 @@ public class RolesTestImpl implements ResourceType {
                         + response.getStatusLine().getReasonPhrase();
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUp(uId, requestPaths[i].getTestCaseName());
+                    cleanUp(uId, requestPath.getTestCaseName());
                 }
                 // Clean up groups.
                 for (String uId : groupIds) {
-                    cleanUp(uId, requestPaths[i].getTestCaseName());
+                    cleanUp(uId, requestPath.getTestCaseName());
                 }
-                cleanUp(id, requestPaths[i].getTestCaseName());
-                if (requestPaths[i].getTestCaseName() != "Group not found error response") {
+                cleanUp(id, requestPath.getTestCaseName());
+                if (!requestPath.getTestCaseName().equals("Group not found error response")) {
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not get the default group from url " + url,
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
                     continue;
                 }
             }
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Obtain the schema corresponding to group.
                 SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.getInstance().getGroupResourceSchema();
                 JSONDecoder jsonDecoder = new JSONDecoder();
                 try {
-                    role = (Role) jsonDecoder.decodeResource(responseString, schema, new Role());
+                    role = jsonDecoder.decodeResource(responseString, schema, new Role());
 
                 } catch (BadRequestException | CharonException | InternalErrorException e) {
                     // Clean up users.
                     for (String uId : userIDs) {
-                        cleanUp(uId, requestPaths[i].getTestCaseName());
+                        cleanUp(uId, requestPath.getTestCaseName());
                     }
                     // Clean up groups.
                     for (String uId : groupIds) {
-                        cleanUp(uId, requestPaths[i].getTestCaseName());
+                        cleanUp(uId, requestPath.getTestCaseName());
                     }
-                    cleanUp(id, requestPaths[i].getTestCaseName());
+                    cleanUp(id, requestPath.getTestCaseName());
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Could not decode the server response",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -891,15 +913,15 @@ public class RolesTestImpl implements ResourceType {
                 } catch (BadRequestException | CharonException e) {
                     // Clean up users.
                     for (String uId : userIDs) {
-                        cleanUp(uId, requestPaths[i].getTestCaseName());
+                        cleanUp(uId, requestPath.getTestCaseName());
                     }
                     // Clean up groups.
                     for (String uId : groupIds) {
-                        cleanUp(uId, requestPaths[i].getTestCaseName());
+                        cleanUp(uId, requestPath.getTestCaseName());
                     }
-                    cleanUp(id, requestPaths[i].getTestCaseName());
+                    cleanUp(id, requestPath.getTestCaseName());
                     long stopTime = System.currentTimeMillis();
-                    testResults.add(new TestResult(TestResult.ERROR, requestPaths[i].getTestCaseName(),
+                    testResults.add(new TestResult(TestResult.ERROR, requestPath.getTestCaseName(),
                             "Response Validation Error",
                             ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                     subTests), stopTime - startTime));
@@ -907,23 +929,23 @@ public class RolesTestImpl implements ResourceType {
                 }
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUp(uId, requestPaths[i].getTestCaseName());
+                    cleanUp(uId, requestPath.getTestCaseName());
                 }
                 // Clean up groups.
                 for (String uId : groupIds) {
-                    cleanUp(uId, requestPaths[i].getTestCaseName());
+                    cleanUp(uId, requestPath.getTestCaseName());
                 }
-                cleanUp(id, requestPaths[i].getTestCaseName());
+                cleanUp(id, requestPath.getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString,
                                 headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            } else if (requestPaths[i].getTestCaseName() == "Role not found error response" &&
+            } else if (requestPath.getTestCaseName().equals("Role not found error response") &&
                     response.getStatusLine().getStatusCode() == 404) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, requestPaths[i].getTestCaseName(),
+                        (TestResult.SUCCESS, requestPath.getTestCaseName(),
                                 "Server successfully given the expected error 404(Role not found in the user store) " +
                                         "message",
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
@@ -931,12 +953,12 @@ public class RolesTestImpl implements ResourceType {
             } else {
                 // Clean up users.
                 for (String uId : userIDs) {
-                    cleanUp(uId, requestPaths[i].getTestCaseName());
+                    cleanUp(uId, requestPath.getTestCaseName());
                 }
-                cleanUp(id, requestPaths[i].getTestCaseName());
+                cleanUp(id, requestPath.getTestCaseName());
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.ERROR, requestPaths[i].getTestCaseName(), StringUtils.EMPTY,
+                        (TestResult.ERROR, requestPath.getTestCaseName(), StringUtils.EMPTY,
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             }

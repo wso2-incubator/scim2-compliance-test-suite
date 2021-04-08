@@ -21,6 +21,7 @@ package org.wso2.scim2.testsuite.core.tests;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -47,7 +48,7 @@ import java.util.ArrayList;
  */
 public class ResourceTypeTestImpl implements ResourceType {
 
-    private ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
+    private final ComplianceTestMetaDataHolder complianceTestMetaDataHolder;
     SCIMResourceType scimResourceType = null;
 
     public ResourceTypeTestImpl(ComplianceTestMetaDataHolder complianceTestMetaDataHolder) {
@@ -68,19 +69,19 @@ public class ResourceTypeTestImpl implements ResourceType {
         long startTime = System.currentTimeMillis();
         ArrayList<TestResult> testResults;
         testResults = new ArrayList<>();
-        Boolean errorOccured = false;
+        boolean errorOccurred = false;
         // Construct the endpoint url.
         String url = complianceTestMetaDataHolder.getUrl() +
                 ComplianceConstants.TestConstants.RESOURCE_TYPE_ENDPOINT;
         // Specify the get request.
         HttpGet method = new HttpGet(url);
         HttpClient client = HTTPClient.getHttpClient();
-        method = (HttpGet) HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
+        HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
         method.setHeader("Accept", "application/json");
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
-        String responseStatus = StringUtils.EMPTY;
+        String responseStatus;
         ArrayList<String> subTests = new ArrayList<>();
         try {
             // Get the resource types.
@@ -95,6 +96,7 @@ public class ResourceTypeTestImpl implements ResourceType {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
         } catch (Exception e) {
+            assert response != null;
             Header[] headers = response.getAllHeaders();
             for (Header header : headers) {
                 headerString.append(String.format("%s : %s \n", header.getName(), header.getValue()));
@@ -103,24 +105,24 @@ public class ResourceTypeTestImpl implements ResourceType {
                     + response.getStatusLine().getReasonPhrase();
             // Check for status returned.
             subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-            subTests.add("Expected : 200");
-            subTests.add("Status : Failed");
+            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
             subTests.add(StringUtils.EMPTY);
             long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
-                    (TestResult.ERROR, "Get ResourceType",
+                    (TestResult.ERROR, ComplianceConstants.TestConstants.GET_RESOURCETYPE,
                             "Could not get ResourceType at url " + url,
                             ComplianceUtils.getWire(method, responseString,
                                     headerString.toString(), responseStatus, subTests), stopTime - startTime));
-            errorOccured = true;
+            errorOccurred = true;
         }
-        if (response.getStatusLine().getStatusCode() == 200) {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             // Check for status returned.
             subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add("Actual : " + response.getStatusLine().getStatusCode());
-            subTests.add("Expected : 200");
-            subTests.add("Status : Success");
+            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
+            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
             subTests.add(StringUtils.EMPTY);
             // Obtain the schema corresponding to resourceType.
             SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.
@@ -128,18 +130,18 @@ public class ResourceTypeTestImpl implements ResourceType {
             JSONDecoder jsonDecoder = new JSONDecoder();
             try {
                 scimResourceType =
-                        (SCIMResourceType) jsonDecoder.decodeResource(responseString, schema,
+                        jsonDecoder.decodeResource(responseString, schema,
                                 new SCIMResourceType());
                 complianceTestMetaDataHolder.setScimResourceType(scimResourceType);
 
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR,
-                        "Get ResourceType",
+                        ComplianceConstants.TestConstants.GET_RESOURCETYPE,
                         "Could not decode the server response",
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                 subTests), stopTime - startTime));
-                errorOccured = true;
+                errorOccurred = true;
             }
             try {
                 ResponseValidateTests.runValidateTests(scimResourceType, schema, null,
@@ -147,36 +149,38 @@ public class ResourceTypeTestImpl implements ResourceType {
                         responseString, headerString.toString(), responseStatus, subTests);
 
             } catch (BadRequestException | CharonException e) {
-                subTests.add("Status : Failed");
+                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR,
-                        "Get ResourceType",
+                        ComplianceConstants.TestConstants.GET_RESOURCETYPE,
                         "Response Validation Error",
                         ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                                 subTests), stopTime - startTime));
-                errorOccured = true;
+                errorOccurred = true;
             } catch (GeneralComplianceException e) {
-                subTests.add("Status : Failed");
+                // Separately catching exception to get descriptive message from GeneralComplianceException.
+                subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR,
-                        "Get ResourceType",
+                        ComplianceConstants.TestConstants.GET_RESOURCETYPE,
                         e.getResult().getMessage(), ComplianceUtils.getWire(method,
                         responseString, headerString.toString(), responseStatus, subTests), stopTime - startTime));
-                errorOccured = true;
+                errorOccurred = true;
             }
-            if (!errorOccured) {
+            if (!errorOccurred) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult
-                        (TestResult.SUCCESS, "Get ResourceType", StringUtils.EMPTY, ComplianceUtils.getWire(method,
-                                responseString, headerString.toString(), responseStatus, subTests),
+                        (TestResult.SUCCESS, ComplianceConstants.TestConstants.GET_RESOURCETYPE, StringUtils.EMPTY,
+                                ComplianceUtils.getWire(method,
+                                        responseString, headerString.toString(), responseStatus, subTests),
                                 stopTime - startTime));
             }
         } else {
             long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
-                    (TestResult.ERROR, "Get ServiceProviderConfig",
+                    (TestResult.ERROR, ComplianceConstants.TestConstants.GET_RESOURCETYPE,
                             StringUtils.EMPTY, ComplianceUtils.getWire(method, responseString, headerString.toString(),
                             responseStatus, subTests), stopTime - startTime));
         }

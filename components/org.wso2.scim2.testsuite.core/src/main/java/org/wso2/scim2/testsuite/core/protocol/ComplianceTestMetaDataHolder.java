@@ -45,7 +45,7 @@ public class ComplianceTestMetaDataHolder {
 
     public void setScimServiceProviderConfig(SCIMServiceProviderConfig scimServiceProviderConfig) {
 
-        this.scimServiceProviderConfig = scimServiceProviderConfig;
+        ComplianceTestMetaDataHolder.scimServiceProviderConfig = scimServiceProviderConfig;
     }
 
     public String getUrl() {

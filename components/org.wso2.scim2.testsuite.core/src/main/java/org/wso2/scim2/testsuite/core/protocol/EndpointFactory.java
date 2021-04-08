@@ -34,10 +34,10 @@ import org.wso2.scim2.testsuite.core.tests.UserTestImpl;
  */
 public class EndpointFactory {
 
-    private String url;
-    private String userName;
-    private String password;
-    private String token;
+    private final String url;
+    private final String userName;
+    private final String password;
+    private final String token;
 
     /**
      * @param url      Service Provider endpoint.
@@ -72,22 +72,23 @@ public class EndpointFactory {
         // Set the scim schema object.
         complianceTestMetaDataHolder.setScimSchema(scimSchema);
 
-        if (endpoint.equals("serviceProviderConfig")) {
-            return new ServiceProviderConfigTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("user")) {
-            return new UserTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("group")) {
-            return new GroupTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("resourceType")) {
-            return new ResourceTypeTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("schemaTest")) {
-            return new SchemaTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("me")) {
-            return new MeTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("bulk")) {
-            return new BulkTestImpl(complianceTestMetaDataHolder);
-        } else if (endpoint.equals("role")) {
-            return new RolesTestImpl(complianceTestMetaDataHolder);
+        switch (endpoint) {
+            case "serviceProviderConfig":
+                return new ServiceProviderConfigTestImpl(complianceTestMetaDataHolder);
+            case "user":
+                return new UserTestImpl(complianceTestMetaDataHolder);
+            case "group":
+                return new GroupTestImpl(complianceTestMetaDataHolder);
+            case "resourceType":
+                return new ResourceTypeTestImpl(complianceTestMetaDataHolder);
+            case "schemaTest":
+                return new SchemaTestImpl(complianceTestMetaDataHolder);
+            case "me":
+                return new MeTestImpl(complianceTestMetaDataHolder);
+            case "bulk":
+                return new BulkTestImpl(complianceTestMetaDataHolder);
+            case "role":
+                return new RolesTestImpl(complianceTestMetaDataHolder);
         }
         return null;
     }

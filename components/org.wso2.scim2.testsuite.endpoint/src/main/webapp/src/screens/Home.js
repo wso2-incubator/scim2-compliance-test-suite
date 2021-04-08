@@ -134,9 +134,9 @@ const userSubTests = [
   { name: 'GET /Users', stateName: 'userGet' },
   { name: 'GET /Users/{id}', stateName: 'userGetById' },
   { name: 'POST /Users', stateName: 'userPost' },
-  { name: 'PUT /Users', stateName: 'userPut' },
-  { name: 'PATCH /Users', stateName: 'userPatch' },
-  { name: 'DELETE /Users', stateName: 'userDelete' },
+  { name: 'PUT /Users/{id}', stateName: 'userPut' },
+  { name: 'PATCH /Users/{id}', stateName: 'userPatch' },
+  { name: 'DELETE /Users/{id}', stateName: 'userDelete' },
   { name: 'POST /Users/.search', stateName: 'userSearch' },
 ];
 
@@ -144,9 +144,9 @@ const groupSubTests = [
   { name: 'GET /Groups', stateName: 'groupGet' },
   { name: 'GET /Groups/{id}', stateName: 'groupGetById' },
   { name: 'POST /Groups', stateName: 'groupPost' },
-  { name: 'PUT /Groups', stateName: 'groupPut' },
-  { name: 'PATCH /Groups', stateName: 'groupPatch' },
-  { name: 'DELETE /Groups', stateName: 'groupDelete' },
+  { name: 'PUT /Groups/{id}', stateName: 'groupPut' },
+  { name: 'PATCH /Groups/{id}', stateName: 'groupPatch' },
+  { name: 'DELETE /Groups/{id}', stateName: 'groupDelete' },
   { name: 'POST /Groups/.search', stateName: 'groupSearch' },
 ];
 
@@ -169,9 +169,9 @@ const rolesSubTests = [
   { name: 'GET /Roles', stateName: 'rolesGet' },
   { name: 'GET /Roles/{id}', stateName: 'rolesGetById' },
   { name: 'POST /Roles', stateName: 'rolesPost' },
-  { name: 'PUT /Roles', stateName: 'rolesPut' },
-  { name: 'PATCH /Roles', stateName: 'rolesPatch' },
-  { name: 'DELETE /Roles', stateName: 'rolesDelete' },
+  { name: 'PUT /Roles/{id}', stateName: 'rolesPut' },
+  { name: 'PATCH /Roles/{id}', stateName: 'rolesPatch' },
+  { name: 'DELETE /Roles/{id}', stateName: 'rolesDelete' },
   { name: 'POST /Roles/.search', stateName: 'rolesSearch' },
 ];
 

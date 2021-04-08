@@ -17,46 +17,22 @@
  */
 package org.wso2.scim2.testsuite.core.entities;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
- *  Provide functionality to store request data and response data.
+ * Provide functionality to store request data and response data.
  */
-@XmlRootElement
 public class Wire {
 
     public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>", "<empty>", "<empty>", "<empty>",
             "<empty>", "<empty>", "<empty>", "<empty>");
-
-    @XmlElement(name = "to_server")
     String toServer = "";
-
-    @XmlElement(name = "from_server")
     String fromServer = "";
-
-    @XmlElement(name = "tests")
     String tests = "";
-
-    @XmlElement(name = "responseBody")
     String responseBody = "";
-
-    @XmlElement(name = "responseHeaders")
     String responseHeaders = "";
-
-    @XmlElement(name = "responseStatus")
     String responseStatus = "";
-
-    @XmlElement(name = "requestType")
     String requestType = "";
-
-    @XmlElement(name = "requestUri")
     String requestUri = "";
-
-    @XmlElement(name = "requestBody")
     String requestBody = "";
-
-    @XmlElement(name = "requestHeaders")
     String requestHeaders = "";
 
     public Wire() {

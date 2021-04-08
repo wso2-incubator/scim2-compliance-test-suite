@@ -35,7 +35,7 @@ import org.wso2.scim2.testsuite.core.objects.SCIMSchema;
 import org.wso2.scim2.testsuite.core.protocol.ComplianceUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * This class build schema representations using the /Schema Endpoint.
@@ -68,50 +68,57 @@ public class SchemaBuilder {
             JSONArray jsonArray = new JSONArray(jsonSchema);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject resourceObject = jsonArray.getJSONObject(i);
-                String resourceId = null;
+                String resourceId;
                 try {
                     resourceId = resourceObject.optString("id");
                 } catch (NullPointerException e) {
                     throw new CriticalComplianceException(new TestResult
-                            (TestResult.ERROR, "Get Schema",
+                            (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                     "Could not get schema at url " + url,
                                     ComplianceUtils.getWire(method, jsonSchema,
                                             headerString, responseStatus, subTests)));
                 }
-                if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:User")) {
-                    // Set the user schema.
-                    scimSchema.setUserSchema(buildResourceSchema(resourceId, resourceObject,
-                            responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(SCIMConstants.USER_CORE_SCHEMA_URI))));
-                } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-                    // Set the group schema.
-                    scimSchema.setGroupSchema(buildResourceSchema(resourceId, resourceObject,
-                            responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(SCIMConstants.GROUP_CORE_SCHEMA_URI))));
-                } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:ResourceType")) {
-                    // Set the resource type schema.
-                    scimSchema.setResourceTypeSchema(buildResourceSchema(resourceId, resourceObject,
-                            responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(SCIMConstants.RESOURCE_TYPE_SCHEMA_URI))));
-                } else if (resourceId.equals("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig")) {
-                    // Set the user service provider schema.
-                    scimSchema.setServiceProviderConfigSchema(buildResourceSchema(resourceId, resourceObject,
-                            responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(SCIMConstants.SERVICE_PROVIDER_CONFIG_SCHEMA_URI))));
-                } else if (resourceId.equals("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")) {
-                    // Set the user extension schema.
-                    ArrayList currentAttributes = scimSchema.getUserSchema().getAttributesList();
-                    SCIMResourceTypeSchema extensionSchema = buildResourceSchema(resourceId, resourceObject,
-                            responseStatus, method, headerString, url, jsonSchema, subTests,
-                            new ArrayList<String>(Arrays.asList(ComplianceConstants.TestConstants.
-                                    EXTENSION_SCHEMA_URI)));
-                    currentAttributes.add(extensionSchema.getAttributesList());
-                    scimSchema.getUserSchema().setAttributeList(currentAttributes);
+                switch (resourceId) {
+                    case "urn:ietf:params:scim:schemas:core:2.0:User":
+                        // Set the user schema.
+                        scimSchema.setUserSchema(buildResourceSchema(resourceId, resourceObject,
+                                responseStatus, method, headerString, url, jsonSchema, subTests,
+                                new ArrayList<>(Collections.singletonList(SCIMConstants.USER_CORE_SCHEMA_URI))));
+                        break;
+                    case "urn:ietf:params:scim:schemas:core:2.0:Group":
+                        // Set the group schema.
+                        scimSchema.setGroupSchema(buildResourceSchema(resourceId, resourceObject,
+                                responseStatus, method, headerString, url, jsonSchema, subTests,
+                                new ArrayList<>(Collections.singletonList(SCIMConstants.GROUP_CORE_SCHEMA_URI))));
+                        break;
+                    case "urn:ietf:params:scim:schemas:core:2.0:ResourceType":
+                        // Set the resource type schema.
+                        scimSchema.setResourceTypeSchema(buildResourceSchema(resourceId, resourceObject,
+                                responseStatus, method, headerString, url, jsonSchema, subTests,
+                                new ArrayList<>(Collections.singletonList(SCIMConstants.RESOURCE_TYPE_SCHEMA_URI))));
+                        break;
+                    case "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig":
+                        // Set the user service provider schema.
+                        scimSchema.setServiceProviderConfigSchema(buildResourceSchema(resourceId, resourceObject,
+                                responseStatus, method, headerString, url, jsonSchema, subTests,
+                                new ArrayList<>(Collections.singletonList(SCIMConstants.
+                                        SERVICE_PROVIDER_CONFIG_SCHEMA_URI))));
+                        break;
+                    case "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User":
+                        // Set the user extension schema.
+                        ArrayList currentAttributes = scimSchema.getUserSchema().getAttributesList();
+                        SCIMResourceTypeSchema extensionSchema = buildResourceSchema(resourceId, resourceObject,
+                                responseStatus, method, headerString, url, jsonSchema, subTests,
+                                new ArrayList<>(Collections.singletonList(ComplianceConstants.TestConstants.
+                                        EXTENSION_SCHEMA_URI)));
+                        currentAttributes.add(extensionSchema.getAttributesList());
+                        scimSchema.getUserSchema().setAttributeList(currentAttributes);
+                        break;
                 }
             }
         } catch (JSONException e) {
             throw new CriticalComplianceException(new TestResult
-                    (TestResult.ERROR, "Get Schema",
+                    (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                             "Could not get schema at url " + url,
                             ComplianceUtils.getWire(method, jsonSchema,
                                     headerString, responseStatus, subTests)));
@@ -146,34 +153,34 @@ public class SchemaBuilder {
             throws ComplianceException, CriticalComplianceException {
 
         ArrayList<SCIMAttributeSchema> attributeSchemaList = new ArrayList<>();
-        JSONArray attributeList = null;
+        JSONArray attributeList;
         try {
             attributeList = resourceObject.optJSONArray("attributes");
         } catch (NullPointerException e) {
             throw new CriticalComplianceException(new TestResult
-                    (TestResult.ERROR, "Get Schema",
+                    (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                             "Could not get schema at url " + url,
                             ComplianceUtils.getWire(method, jsonSchema,
                                     headerString, responseStatus, subTests)));
         }
 
         for (int j = 0; j < attributeList.length(); j++) {
-            JSONObject attribute = null;
+            JSONObject attribute;
             try {
                 attribute = attributeList.getJSONObject(j);
             } catch (JSONException e) {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String name = "";
+            String name;
             if (attribute.optString("name") != null) {
                 name = attribute.optString("name");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
@@ -187,22 +194,22 @@ public class SchemaBuilder {
             if (attribute.has("subAttributes")) {
                 JSONArray subAttributesArray = attribute.optJSONArray("subAttributes");
                 for (int k = 0; k < subAttributesArray.length(); k++) {
-                    JSONObject subAttribute = null;
+                    JSONObject subAttribute;
                     try {
                         subAttribute = subAttributesArray.getJSONObject(k);
                     } catch (JSONException e) {
                         throw new CriticalComplianceException(new TestResult
-                                (TestResult.ERROR, "Get Schema",
+                                (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                         "Could not get schema at url " + url,
                                         ComplianceUtils.getWire(method, jsonSchema,
                                                 headerString, responseStatus, subTests)));
                     }
-                    String subName = "";
+                    String subName;
                     if (subAttribute.optString("name") != null) {
                         subName = subAttribute.optString("name");
                     } else {
                         throw new CriticalComplianceException(new TestResult
-                                (TestResult.ERROR, "Get Schema",
+                                (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                         "Could not get schema at url " + url,
                                         ComplianceUtils.getWire(method, jsonSchema,
                                                 headerString, responseStatus, subTests)));
@@ -219,7 +226,7 @@ public class SchemaBuilder {
             attributeSchemaList.add(scimAttributeSchema);
         }
         return SCIMResourceTypeSchema.createSCIMResourceSchema(schemaURIs,
-                attributeSchemaList.toArray(new SCIMAttributeSchema[attributeSchemaList.size()]));
+                attributeSchemaList.toArray(new SCIMAttributeSchema[0]));
     }
 
     /**
@@ -249,93 +256,93 @@ public class SchemaBuilder {
 
         String attributeName = null;
         try {
-            String name = "";
+            String name;
             if (attribute.optString("name") != null) {
                 name = attribute.optString("name");
                 attributeName = name;
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String type = "";
+            String type;
             if (attribute.optString("type") != null) {
                 type = attribute.optString("type");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            boolean multivalued = false;
+            boolean multivalued;
             if (attribute.get("multiValued") != null) {
                 multivalued = attribute.optBoolean("multiValued");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String description = "";
+            String description;
             if (attribute.optString("description") != null) {
                 description = attribute.optString("description");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            boolean required = false;
+            boolean required;
             if (attribute.get("required") != null) {
                 required = attribute.optBoolean("required");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            boolean caseExact = false;
+            boolean caseExact;
             if (attribute.get("caseExact") != null) {
                 caseExact = attribute.optBoolean("caseExact");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String mutability = "";
+            String mutability;
             if (attribute.optString("mutability") != null) {
                 mutability = attribute.optString("mutability");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String returned = "";
+            String returned;
             if (attribute.optString("returned") != null) {
                 returned = attribute.optString("returned");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
             }
-            String uniqueness = "";
+            String uniqueness;
             if (attribute.optString("uniqueness") != null) {
                 uniqueness = attribute.optString("uniqueness");
             } else {
                 throw new CriticalComplianceException(new TestResult
-                        (TestResult.ERROR, "Get Schema",
+                        (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                                 "Could not get schema at url " + url,
                                 ComplianceUtils.getWire(method, jsonSchema,
                                         headerString, responseStatus, subTests)));
@@ -346,55 +353,78 @@ public class SchemaBuilder {
             SCIMDefinitions.Returned returnedDefinition = null;
             SCIMDefinitions.Uniqueness uniquenessDefinition = null;
 
-            if (mutability.equals("readWrite")) {
-                mutabilityDefinition = SCIMDefinitions.Mutability.READ_WRITE;
-            } else if (mutability.equals("readOnly")) {
-                mutabilityDefinition = SCIMDefinitions.Mutability.READ_ONLY;
-            } else if (mutability.equals("writeOnly")) {
-                mutabilityDefinition = SCIMDefinitions.Mutability.WRITE_ONLY;
-            } else if (mutability.equals("immutable")) {
-                mutabilityDefinition = SCIMDefinitions.Mutability.IMMUTABLE;
+            switch (mutability) {
+                case "readWrite":
+                    mutabilityDefinition = SCIMDefinitions.Mutability.READ_WRITE;
+                    break;
+                case "readOnly":
+                    mutabilityDefinition = SCIMDefinitions.Mutability.READ_ONLY;
+                    break;
+                case "writeOnly":
+                    mutabilityDefinition = SCIMDefinitions.Mutability.WRITE_ONLY;
+                    break;
+                case "immutable":
+                    mutabilityDefinition = SCIMDefinitions.Mutability.IMMUTABLE;
+                    break;
             }
 
-            if (type.equals("binary")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.BINARY;
-            } else if (type.equals("boolean")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.BOOLEAN;
-            } else if (type.equals("complex")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.COMPLEX;
-            } else if (type.equals("dataTime")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.DATE_TIME;
-            } else if (type.equals("decimal")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.DECIMAL;
-            } else if (type.equals("integer")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.INTEGER;
-            } else if (type.equals("reference")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.REFERENCE;
-            } else if (type.equals("string")) {
-                dataTypeDefinition = SCIMDefinitions.DataType.STRING;
+            switch (type) {
+                case "binary":
+                    dataTypeDefinition = SCIMDefinitions.DataType.BINARY;
+                    break;
+                case "boolean":
+                    dataTypeDefinition = SCIMDefinitions.DataType.BOOLEAN;
+                    break;
+                case "complex":
+                    dataTypeDefinition = SCIMDefinitions.DataType.COMPLEX;
+                    break;
+                case "dataTime":
+                    dataTypeDefinition = SCIMDefinitions.DataType.DATE_TIME;
+                    break;
+                case "decimal":
+                    dataTypeDefinition = SCIMDefinitions.DataType.DECIMAL;
+                    break;
+                case "integer":
+                    dataTypeDefinition = SCIMDefinitions.DataType.INTEGER;
+                    break;
+                case "reference":
+                    dataTypeDefinition = SCIMDefinitions.DataType.REFERENCE;
+                    break;
+                case "string":
+                    dataTypeDefinition = SCIMDefinitions.DataType.STRING;
+                    break;
             }
 
-            if (returned.equals("always")) {
-                returnedDefinition = SCIMDefinitions.Returned.ALWAYS;
-            } else if (returned.equals("default")) {
-                returnedDefinition = SCIMDefinitions.Returned.DEFAULT;
-            } else if (returned.equals("never")) {
-                returnedDefinition = SCIMDefinitions.Returned.NEVER;
-            } else if (returned.equals("request")) {
-                returnedDefinition = SCIMDefinitions.Returned.REQUEST;
+            switch (returned) {
+                case "always":
+                    returnedDefinition = SCIMDefinitions.Returned.ALWAYS;
+                    break;
+                case "default":
+                    returnedDefinition = SCIMDefinitions.Returned.DEFAULT;
+                    break;
+                case "never":
+                    returnedDefinition = SCIMDefinitions.Returned.NEVER;
+                    break;
+                case "request":
+                    returnedDefinition = SCIMDefinitions.Returned.REQUEST;
+                    break;
             }
 
-            if (uniqueness.equals("global")) {
-                uniquenessDefinition = SCIMDefinitions.Uniqueness.GLOBAL;
-            } else if (uniqueness.equals("none")) {
-                uniquenessDefinition = SCIMDefinitions.Uniqueness.NONE;
-            } else if (uniqueness.equals("server")) {
-                uniquenessDefinition = SCIMDefinitions.Uniqueness.SERVER;
+            switch (uniqueness) {
+                case "global":
+                    uniquenessDefinition = SCIMDefinitions.Uniqueness.GLOBAL;
+                    break;
+                case "none":
+                    uniquenessDefinition = SCIMDefinitions.Uniqueness.NONE;
+                    break;
+                case "server":
+                    uniquenessDefinition = SCIMDefinitions.Uniqueness.SERVER;
+                    break;
             }
 
             subTests.add("Validate the attribute definitions of " + attributeName);
             subTests.add("Test description : Check attribute definition follow SCIM specification.");
-            subTests.add("Status : Success");
+            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
             subTests.add(StringUtils.EMPTY);
 
             return SCIMAttributeSchema.createSCIMAttributeSchema(uri, name, dataTypeDefinition,
@@ -405,10 +435,10 @@ public class SchemaBuilder {
         } catch (JSONException e) {
             subTests.add("Validate the attribute definitions of " + attributeName);
             subTests.add("Test description : Check attribute definition follow SCIM specification.");
-            subTests.add("Status : Failed");
+            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
             subTests.add(StringUtils.EMPTY);
             throw new CriticalComplianceException(new TestResult
-                    (TestResult.ERROR, "Get Schema",
+                    (TestResult.ERROR, ComplianceConstants.TestConstants.GET_SCHEMAS,
                             e.getMessage() + "in attribute " + attributeName,
                             ComplianceUtils.getWire(method, jsonSchema,
                                     headerString, responseStatus, subTests)));
