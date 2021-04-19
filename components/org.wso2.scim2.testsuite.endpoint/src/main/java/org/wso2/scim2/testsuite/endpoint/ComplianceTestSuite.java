@@ -25,6 +25,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.wso2.scim2.testsuite.core.entities.Result;
 import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
+import org.wso2.scim2.testsuite.core.pdf.PDFGenerator;
 import org.wso2.scim2.testsuite.core.protocol.EndpointFactory;
 import org.wso2.scim2.testsuite.core.tests.ResourceType;
 import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -280,8 +282,20 @@ public class ComplianceTestSuite extends HttpServlet {
 
             finalResults = new Result(statistics, results);
 
-        } catch (Exception ee) {
-            new Result(ee.getMessage());
+        } catch (Exception e) {
+            new Result(e.getMessage());
+        }
+
+        // Generate pdf results sheet
+        try {
+            ServletContext context = request.getServletContext();
+            String fullPath = context.getRealPath("/");
+            String savePath = fullPath + "/WEB-INF/SCIM 2.0 Compliance Test Suite - Auto Generated Test Report";
+            String reportURL = PDFGenerator.generatePdfResults(finalResults, savePath);
+            assert finalResults != null;
+            finalResults.setReportLink("file://" + reportURL);
+        } catch (IOException e) {
+            new Result(e.getMessage());
         }
 
         response.setContentType("application/json");
