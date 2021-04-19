@@ -34,6 +34,7 @@
         <apache.pdfbox.preflight.version>2.0.7</apache.pdfbox.preflight.version>
         <apache.pdfbox.xmpbox.version>2.0.7</apache.pdfbox.xmpbox.version>
     </properties>
+
     <repositories>
         <repository>
             <id>project.local</id>

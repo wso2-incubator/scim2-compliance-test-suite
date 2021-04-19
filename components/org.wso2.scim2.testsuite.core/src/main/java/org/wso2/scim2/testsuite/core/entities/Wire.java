@@ -17,6 +17,8 @@
  */
 package org.wso2.scim2.testsuite.core.entities;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Provide functionality to store request data and response data.
  */
@@ -24,16 +26,16 @@ public class Wire {
 
     public static final Wire EMPTY = new Wire("<empty>", "<empty>", "<empty>", "<empty>", "<empty>", "<empty>",
             "<empty>", "<empty>", "<empty>", "<empty>");
-    String toServer = "";
-    String fromServer = "";
-    String tests = "";
-    String responseBody = "";
-    String responseHeaders = "";
-    String responseStatus = "";
-    String requestType = "";
-    String requestUri = "";
-    String requestBody = "";
-    String requestHeaders = "";
+    String toServer = StringUtils.EMPTY;
+    String fromServer = StringUtils.EMPTY;
+    String tests = StringUtils.EMPTY;
+    String responseBody = StringUtils.EMPTY;
+    String responseHeaders = StringUtils.EMPTY;
+    String responseStatus = StringUtils.EMPTY;
+    String requestType = StringUtils.EMPTY;
+    String requestUri = StringUtils.EMPTY;
+    String requestBody = StringUtils.EMPTY;
+    String requestHeaders = StringUtils.EMPTY;
 
     public Wire() {
 

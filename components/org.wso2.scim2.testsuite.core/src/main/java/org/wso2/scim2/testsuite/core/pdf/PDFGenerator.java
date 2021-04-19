@@ -18,6 +18,7 @@
 
 package org.wso2.scim2.testsuite.core.pdf;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -53,7 +54,7 @@ public class PDFGenerator {
     private static void init(Result finalResults) {
 
         document = new PDDocument();
-        if (!finalResults.getErrorMessage().equals("")) {
+        if (!finalResults.getErrorMessage().equals(StringUtils.EMPTY)) {
             // Creating a blank page.
             PDPage blankPage = new PDPage();
             // Adding the blank page to the document.
@@ -410,7 +411,7 @@ public class PDFGenerator {
                 lastSpace = -1;
             } else if (spaceIndex == text.length()) {
                 lines.add(text);
-                text = "";
+                text = StringUtils.EMPTY;
             } else {
                 lastSpace = spaceIndex;
             }

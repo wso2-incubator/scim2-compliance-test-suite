@@ -28,6 +28,7 @@ import org.wso2.scim2.testsuite.core.tests.RolesTestImpl;
 import org.wso2.scim2.testsuite.core.tests.SchemaTestImpl;
 import org.wso2.scim2.testsuite.core.tests.ServiceProviderConfigTestImpl;
 import org.wso2.scim2.testsuite.core.tests.UserTestImpl;
+import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
 /**
  * This class contains test endpoints for the test suite.
@@ -73,21 +74,21 @@ public class EndpointFactory {
         complianceTestMetaDataHolder.setScimSchema(scimSchema);
 
         switch (endpoint) {
-            case "serviceProviderConfig":
+            case ComplianceConstants.EndPointConstants.SERVICEPROVIDERCONFIG:
                 return new ServiceProviderConfigTestImpl(complianceTestMetaDataHolder);
-            case "user":
+            case ComplianceConstants.EndPointConstants.USER:
                 return new UserTestImpl(complianceTestMetaDataHolder);
-            case "group":
+            case ComplianceConstants.EndPointConstants.GROUP:
                 return new GroupTestImpl(complianceTestMetaDataHolder);
-            case "resourceType":
+            case ComplianceConstants.EndPointConstants.RESOURCETYPE:
                 return new ResourceTypeTestImpl(complianceTestMetaDataHolder);
-            case "schemaTest":
+            case ComplianceConstants.EndPointConstants.SCHEMAS:
                 return new SchemaTestImpl(complianceTestMetaDataHolder);
-            case "me":
+            case ComplianceConstants.EndPointConstants.ME:
                 return new MeTestImpl(complianceTestMetaDataHolder);
-            case "bulk":
+            case ComplianceConstants.EndPointConstants.BULK:
                 return new BulkTestImpl(complianceTestMetaDataHolder);
-            case "role":
+            case ComplianceConstants.EndPointConstants.ROLE:
                 return new RolesTestImpl(complianceTestMetaDataHolder);
         }
         return null;

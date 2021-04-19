@@ -95,6 +95,21 @@ public class ComplianceConstants {
     }
 
     /**
+     * This method contains the defined constant used in scim resource endpoints.
+     */
+    public static class EndPointConstants {
+
+        public static final String SERVICEPROVIDERCONFIG = "ServiceProviderConfig";
+        public static final String RESOURCETYPE = "ResourceType";
+        public static final String SCHEMAS = "Schemas";
+        public static final String USER = "User";
+        public static final String GROUP = "Group";
+        public static final String ME = "Me";
+        public static final String BULK = "Bulk";
+        public static final String ROLE = "Role";
+    }
+
+    /**
      * This method contains the defined constants used in tests.
      */
     public static class DefinedInstances {

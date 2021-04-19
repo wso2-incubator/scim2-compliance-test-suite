@@ -17,6 +17,8 @@
  */
 package org.wso2.scim2.testsuite.core.entities;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +29,8 @@ public class Result {
 
     List<TestResult> results = new ArrayList<>();
     Statistics statistics;
-    String errorMessage = "";
-    String link = "";
+    String errorMessage = StringUtils.EMPTY;
+    String link = StringUtils.EMPTY;
 
     public Result() {
 

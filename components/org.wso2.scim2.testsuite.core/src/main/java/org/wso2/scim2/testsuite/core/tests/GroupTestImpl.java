@@ -585,8 +585,8 @@ public class GroupTestImpl implements ResourceType {
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer startIndex;
-            Integer count;
+            int startIndex;
+            int count;
             ArrayList<String> subTests = new ArrayList<>();
             boolean errorOccur = false;
             try {
@@ -644,8 +644,8 @@ public class GroupTestImpl implements ResourceType {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray groupsArray = jsonObj.getJSONArray("Resources");
-                    startIndex = (Integer) jsonObjResponse.get("startIndex");
-                    count = (Integer) jsonObjResponse.get("totalResults");
+                    startIndex = (int) jsonObjResponse.get("startIndex");
+                    count = (int) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < groupsArray.length(); j++) {
                         tmp = groupsArray.getJSONObject(j);
@@ -1914,7 +1914,7 @@ public class GroupTestImpl implements ResourceType {
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer totalResults;
+            int totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
             boolean errorOccur = false;
@@ -1978,7 +1978,7 @@ public class GroupTestImpl implements ResourceType {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray groupsArray = jsonObj.getJSONArray("Resources");
-                    totalResults = (Integer) jsonObjResponse.get("totalResults");
+                    totalResults = (int) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < groupsArray.length(); j++) {
                         tmp = groupsArray.getJSONObject(j);

@@ -506,8 +506,8 @@ public class UserTestImpl implements ResourceType {
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer startIndex;
-            Integer count;
+            int startIndex;
+            int count;
             ArrayList<String> subTests = new ArrayList<>();
             boolean errorOccur = false;
             try {
@@ -566,8 +566,8 @@ public class UserTestImpl implements ResourceType {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray usersArray = jsonObj.getJSONArray("Resources");
-                    startIndex = (Integer) jsonObjResponse.get("startIndex");
-                    count = (Integer) jsonObjResponse.get("totalResults");
+                    startIndex = (int) jsonObjResponse.get("startIndex");
+                    count = (int) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < usersArray.length(); j++) {
                         tmp = usersArray.getJSONObject(j);
@@ -2098,7 +2098,7 @@ public class UserTestImpl implements ResourceType {
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer totalResults;
+            int totalResults;
             // JSONObject jsonObj = null;
             ArrayList<String> subTests = new ArrayList<>();
             boolean errorOccur = false;
@@ -2160,7 +2160,7 @@ public class UserTestImpl implements ResourceType {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray usersArray = jsonObj.getJSONArray("Resources");
-                    totalResults = (Integer) jsonObjResponse.get("totalResults");
+                    totalResults = (int) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < usersArray.length(); j++) {
                         tmp = usersArray.getJSONObject(j);

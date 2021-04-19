@@ -17,6 +17,7 @@
  */
 package org.wso2.scim2.testsuite.core.entities;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.scim2.testsuite.core.exception.ComplianceException;
 import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
@@ -32,8 +33,8 @@ public class TestResult {
     public static final int ERROR = 0;
     public static final int SUCCESS = 1;
     public static final int SKIPPED = 2;
-    String name = "";
-    String message = "";
+    String name = StringUtils.EMPTY;
+    String message = StringUtils.EMPTY;
     String statusText = "Failed";
     String statusLabel = "label-important";
     Wire wire;
@@ -68,7 +69,7 @@ public class TestResult {
     public TestResult(int status, ComplianceException complianceException) {
 
         this.name = complianceException.getDetail();
-        this.message = "";
+        this.message = StringUtils.EMPTY;
         this.wire = null;
         this.status = status;
         this.statusText = statusTexts[status];

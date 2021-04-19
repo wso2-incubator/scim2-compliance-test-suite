@@ -107,7 +107,7 @@ public class BulkTestImpl implements ResourceType {
         for (int i = 0; i < jsonarray.length(); i++) {
             JSONObject innerJsonObject = jsonarray.getJSONObject(i);
             JSONObject innerJsonObject2 = innerJsonObject.getJSONObject("status");
-            Integer code = innerJsonObject2.getInt("code");
+            int code = innerJsonObject2.getInt("code");
             statusCodes.add(code);
         }
         return statusCodes;

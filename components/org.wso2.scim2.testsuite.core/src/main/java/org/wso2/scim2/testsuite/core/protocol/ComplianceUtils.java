@@ -17,6 +17,7 @@
  */
 package org.wso2.scim2.testsuite.core.protocol;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -91,6 +92,8 @@ public class ComplianceUtils {
 
     public static Wire getWire(Throwable e) {
 // Todo - using another constructor
-        return new Wire(ExceptionUtils.getFullStackTrace(e), "", "", "", "", "", "", "", "", "");
+        return new Wire(ExceptionUtils.getFullStackTrace(e), StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY
+                , StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
+                StringUtils.EMPTY);
     }
 }

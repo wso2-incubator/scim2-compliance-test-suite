@@ -25,6 +25,7 @@ import org.wso2.scim2.testsuite.core.entities.Statistics;
 import org.wso2.scim2.testsuite.core.entities.TestResult;
 import org.wso2.scim2.testsuite.core.pdf.PDFGenerator;
 import org.wso2.scim2.testsuite.core.tests.ResourceType;
+import org.wso2.scim2.testsuite.core.utils.ComplianceConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,13 +40,14 @@ public class Compliance {
     public static void main(String[] arg) {
 
         EndpointFactory endFactory = new EndpointFactory("https://localhost:9443/scim2", "admin", "admin", "");
-        ResourceType user = endFactory.getInstance("user");
-        ResourceType group = endFactory.getInstance("group");
-        ResourceType serviceProviderConfig = endFactory.getInstance("serviceProviderConfig");
-        ResourceType resourceType = endFactory.getInstance("resourceType");
-        ResourceType schema = endFactory.getInstance("schemaTest");
-        ResourceType self = endFactory.getInstance("me");
-        ResourceType bulk = endFactory.getInstance("bulk");
+        ResourceType user = endFactory.getInstance(ComplianceConstants.EndPointConstants.USER);
+        ResourceType group = endFactory.getInstance(ComplianceConstants.EndPointConstants.GROUP);
+        ResourceType serviceProviderConfig =
+                endFactory.getInstance(ComplianceConstants.EndPointConstants.SERVICEPROVIDERCONFIG);
+        ResourceType resourceType = endFactory.getInstance(ComplianceConstants.EndPointConstants.RESOURCETYPE);
+        ResourceType schema = endFactory.getInstance(ComplianceConstants.EndPointConstants.SCHEMAS);
+        ResourceType self = endFactory.getInstance(ComplianceConstants.EndPointConstants.ME);
+        ResourceType bulk = endFactory.getInstance(ComplianceConstants.EndPointConstants.BULK);
 
         try {
             // Invoke ServiceProviderConfig test.

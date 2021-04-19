@@ -572,8 +572,8 @@ public class RolesTestImpl implements ResourceType {
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
             String responseStatus;
-            Integer startIndex;
-            Integer count;
+            int startIndex;
+            int count;
             ArrayList<String> subTests = new ArrayList<>();
             boolean errorOccur = false;
             try {
@@ -619,8 +619,8 @@ public class RolesTestImpl implements ResourceType {
                     JSONObject jsonObj = new JSONObject(responseString);
                     jsonObjResponse = jsonObj;
                     JSONArray rolesArray = jsonObj.getJSONArray("Resources");
-                    startIndex = (Integer) jsonObjResponse.get("startIndex");
-                    count = (Integer) jsonObjResponse.get("totalResults");
+                    startIndex = (int) jsonObjResponse.get("startIndex");
+                    count = (int) jsonObjResponse.get("totalResults");
                     JSONObject tmp;
                     for (int j = 0; j < rolesArray.length(); j++) {
                         tmp = rolesArray.getJSONObject(j);
