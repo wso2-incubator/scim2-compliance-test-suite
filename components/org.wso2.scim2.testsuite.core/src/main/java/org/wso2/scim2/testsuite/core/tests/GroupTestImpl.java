@@ -109,8 +109,10 @@ public class GroupTestImpl implements ResourceType {
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -179,7 +181,8 @@ public class GroupTestImpl implements ResourceType {
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -265,8 +268,10 @@ public class GroupTestImpl implements ResourceType {
         //create groups
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder();
@@ -335,7 +340,8 @@ public class GroupTestImpl implements ResourceType {
         HttpDelete method = new HttpDelete(deleteGroupURL);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -580,7 +586,8 @@ public class GroupTestImpl implements ResourceType {
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -932,7 +939,8 @@ public class GroupTestImpl implements ResourceType {
             HttpGet method = new HttpGet(getGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1114,8 +1122,10 @@ public class GroupTestImpl implements ResourceType {
             // Create group test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1361,8 +1371,10 @@ public class GroupTestImpl implements ResourceType {
                 // Patch group.
                 HttpEntity entity = new ByteArrayEntity(definedPatchedGroup.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
-                method.setHeader("Accept", "application/json");
-                method.setHeader("Content-Type", "application/json");
+                method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+                method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
@@ -1582,8 +1594,10 @@ public class GroupTestImpl implements ResourceType {
                 HttpEntity entity = new ByteArrayEntity
                         (definedGroups.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
-                method.setHeader("Accept", "application/json");
-                method.setHeader("Content-Type", "application/json");
+                method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+                method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
@@ -1769,7 +1783,8 @@ public class GroupTestImpl implements ResourceType {
             HttpDelete method = new HttpDelete(deleteGroupURL);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1908,8 +1923,10 @@ public class GroupTestImpl implements ResourceType {
             // Create group test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);

@@ -81,8 +81,10 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         HttpGet method = new HttpGet(url);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -137,8 +139,7 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
                 scimServiceProviderConfig =
                         jsonDecoder.decodeResource(responseString, schema,
                                 new SCIMServiceProviderConfig());
-                complianceTestMetaDataHolder.setScimServiceProviderConfig(scimServiceProviderConfig); // Todo - set
-                // another schema 2 separate.
+                complianceTestMetaDataHolder.setScimServiceProviderConfig(scimServiceProviderConfig);
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR, ComplianceConstants.TestConstants.GET_CONFIG,

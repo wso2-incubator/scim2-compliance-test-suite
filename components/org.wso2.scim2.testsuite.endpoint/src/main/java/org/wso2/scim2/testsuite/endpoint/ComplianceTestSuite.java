@@ -298,7 +298,7 @@ public class ComplianceTestSuite extends HttpServlet {
             new Result(e.getMessage());
         }
 
-        response.setContentType("application/json");
+        response.setContentType(ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         // Get the printWriter object from response to write the required json object to the output stream.
         PrintWriter out = response.getWriter();
         // Map java object  to a json.

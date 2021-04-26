@@ -79,7 +79,8 @@ public class SchemaTestImpl implements ResourceType {
         HttpGet method = new HttpGet(url);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);

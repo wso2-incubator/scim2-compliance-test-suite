@@ -35,6 +35,9 @@ public class ComplianceConstants {
         public static final String AUTHORIZATION_SERVER = "authorizationServer";
         public static final String HTTP = "http";
         public static final String HTTPS = "https";
+        public static final String ACCEPT="Accept";
+        public static final String APPLICATION_JSON="application/json";
+        public static final String CONTENT_TYPE="Content-Type";
     }
 
     /**

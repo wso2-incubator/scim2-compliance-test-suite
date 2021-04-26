@@ -144,8 +144,10 @@ public class BulkTestImpl implements ResourceType {
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -239,8 +241,10 @@ public class BulkTestImpl implements ResourceType {
         // Create groups.
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder();
@@ -320,7 +324,8 @@ public class BulkTestImpl implements ResourceType {
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -592,8 +597,10 @@ public class BulkTestImpl implements ResourceType {
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -636,7 +643,7 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
@@ -672,7 +679,7 @@ public class BulkTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 // Run clean up task.
@@ -730,7 +737,7 @@ public class BulkTestImpl implements ResourceType {
                                 ComplianceUtils.getWire(method, responseString, headerString.toString(),
                                         responseStatus, subTests), stopTime - startTime));
             } else if (requestPaths[i].getTestCaseName().equals("Bulk post operation with fail on errors") &&
-                    response.getStatusLine().getStatusCode() ==  HttpStatus.SC_OK) {
+                    response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 int n = 0;
                 boolean failOnErrorPass = true;
                 for (Integer status : resourceStatusCodes) {
@@ -797,7 +804,7 @@ public class BulkTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -986,8 +993,10 @@ public class BulkTestImpl implements ResourceType {
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1024,7 +1033,7 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
@@ -1037,11 +1046,11 @@ public class BulkTestImpl implements ResourceType {
             }
             boolean pass = false;
             for (Integer status : resourceStatusCodes) {
-                if (status ==  HttpStatus.SC_OK) {
+                if (status == HttpStatus.SC_OK) {
                     // Check for status returned.
                     subTests.add("Check each resource status");
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + status);
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                     pass = true;
@@ -1049,18 +1058,18 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add("Check each resource status");
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + status);
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     pass = false;
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() ==  HttpStatus.SC_OK && pass) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && pass) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1072,7 +1081,7 @@ public class BulkTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1275,8 +1284,10 @@ public class BulkTestImpl implements ResourceType {
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1313,7 +1324,7 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
@@ -1326,11 +1337,11 @@ public class BulkTestImpl implements ResourceType {
             }
             boolean pass = false;
             for (Integer status : resourceStatusCodes) {
-                if (status ==  HttpStatus.SC_OK) {
+                if (status == HttpStatus.SC_OK) {
                     // Check for status returned.
                     subTests.add("Check each resource status");
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + status);
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                     subTests.add(StringUtils.EMPTY);
                     pass = true;
@@ -1338,18 +1349,18 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add("Check each resource status");
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + status);
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     pass = false;
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() ==  HttpStatus.SC_OK && pass) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && pass) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1361,7 +1372,7 @@ public class BulkTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1502,8 +1513,10 @@ public class BulkTestImpl implements ResourceType {
             // Create test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1541,7 +1554,7 @@ public class BulkTestImpl implements ResourceType {
                     // Check for status returned.
                     subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                     subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                    subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                    subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                     subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                     subTests.add(StringUtils.EMPTY);
                     long stopTime = System.currentTimeMillis();
@@ -1573,11 +1586,11 @@ public class BulkTestImpl implements ResourceType {
                     break;
                 }
             }
-            if (response.getStatusLine().getStatusCode() ==  HttpStatus.SC_OK && pass) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && pass) {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();
@@ -1589,7 +1602,7 @@ public class BulkTestImpl implements ResourceType {
                 // Check for status returned.
                 subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
                 subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-                subTests.add(ComplianceConstants.TestConstants.EXPECTED +  HttpStatus.SC_OK);
+                subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
                 subTests.add("Status : Skipped");
                 subTests.add(StringUtils.EMPTY);
                 long stopTime = System.currentTimeMillis();

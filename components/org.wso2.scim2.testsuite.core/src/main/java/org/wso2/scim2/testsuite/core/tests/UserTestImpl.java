@@ -105,8 +105,10 @@ public class UserTestImpl implements ResourceType {
         // Create users.
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
-        method.setHeader("Content-Type", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+        method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -172,7 +174,8 @@ public class UserTestImpl implements ResourceType {
         HttpDelete method = new HttpDelete(deleteUserURL);
         HttpClient client = HTTPClient.getHttpClient();
         HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-        method.setHeader("Accept", "application/json");
+        method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
         HttpResponse response = null;
         String responseString = StringUtils.EMPTY;
         StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -501,7 +504,8 @@ public class UserTestImpl implements ResourceType {
             HttpGet method = new HttpGet(requestUrl);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -897,7 +901,8 @@ public class UserTestImpl implements ResourceType {
             HttpGet method = new HttpGet(getUserURL);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1255,8 +1260,10 @@ public class UserTestImpl implements ResourceType {
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -1547,8 +1554,10 @@ public class UserTestImpl implements ResourceType {
                 HttpEntity entity = new ByteArrayEntity
                         (definedUsers.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
-                method.setHeader("Accept", "application/json");
-                method.setHeader("Content-Type", "application/json");
+                method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+                method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
@@ -1770,8 +1779,10 @@ public class UserTestImpl implements ResourceType {
                 HttpEntity entity = new ByteArrayEntity
                         (definedUsers.get(i).getBytes(StandardCharsets.UTF_8));
                 method.setEntity(entity);
-                method.setHeader("Accept", "application/json");
-                method.setHeader("Content-Type", "application/json");
+                method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+                method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                        ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
                 response = client.execute(method);
                 // Read the response body.
                 responseString = new BasicResponseHandler().handleResponse(response);
@@ -1960,7 +1971,8 @@ public class UserTestImpl implements ResourceType {
             HttpDelete method = new HttpDelete(deleteUserURL);
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);
@@ -2092,8 +2104,10 @@ public class UserTestImpl implements ResourceType {
             // Create user test.
             HttpClient client = HTTPClient.getHttpClient();
             HTTPClient.setAuthorizationHeader(complianceTestMetaDataHolder, method);
-            method.setHeader("Accept", "application/json");
-            method.setHeader("Content-Type", "application/json");
+            method.setHeader(ComplianceConstants.RequestCodeConstants.ACCEPT,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
+            method.setHeader(ComplianceConstants.RequestCodeConstants.CONTENT_TYPE,
+                    ComplianceConstants.RequestCodeConstants.APPLICATION_JSON);
             HttpResponse response = null;
             String responseString = StringUtils.EMPTY;
             StringBuilder headerString = new StringBuilder(StringUtils.EMPTY);

@@ -49,7 +49,7 @@ public class ComplianceUtils {
                                String headerString, String responseStatus,
                                ArrayList<String> subTests) throws ComplianceException {
 
-        StringBuilder toServer = new StringBuilder(); // Todo - don't make  variable which has redundant data.
+        StringBuilder toServer = new StringBuilder();
         StringBuilder fromServer = new StringBuilder();
         StringBuilder subTestsPerformed = new StringBuilder();
         StringBuilder requestUri = new StringBuilder();
@@ -91,7 +91,6 @@ public class ComplianceUtils {
     }
 
     public static Wire getWire(Throwable e) {
-// Todo - using another constructor
         return new Wire(ExceptionUtils.getFullStackTrace(e), StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY
                 , StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
                 StringUtils.EMPTY);
