@@ -384,11 +384,10 @@ public class RolesTestImpl implements ResourceType {
      *
      * @param location Resource location.
      * @param testName Related test case name.
-     * @return true or false.
      * @throws GeneralComplianceException General exceptions.
      * @throws ComplianceException        Constructed new exception with the specified detail message.
      */
-    private boolean cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
+    private void cleanUp(String location, String testName) throws GeneralComplianceException, ComplianceException {
 
         long startTime = System.currentTimeMillis();
         String deleteUserURL;
@@ -456,9 +455,7 @@ public class RolesTestImpl implements ResourceType {
                     ComplianceUtils.getWire(method, responseString, headerString.toString(), responseStatus,
                             subTests), stopTime - startTime));
         }
-        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
-            return true;
-        } else {
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) {
             long stopTime = System.currentTimeMillis();
             throw new GeneralComplianceException(new TestResult(TestResult.ERROR, testName,
                     "Could not delete the default user at url " + url,

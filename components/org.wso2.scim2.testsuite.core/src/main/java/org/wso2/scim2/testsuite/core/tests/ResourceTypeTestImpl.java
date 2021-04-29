@@ -57,6 +57,22 @@ public class ResourceTypeTestImpl implements ResourceType {
     }
 
     /**
+     * Add assertion details.
+     *
+     * @param actual   Actual result.
+     * @param status   Status of the assertion.
+     * @param subTests Array containing assertions details.
+     */
+    private void addAssertion(int actual, String status, ArrayList<String> subTests) {
+
+        subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+        subTests.add(ComplianceConstants.TestConstants.ACTUAL + actual);
+        subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+        subTests.add(status);
+        subTests.add(StringUtils.EMPTY);
+    }
+
+    /**
      * Get ResourceType tests.
      *
      * @return testResults Array containing test results.
@@ -105,11 +121,8 @@ public class ResourceTypeTestImpl implements ResourceType {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
             // Check for status returned.
-            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
-            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
-            subTests.add(StringUtils.EMPTY);
+            addAssertion(response.getStatusLine().getStatusCode(), ComplianceConstants.TestConstants.STATUS_FAILED,
+                    subTests);
             long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, ComplianceConstants.TestConstants.GET_RESOURCETYPE,
@@ -120,11 +133,8 @@ public class ResourceTypeTestImpl implements ResourceType {
         }
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             // Check for status returned.
-            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
-            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
-            subTests.add(StringUtils.EMPTY);
+            addAssertion(response.getStatusLine().getStatusCode(), ComplianceConstants.TestConstants.STATUS_SUCCESS,
+                    subTests);
             // Obtain the schema corresponding to resourceType.
             SCIMResourceTypeSchema schema = SCIMResourceSchemaManager.
                     getInstance().getResourceTypeResourceSchema();
@@ -134,7 +144,6 @@ public class ResourceTypeTestImpl implements ResourceType {
                         jsonDecoder.decodeResource(responseString, schema,
                                 new SCIMResourceType());
                 complianceTestMetaDataHolder.setScimResourceType(scimResourceType);
-
             } catch (BadRequestException | CharonException | InternalErrorException e) {
                 long stopTime = System.currentTimeMillis();
                 testResults.add(new TestResult(TestResult.ERROR,
@@ -148,7 +157,6 @@ public class ResourceTypeTestImpl implements ResourceType {
                 ResponseValidateTests.runValidateTests(scimResourceType, schema, null,
                         null, method,
                         responseString, headerString.toString(), responseStatus, subTests);
-
             } catch (BadRequestException | CharonException e) {
                 subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
                 subTests.add(StringUtils.EMPTY);

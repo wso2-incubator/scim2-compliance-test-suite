@@ -61,6 +61,23 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
     }
 
     /**
+     * Add assertion details.
+     *
+     * @param actual   Actual result.
+     * @param status   Status of the assertion.
+     * @param subTests Array containing assertions details.
+     */
+    private void addAssertion(int actual, String status,
+                              ArrayList<String> subTests) {
+
+        subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
+        subTests.add(ComplianceConstants.TestConstants.ACTUAL + actual);
+        subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
+        subTests.add(status);
+        subTests.add(StringUtils.EMPTY);
+    }
+
+    /**
      * Get serviceProviderConfig tests.
      *
      * @return testResults Array containing test results.
@@ -111,11 +128,8 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
             responseStatus = response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase();
             // Check for status returned.
-            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
-            subTests.add(ComplianceConstants.TestConstants.STATUS_FAILED);
-            subTests.add(StringUtils.EMPTY);
+            addAssertion(response.getStatusLine().getStatusCode(),
+                    ComplianceConstants.TestConstants.STATUS_FAILED, subTests);
             long stopTime = System.currentTimeMillis();
             testResults.add(new TestResult
                     (TestResult.ERROR, ComplianceConstants.TestConstants.GET_CONFIG,
@@ -126,11 +140,8 @@ public class ServiceProviderConfigTestImpl implements ResourceType {
         }
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             // Check for status returned.
-            subTests.add(ComplianceConstants.TestConstants.STATUS_CODE);
-            subTests.add(ComplianceConstants.TestConstants.ACTUAL + response.getStatusLine().getStatusCode());
-            subTests.add(ComplianceConstants.TestConstants.EXPECTED + HttpStatus.SC_OK);
-            subTests.add(ComplianceConstants.TestConstants.STATUS_SUCCESS);
-            subTests.add(StringUtils.EMPTY);
+            addAssertion(response.getStatusLine().getStatusCode(),
+                    ComplianceConstants.TestConstants.STATUS_SUCCESS, subTests);
             // Obtain the schema corresponding to serviceProviderConfig.
             SCIMResourceTypeSchema schema = complianceTestMetaDataHolder.getScimSchema().
                     getServiceProviderConfigSchema();

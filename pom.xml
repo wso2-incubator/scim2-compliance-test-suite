@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.scim2.testsuite</groupId>
     <artifactId>scim2-compliance-test-suite</artifactId>
@@ -11,6 +12,7 @@
     </modules>
     <name>TestSuite</name>
     <url>https://github.com/erdtman/simplecloud.info</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javax.servlet-api.version>2.4</javax.servlet-api.version>
@@ -51,7 +53,6 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
-
         <repository>
             <id>wso2.releases</id>
             <name>WSO2 internal Repository</name>
@@ -62,7 +63,6 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
-
         <repository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
@@ -88,7 +88,6 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </pluginRepository>
-
         <pluginRepository>
             <id>wso2.snapshots</id>
             <name>WSO2 Snapshot Repository</name>

@@ -20,14 +20,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
         <groupId>org.wso2.scim2.testsuite</groupId>
         <artifactId>scim2-compliance-test-suite</artifactId>
         <version>1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.scim2.testsuite.endpoint</artifactId>
     <packaging>war</packaging>
 
@@ -116,7 +117,6 @@
         <npm.output.directory>build</npm.output.directory>
     </properties>
 
-
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
@@ -142,7 +142,6 @@
                     <packagingExcludes>node_modules/**,public/**,src/**,home/**,build/**,webapp/*</packagingExcludes>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -194,9 +193,7 @@
                             </arguments>
                         </configuration>
                     </execution>
-
                 </executions>
-
                 <configuration>
                     <environmentVariables>
                         <CI>false</CI>
@@ -222,7 +219,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-
                         <configuration>
                             <environmentVariables>
                                 <PUBLIC_URL>http://localhost:8080/${project.artifactId}</PUBLIC_URL>
@@ -233,7 +229,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>prod</id>
             <build>
@@ -241,7 +236,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-
                         <configuration>
                             <environmentVariables>
                                 <PUBLIC_URL>http://scim2compliancetestsuite.com/${project.artifactId}</PUBLIC_URL>
@@ -253,4 +247,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>

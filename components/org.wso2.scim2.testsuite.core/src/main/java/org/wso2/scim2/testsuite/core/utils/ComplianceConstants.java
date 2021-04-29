@@ -35,9 +35,9 @@ public class ComplianceConstants {
         public static final String AUTHORIZATION_SERVER = "authorizationServer";
         public static final String HTTP = "http";
         public static final String HTTPS = "https";
-        public static final String ACCEPT="Accept";
-        public static final String APPLICATION_JSON="application/json";
-        public static final String CONTENT_TYPE="Content-Type";
+        public static final String ACCEPT = "Accept";
+        public static final String APPLICATION_JSON = "application/json";
+        public static final String CONTENT_TYPE = "Content-Type";
     }
 
     /**
@@ -89,9 +89,11 @@ public class ComplianceConstants {
         // Sub tests constants.
         public static final String ACTUAL = "Actual : ";
         public static final String EXPECTED = "Expected : ";
+        public static final String MESSAGE = "Message : ";
         public static final String STATUS_SUCCESS = "Status : Success";
         public static final String STATUS_FAILED = "Status : FAILED";
         public static final String STATUS_SKIPPED = "Status : Skipped";
+        public static final String STATUS_REDIRECT = "Status : Permanent Redirect";
 
         // Status codes.
         public static final int SC_REDIRECT = 308;
