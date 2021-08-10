@@ -1,110 +1,120 @@
 # SCIM 2.0 Compliance Test Suite
 
-## What is SCIM ?
-
-The System for Cross-domain Identity Management (SCIM) specification is designed to make managing user identities in cloud-based applications and services easier. The specification suite seeks to build upon experience with existing schemas and deployments, placing specific emphasis on simplicity of development and integration, while applying existing authentication, authorization, and privacy models. Its intent is to reduce the cost and complexity of user management operations by providing a common user schema and extension model, as well as binding documents to provide patterns for exchanging this schema using standard protocols. In essence: make it fast, cheap, and easy to move users in to, out of, and around the cloud.
-
-## SCIM 2.0 Compliance Test Suite
-
 <p align="center">
 <img align="middle" src="https://github.com/wso2-incubator/scim2-compliance-test-suite/blob/master/logo.png"  width="350px" height = "140px">
 </p>
 
-This project is on implementing the SCIM 2.0 compliance test suite which can be run on both the cloud and on premise. In the test suite, it is intended to validate the supportability of a provided service provider, in terms of the SCIM 2.0 core specification and protocol specification.
+This project is on implementing the SCIM 2.0 compliance test suite which can be run on-premise. The test suite is 
+intended to validate the supportability of a provided service provider in terms of the SCIM 2.0 [core specification](https://tools.ietf.org/html/rfc7643) 
+and [protocol specification](https://tools.ietf.org/html/rfc7644).
 
-The test suite generates a detailed analysis view and comprehensive report upon providing the server’s SCIM endpoint. The report includes the test results indicating the coverage percentage of each specification and a detailed view of the results of each test including requests sent by the test suite, expected response and the server response along with the indication whether a particular test is passed or not.
+## Table Of Contents
 
-### How to Run On Premise
+- [How to run On-Premise](#how-to-run-on-premise)
+- [Design and Implementation](#design-and-implementation)
+- [Test coverage](#test-coverage)
+- [Features](#features)
+- [Contribute](#contribute)
+    * [Reporting Issues](#reporting-issues)
+- [License](#license)
 
-1. Build the test suite 
-```
-mvn clean install
-```
-2. Install java certificate as explained by [here](http://www.mkyong.com/webservices/jax-ws/suncertpathbuilderexception-unable-to-find-valid-certification-path-to-requested-target/).
+## How to Run On Premise
 
-3. Deploy the scimproxycompliance.war and run it.
+1. Clone this project by running git clone https://github.com/wso2-incubator/scim2-compliance-test-suite.git
+2. Make sure you have the latest node version installed.
+3.  Opened the cloned project and run
+    ```
+    mvn clean install
+    ```
+4. Install the java certificate as explained [here](http://www.mkyong.com/webservices/jax-ws/suncertpathbuilderexception-unable-to-find-valid-certification-path-to-requested-target/).
+5. Deploy the org.wso2.scim2.testsuite.endpoint.war file inside components/org.wso2.scim2.testsuite.endpoint/target to apache tomcat webapps. In linux environment /var/lib/tomcat9/webapps.
+6. Navigate to http://127.0.0.1:8080/org.wso2.scim2.testsuite.endpoint/ from the browser.
+7. Click on authentication and add the details. Then click on Submit.
 
-4. Navigate to SCIM 2.0 Compliance Test.
 
-5. Enter your SCIM base URL (eg: https://localhost:8080/scim2/) and add the authentication with basic auth under settings menu.
+![Authentication forum](https://user-images.githubusercontent.com/38417165/115225304-90352600-a12b-11eb-9aac-c1c685ab8c55.png)
 
-6. Click Go.
+9.  Select endpoints that need to be tested and click on the Run button.
 
-### Test Coverage 
+![Select tests](https://user-images.githubusercontent.com/38417165/115225312-91fee980-a12b-11eb-9d39-a897854fd5f5.png)
 
-The current implememtation tests the following aspects of the SCIM 2.0 implementation of service provider.
 
-#### /Users Endpoint
-- [x] Create
-- [x] Get
-- [x] Delete
-- [x] List
-- [x] Pagination
-- [x] Update with PUT
-- [x] Sorting
-- [x] Filtering
-- [x] Update with PATCH 
- 
-#### /Groups Endpoint
-- [x] Create
-- [x] Get
-- [x] Delete
-- [x] List
-- [x] Filtering
-- [x] Pagination
-- [x] Sorting
-- [x] Update with PUT
-- [x] Update with PATCH 
+## Design and Implementation 
 
-#### /Me Endpoint
-- [x] Create
-- [x] Get
-- [x] Delete
-- [x] Update with PUT
-- [x] Update with PATCH 
+![Architecture Diagram](https://user-images.githubusercontent.com/38417165/115230197-a645e500-a131-11eb-8fa4-0312c6cb8abe.jpeg)
 
-#### EnterpriseUser
-- [x] Create
-- [x] Get
-- [x] Delete
-- [x] List
-- [x] Pagination
-- [x] Update with PUT
-- [x] Sorting
-- [x] Filtering
-- [x] Update with PATCH 
 
-#### /ServiceProviderConfig Endpoint
-- [x] Get
 
-#### /ResourceType Endpoint
-- [x] Get
+SCIM2 Compliance Test Suite is mainly built on top of using the above components.
 
-#### /Schemas Endpoint
-- [x] Get
+- **Test Base (Java Library)** - This is a pure Java library that includes 125 compliance tests. It can be used by any 
+web application or any other Java component. It has the ability to skip/execute tests based on ServiceProviderConfig details returned from SCIM Service Provider (SP)(eg: If SP doesn’t support Bulk operations, Bulk endpoint-related tests get skipped).
+- **Web Application** - React-based web application which uses a web servlet to communicate with implemented Java API 
+  in the Test Base. It has the capability to select desired resource operations using the checkbox options, and display the executed test cases and their corresponding results in a user-friendly manner. It also has two authentication methods namely basic authentication and bearer token to access the SCIM endpoint.
 
-#### /Bulk Endpoint
-- [x] Create
+![Web application view](https://user-images.githubusercontent.com/38417165/115225327-962b0700-a12b-11eb-8b45-536dd5ce4d25.png)
 
-### Value Adding Features
 
-**Test Report as PDF** - A PDF test report will be generated by the end of test suite which includes the test results indicating the coverage percentage of each specification and a detailed view of the results of each test including requests sent by the test suite, expected response and the server response along with the indication whether a particular test is passed or not.
 
-**Add Custom Test Cases** - The suite is developed with scalability in mind. Developers are welcome to add custom tests cases and improve the test suite.
+- **Integration test component of product-is** - This work along with product-is at the product build time. It directly 
+  invokes the Test Base to execute test cases. If any assertion failure is found, the product-is build will be terminated with the status “build-failure”.
+    
+- **SCIM service provider implementation** - SCIM implementation that need to be tested.  
 
-#### How to Add Custom Tests Cases
+## Test Coverage 
 
-1. Navigate to the class which you want to add the test case (eg: UserTest class for /Users endpoint related test cases).
+This test suite covers the main SCIM endpoints defined in RFC 7643 using 125 test cases. These test cases belong to 7 endpoints and operations under each endpoint. The following image illustrates the number of test cases covered and methods covered under each endpoint.
 
-2. Add your test case as a seperate method.
+![Test Coverage](https://user-images.githubusercontent.com/38417165/115230205-a7771200-a131-11eb-835c-80c15548393f.jpeg)
 
-3. Add @TestCase annotation to your method.
-```
-@TestCase
-public void customTestCase() {
-  .....
+
+
+
+## Features
+
+**Test Report as PDF** - A PDF test report will be generated by the end of the test suite execution and can be found in the '/WEB-INF folder where the web app resides. It includes the executed test case, validated assertions along with the 
+expected results and actual results. The PDF ends with an overall statistical summary including Total elapsed time, Number of total test cases, passed cases, failed cases, 
+and skipped test cases. 
+
+<div>
+<p align="center">
+<img align="middle" src="https://user-images.githubusercontent.com/38417165/115225319-94614380-a12b-11eb-923b-2fa850c9879d.png"  
+width="200px" height = "340px">
+<img align="middle" src="https://user-images.githubusercontent.com/38417165/115225324-95927080-a12b-11eb-9a2f-2753d8c72d39.png"  
+width="200px" height = "340px">
+<img align="middle" src="https://user-images.githubusercontent.com/38417165/115225314-92978000-a12b-11eb-81ea-e534bb76ed65.png"  
+width="200px" height = "340px">
+</p>
+</div>
+**Add Custom Test Cases** - The suite is developed with scalability in mind. Developers are welcome to add custom test 
+cases and improve the test suite.
+
+
+1. Navigate to the /components/org.wso2.scim2.testsuite.
+core/src/main/java/org/wso2/scim2/testsuite/core/tests/resource class in which you want to add the test case (eg: UserTest class for /Users endpoint related test cases).
+2. Go to the operation in which you want to add a test scenario.(eg: getMethodTest operation)
+3. Add the testCaseName using setTestCaseName , set the request URL using setUrl , and the check test supportability 
+using getTestSupported.
+4. Add the required assertions to cover the scenario inside the for loop in getTestMethod.
+5. Rebuild the project and run.
+
+**Add Custom Resources** - All the basic resources are covered under the test suite. If your organization needs a 
+specific test resource. You can add a new test class with a resource name and implement it as a ResourceType. You can add necessary tests by overriding the base methods.
+````
+public class NewTestResource implements ResourceType {
+...
 }
-```
-4. Rebuild the project and run.
 
-This project is an ongoing project and we value your contributions. We are open for PRs. For any clarifications, reach us through dev@wso2.org
+````
+
+## Contribute
+
+Please read [Contributing](http://wso2.github.io/) to the CodeBase for details on our code of conduct, and the 
+process for submitting pull requests to us.
+
+###  Reporting issues
+We encourage you to report issues, improvements, and feature requests creating Github [Issues](https://github.com/wso2-incubator/scim2-compliance-test-suite/issues).
+
+## License
+This project is licensed under Apache License 2.0. See the [LICENSE](https://github.com/wso2-incubator/scim2-compliance-test-suite/blob/master/LICENSE) file for details.
+
